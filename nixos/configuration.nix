@@ -125,7 +125,7 @@
     XDG_STATE_HOME = "$HOME/.local/state";
 
     PATH = [ "$HOME/.local/bin" ];
-    EDITOR = "nvim";
+    EDITOR = "emacsclient -nw -a 'nvim'";
   };
 
   environment.systemPackages = with pkgs; [
