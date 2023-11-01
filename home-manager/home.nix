@@ -44,18 +44,34 @@
   };
 
   # Add stuff for your user as you see fit:
-  # programs.neovim.enable = true;
   # programs.mtr.enable = true;
-  programs.gnupg.agent = {
-    enable = true;
-    enableSSHSupport = true;
-  };
-  # programs.starship.enable = true;
-  home.packages = with pkgs; [ steam microsoft-edge firefox anydesk
+  home.packages = with pkgs; [ microsoft-edge firefox anydesk
                                # kdenlive mpv ispell redshift
                                kate onlyoffice-bin
                                tikzit zotero motrix
                              ];
+  programs.gnupg.agent = {
+    enable = true;
+    enableSSHSupport = true;
+  };
+  programs.starship.enable = true;
+  programs.fish = {
+    enable = true;
+    interactiveShellInit = ''
+      set fish_greeting
+      zoxide init fish | source
+    '';
+    # plugins = with pkgs.fishPlugins; [ bass ];
+  };
+  programs.neovim = {
+    enable = true;
+    viAlias = true;
+    vimAlias = true;
+    extraConfig = ''
+      set number relativenumber
+    '';
+    plugins = with pkgs.vimPlugins; [ vim-commentary  vim-surround ];
+  };
 
   # Enable home-manager and git
   programs.home-manager.enable = true;

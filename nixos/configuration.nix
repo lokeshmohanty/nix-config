@@ -95,8 +95,6 @@
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
-  programs.fish.enable = true;
-  users.defaultUserShell = pkgs.fish;
   users.users = {
     lokesh = {
       # If you do, you can skip setting a root password by
@@ -123,7 +121,7 @@
   };
 
   environment.systemPackages = with pkgs; [
-    gitFull gh
+    gitFull gh home-manager zoxide
     vim emacs29 emacsPackages.vterm ledger notmuch
     inxi neofetch powertop shellcheck
     rofi ripgrep tldr yt-dlp ffmpeg
