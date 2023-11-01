@@ -38,15 +38,24 @@
     };
   };
 
-  # TODO: Set your username
   home = {
-    username = "your-username";
-    homeDirectory = "/home/your-username";
+    username = "lokesh";
+    homeDirectory = "/home/lokesh";
   };
 
   # Add stuff for your user as you see fit:
   # programs.neovim.enable = true;
-  # home.packages = with pkgs; [ steam ];
+  # programs.mtr.enable = true;
+  programs.gnupg.agent = {
+    enable = true;
+    enableSSHSupport = true;
+  };
+  # programs.starship.enable = true;
+  home.packages = with pkgs; [ steam microsoft-edge firefox anydesk
+                               # kdenlive mpv ispell redshift
+                               kate onlyoffice-bin
+                               tikzit zotero motrix
+                             ];
 
   # Enable home-manager and git
   programs.home-manager.enable = true;

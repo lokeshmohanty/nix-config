@@ -50,46 +50,203 @@
     nixPath = lib.mapAttrsToList (key: value: "${key}=${value.to.path}") config.nix.registry;
 
     settings = {
-      # Enable flakes and new 'nix' command
       experimental-features = "nix-command flakes";
-      # Deduplicate and optimize nix store
       auto-optimise-store = true;
     };
   };
 
   # FIXME: Add the rest of your current configuration
+  hardware.opengl = {
+    enable = true;
+    driSupport = true;
+    driSupport32Bit = true;
+    extraPackages = [
+      pkgs.rocm-opencl-icd
+      pkgs.rocm-opencl-runtime
+      pkgs.amdvlk
+    ];
+  };
 
-  # TODO: Set your hostname
-  networking.hostName = "your-hostname";
+  networking.hostName = "sudarshan";
+  networking.networkmanager.enable = true;
 
-  # TODO: This is just an example, be sure to use whatever bootloader you prefer
   boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+  boot.supportedFilesystems = [ "ntfs" ];
 
-  # TODO: Configure your system-wide user settings (groups, etc), add more users as needed.
+  powerManagement.enable = true;
+  services.thermald.enable = true;
+  # services.tlp.enable = true;
+
+  time.timeZone = "Asia/Kolkata";
+  i18n.defaultLocale = "en_IN";
+  i18n.extraLocaleSettings = {
+    LC_ADDRESS = "en_IN";
+    LC_IDENTIFICATION = "en_IN";
+    LC_MEASUREMENT = "en_IN";
+    LC_MONETARY = "en_IN";
+    LC_NAME = "en_IN";
+    LC_NUMERIC = "en_IN";
+    LC_PAPER = "en_IN";
+    LC_TELEPHONE = "en_IN";
+    LC_TIME = "en_IN";
+  };
+
+  # Enable touchpad support (enabled default in most desktopManager).
+  # services.xserver.libinput.enable = true;
+
+  programs.fish.enable = true;
+  users.defaultUserShell = pkgs.fish;
   users.users = {
-    # FIXME: Replace with your username
-    your-username = {
-      # TODO: You can set an initial password for your user.
-      # If you do, you can skip setting a root password by passing '--no-root-passwd' to nixos-install.
+    lokesh = {
+      # If you do, you can skip setting a root password by
+      # passing '--no-root-passwd' to nixos-install.
       # Be sure to change it (using passwd) after rebooting!
       initialPassword = "correcthorsebatterystaple";
       isNormalUser = true;
+      description = "Lokesh Mohanty";
       openssh.authorizedKeys.keys = [
         # TODO: Add your SSH public key(s) here, if you plan on using SSH to connect
       ];
-      # TODO: Be sure to add any other groups you need (such as networkmanager, audio, docker, etc)
-      extraGroups = ["wheel"];
+      extraGroups = [ "wheel" "networkmanager" "docker" ];
     };
   };
 
-  # This setups a SSH server. Very important if you're setting up a headless system.
-  # Feel free to remove if you don't need it.
-  services.openssh = {
+  environment.sessionVariables = {
+    XDG_CACHE_HOME = "$HOME/.cache";
+    XDG_CONFIG_HOME = "$HOME/.config";
+    XDG_DATA_HOME = "$HOME/.local/share";
+    XDG_STATE_HOME = "$HOME/.local/state";
+
+    PATH = [ "$HOME/.local/bin" ];
+    EDITOR = "emacsclient -nw";
+  };
+
+  environment.systemPackages = with pkgs; [
+    gitFull gh
+    vim emacs29 emacsPackages.vterm ledger notmuch
+    inxi neofetch powertop shellcheck
+    rofi ripgrep tldr yt-dlp ffmpeg
+    zip unzip file
+    nodejs_20                   # use fnm after configuring it
+
+    pandoc pass rclone rsync
+
+    interception-tools
+    cmakeWithGui
+  ];
+
+  environment.plasma5.excludePackages = with pkgs.libsForQt5; [
+    oxygen
+    plasma-browser-integration
+  ];
+
+  fonts.fonts = with pkgs; [
+    roboto-mono
+    fira-code
+    font-awesome
+
+    iosevka-comfy.comfy-duo
+    iosevka-comfy.comfy-fixed
+
+    # lohit-fonts.devanagari # already provided by noto fonts
+    lohit-fonts.odia
+    lohit-fonts.telugu
+    lohit-fonts.kannada
+
+    emojione
+  ];
+
+  # services.openssh = {
+  #   enable = true;
+  #   permitRootLogin = "no";
+  #   passwordAuthentication = false;
+  # };
+
+  services.locate = {
     enable = true;
-    # Forbid root login through SSH.
-    permitRootLogin = "no";
-    # Use keys only. Remove if you want to SSH using password (not recommended)
-    passwordAuthentication = false;
+    locate = pkgs.plocate;
+    localuser = null;
+  };
+
+  # Enable the X11 windowing system.
+  services.xserver.enable = true;
+  # Load amdgpu driver for Xorg and Wayland
+  # services.xserver.videoDrivers = [ "amdgpu" ];
+
+  # Enable the KDE Plasma Desktop Environment.
+  services.xserver.displayManager.sddm.enable = true;
+  services.xserver.desktopManager.plasma5.enable = true;
+
+  # Enable XMonad
+  services.xserver.windowManager.xmonad = {
+    enable = true;
+    enableContribAndExtras = true;
+  };
+
+  # services.xserver.displayManager.sessionCommands = ''
+  #   xset -dpms 
+  #   xset s blank
+  #   xset s 300
+  #   ${pkgs.lightlocker}/bin/light-locker --idle-hint &
+  # '';
+  # systemd.targets.hybrid-sleep.enable = true;
+  # services.logind.extraConfig = ''
+  #   IdleAction=hybrid-sleep
+  #   IdleActionSec=20s
+  # '';
+
+  # Configure keymap in X11
+  services.xserver = {
+    layout = "us";
+    xkbVariant = "";
+  };
+
+  # Capslock as Control + Escape everywhere
+  services.interception-tools = let
+    dfkConfig = pkgs.writeText "dual-function-keys.yaml" ''
+      MAPPINGS:
+        - KEY: KEY_CAPSLOCK
+          TAP: KEY_ESC
+          HOLD: KEY_LEFTCTRL
+    '';
+  in {
+    enable = true;
+    plugins = lib.mkForce [
+      pkgs.interception-tools-plugins.dual-function-keys
+    ];
+    udevmonConfig = ''
+      - JOB: "${pkgs.interception-tools}/bin/intercept -g $DEVNODE | ${pkgs.interception-tools-plugins.dual-function-keys}/bin/dual-function-keys -c ${dfkConfig} | ${pkgs.interception-tools}/bin/uinput -d $DEVNODE"
+        DEVICE:
+          NAME: "AT Translated Set 2 keyboard"
+          EVENTS:
+            EV_KEY: [[KEY_CAPSLOCK, KEY_ESC, KEY_LEFTCTRL]]
+    '';
+  };
+
+  # Enable CUPS to print documents.
+  services.printing.enable = true;
+
+  # Enable sound with pipewire.
+  sound.enable = true;
+  hardware.pulseaudio.enable = false;
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    # If you want to use JACK applications, uncomment this
+    #jack.enable = true;
+
+    # use the example session manager (no others are packaged yet so this is enabled by default,
+    # no need to redefine it in your config for now)
+    #media-session.enable = true;
+  };
+  virtualisation.docker = {
+    enable = true;
+    rootless.enable = true;
+    rootless.setSocketVariable = true;
   };
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
