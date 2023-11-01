@@ -50,10 +50,6 @@
                                kate onlyoffice-bin
                                tikzit zotero motrix
                              ];
-  programs.gnupg.agent = {
-    enable = true;
-    enableSSHSupport = true;
-  };
   programs.starship.enable = true;
   programs.fish = {
     enable = true;

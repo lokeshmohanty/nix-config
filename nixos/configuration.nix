@@ -95,6 +95,11 @@
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
+  programs.gnupg.agent = {
+    enable = true;
+    enableSSHSupport = true;
+  };
+  programs.fish.enable = true;
   users.users = {
     lokesh = {
       # If you do, you can skip setting a root password by
@@ -109,7 +114,10 @@
       extraGroups = [ "wheel" "networkmanager" "docker" ];
     };
   };
+  users.defaultUserShell = pkgs.fish;
 
+  programs.neovim.enable = true;
+  environment.binsh = "${pkgs.dash}/bin/dash";
   environment.sessionVariables = {
     XDG_CACHE_HOME = "$HOME/.cache";
     XDG_CONFIG_HOME = "$HOME/.config";
@@ -117,11 +125,11 @@
     XDG_STATE_HOME = "$HOME/.local/state";
 
     PATH = [ "$HOME/.local/bin" ];
-    EDITOR = "emacsclient -nw";
+    EDITOR = "nvim";
   };
 
   environment.systemPackages = with pkgs; [
-    gitFull gh home-manager zoxide
+    gitFull gh zoxide
     vim emacs29 emacsPackages.vterm ledger notmuch
     inxi neofetch powertop shellcheck
     rofi ripgrep tldr yt-dlp ffmpeg
