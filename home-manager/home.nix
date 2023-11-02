@@ -49,15 +49,22 @@
                                # kdenlive mpv ispell redshift
                                kate onlyoffice-bin
                                tikzit zotero motrix
+			       fd
                              ];
   programs.starship.enable = true;
   programs.fish = {
     enable = true;
     interactiveShellInit = ''
       set fish_greeting
+      fish_vi_key_bindings
+      alias e "emacsclient -a 'nvim'"
       zoxide init fish | source
     '';
     # plugins = with pkgs.fishPlugins; [ bass ];
+  };
+  programs.fzf = {
+    enable = true;
+    enableFishIntegration = true;
   };
   programs.neovim = {
     enable = true;

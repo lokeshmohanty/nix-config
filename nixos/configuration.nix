@@ -108,9 +108,6 @@
       initialPassword = "correcthorsebatterystaple";
       isNormalUser = true;
       description = "Lokesh Mohanty";
-      openssh.authorizedKeys.keys = [
-        # TODO: Add your SSH public key(s) here, if you plan on using SSH to connect
-      ];
       extraGroups = [ "wheel" "networkmanager" "docker" ];
     };
   };
@@ -165,8 +162,10 @@
 
   # services.openssh = {
   #   enable = true;
-  #   permitRootLogin = "no";
-  #   passwordAuthentication = false;
+  #   settings = {
+  #     PermitRootLogin = "no";
+  #     PasswordAuthentication = false;
+  #   };
   # };
 
   services.locate = {
