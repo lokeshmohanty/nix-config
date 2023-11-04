@@ -137,6 +137,19 @@
 
     interception-tools
     cmakeWithGui
+
+    # hyprland
+    waybar eww
+    (pkgs.waybar.overrideAttrs (oldAttrs: {
+        mesonFlags = oldAttrs.mesonFlags ++ ["-Dexperimental=true"];
+      }))
+
+    dunst libnotify             # mako
+    swww                        # hyprpaper swaybg wpaperd mpvpaper
+    kitty alacritty
+    rofi-wayland wofi           # bemenu fuzzel tofi
+    networkmanagerapplet
+    grim slurp wl-clipboard
   ];
 
   environment.plasma5.excludePackages = with pkgs.libsForQt5; [
@@ -181,13 +194,30 @@
 
   # Enable the KDE Plasma Desktop Environment.
   services.xserver.displayManager.sddm.enable = true;
+  services.xserver.displayManager.defaultSession = "plasmawayland";
   services.xserver.desktopManager.plasma5.enable = true;
 
-  # Enable XMonad
-  services.xserver.windowManager.xmonad = {
+  ## Hyprland
+  programs.hyprland = {
     enable = true;
-    enableContribAndExtras = true;
+    nvidiaPatches = true;
+    xwayland.enable = true;
   };
+
+  environment.sessionVariables = {
+    WLR_NO_HARDWARE_CURSORS = "1"; # prevent cursor from becoming invisible
+    NIXOS_OZONE_WL = "1";          # hint electron apps to use wayland
+  };
+
+  # XDG portal
+  xdg.portal.enable = true;
+  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+
+  # Enable XMonad
+  # services.xserver.windowManager.xmonad = {
+  #   enable = true;
+  #   enableContribAndExtras = true;
+  # };
 
   # services.xserver.displayManager.sessionCommands = ''
   #   xset -dpms 
@@ -202,10 +232,10 @@
   # '';
 
   # Configure keymap in X11
-  services.xserver = {
-    layout = "us";
-    xkbVariant = "";
-  };
+  # services.xserver = {
+  #   layout = "us";
+  #   xkbVariant = "";
+  # };
 
   # Capslock as Control + Escape everywhere
   services.interception-tools = let
@@ -241,8 +271,7 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
+    jack.enable = true;
 
     # use the example session manager (no others are packaged yet so this is enabled by default,
     # no need to redefine it in your config for now)

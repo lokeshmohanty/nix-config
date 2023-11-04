@@ -3,6 +3,8 @@
 
 * Commands
 
+** NixOS
+
 - Apply system configuration (~nixos-install --flake .#hostname~ on live installation media)
 
 #+begin_src shell
@@ -14,6 +16,14 @@
 #+begin_src shell
   nix shell nixpkgs#home-manager
   home-manager switch --flake .#lokesh@sudarshan
+#+end_src
+
+** Nix
+
+- Install ~nix~ ([[https://github.com/DeterminateSystems/nix-installer][DeterminateSystems]], [[https://nixos.org/download.html][Official]])
+
+#+begin_src shell
+  curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 #+end_src
 
 * References
