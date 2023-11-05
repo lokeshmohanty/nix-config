@@ -21,7 +21,6 @@
   ];
 
   nixpkgs = {
-    # You can add overlays here
     overlays = [
       # If you want to use overlays exported from other flakes:
       # neovim-nightly-overlay.overlays.default
@@ -35,8 +34,8 @@
     ];
     # Configure your nixpkgs instance
     config = {
-      # Disable if you don't want unfree packages
       allowUnfree = true;
+      allowInsecure = true;
     };
   };
 
@@ -55,7 +54,6 @@
     };
   };
 
-  # FIXME: Add the rest of your current configuration
   hardware.opengl = {
     enable = true;
     driSupport = true;
@@ -92,23 +90,22 @@
     LC_TIME = "en_IN";
   };
 
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
-
   programs.gnupg.agent = {
     enable = true;
+    pinentryFlavor = "qt";
     enableSSHSupport = true;
   };
+  programs.light.enable = true;
   programs.fish.enable = true;
   users.users = {
     lokesh = {
       # If you do, you can skip setting a root password by
       # passing '--no-root-passwd' to nixos-install.
       # Be sure to change it (using passwd) after rebooting!
-      initialPassword = "correcthorsebatterystaple";
+      initialPassword = "nixos";
       isNormalUser = true;
       description = "Lokesh Mohanty";
-      extraGroups = [ "wheel" "networkmanager" "docker" ];
+      extraGroups = [ "wheel" "input" "video" "networkmanager" "docker" ];
     };
   };
   users.defaultUserShell = pkgs.fish;
@@ -129,27 +126,29 @@
     gitFull gh zoxide
     vim emacs29 emacsPackages.vterm ledger notmuch
     inxi neofetch powertop shellcheck
-    rofi ripgrep tldr yt-dlp ffmpeg
-    zip unzip file
-    nodejs_20                   # use fnm after configuring it
+    ripgrep tldr yt-dlp ffmpeg
+    zip unzip file htop bottom
+    nodejs                     # use fnm after configuring it
 
     pandoc pass rclone rsync
 
     interception-tools
     cmakeWithGui
+    nix-index
 
     # hyprland
     waybar eww
-    # (pkgs.waybar.overrideAttrs (oldAttrs: {
-    #     mesonFlags = oldAttrs.mesonFlags ++ ["-Dexperimental=true"];
-    #   }))
+    dunst libnotify
+    alacritty
+    wofi rofi-wayland
+    networkmanagerapplet mpv
+    grim slurp swappy wl-clipboard
+    swayidle swaylock-effects wlogout
+    swaybg waypaper
+    pamixer pavucontrol killall
+    cliphist pywal
 
-    dunst libnotify             # mako
-    swww                        # hyprpaper swaybg wpaperd mpvpaper
-    kitty alacritty
-    rofi-wayland wofi           # bemenu fuzzel tofi
-    networkmanagerapplet
-    grim slurp wl-clipboard
+    pinentry-qt lxde.lxsession
   ];
 
   environment.plasma5.excludePackages = with pkgs.libsForQt5; [
@@ -157,45 +156,57 @@
     plasma-browser-integration
   ];
 
-  fonts.packages = with pkgs; [
-    roboto-mono
-    fira-code
-    font-awesome
-
-    iosevka-comfy.comfy-duo
-    iosevka-comfy.comfy-fixed
-
-    # lohit-fonts.devanagari # already provided by noto fonts
-    lohit-fonts.odia
-    lohit-fonts.telugu
-    lohit-fonts.kannada
-
-    emojione
-  ];
-
-  # services.openssh = {
-  #   enable = true;
-  #   settings = {
-  #     PermitRootLogin = "no";
-  #     PasswordAuthentication = false;
-  #   };
-  # };
+  fonts = {
+    fontDir.enable = true;
+    packages = with pkgs; [
+      iosevka-comfy.comfy-duo
+      iosevka-comfy.comfy-fixed
+      nerdfonts
+      google-fonts
+      font-awesome
+      emojione
+    ];
+  };
 
   services.locate = {
     enable = true;
     package = pkgs.plocate;
     localuser = null;
   };
+  services.redshift = {
+    enable = true;
+    brightness = {
+      day = "0.8";
+      night = "0.4";
+    };
+    temperature = {
+      day = 5000;
+      night = 3000;
+    };
+  };
+  location = {
+    latitude = 13.0;
+    longitude = 77.5;
+  };
 
   # Enable the X11 windowing system.
-  services.xserver.enable = true;
-  # Load amdgpu driver for Xorg and Wayland
-  # services.xserver.videoDrivers = [ "amdgpu" ];
+  services.xserver = {
+    enable = true;
 
-  # Enable the KDE Plasma Desktop Environment.
-  services.xserver.displayManager.sddm.enable = true;
-  services.xserver.displayManager.defaultSession = "plasmawayland";
-  services.xserver.desktopManager.plasma5.enable = true;
+    # Enable the KDE Plasma Desktop Environment.
+    displayManager = {
+      sddm.enable = true;
+      sddm.theme = "breeze";
+      # defaultSession = "plasmawayland";
+    };
+    desktopManager.plasma5.enable = true;
+
+    # Enable touchpad support (enabled default in most desktopManager).
+    libinput = {
+      enable = true;
+      touchpad.tapping = true;
+    };
+  };
 
   ## Hyprland
   programs.hyprland = {
@@ -203,6 +214,9 @@
     enableNvidiaPatches = true;
     xwayland.enable = true;
   };
+  security.pam.services.swaylock = {};
+
+  security.polkit.enable = true;
 
   environment.sessionVariables = {
     WLR_NO_HARDWARE_CURSORS = "1"; # prevent cursor from becoming invisible
@@ -210,32 +224,12 @@
   };
 
   # XDG portal
-  xdg.portal.enable = true;
-  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-
-  # Enable XMonad
-  # services.xserver.windowManager.xmonad = {
-  #   enable = true;
-  #   enableContribAndExtras = true;
-  # };
-
-  # services.xserver.displayManager.sessionCommands = ''
-  #   xset -dpms 
-  #   xset s blank
-  #   xset s 300
-  #   ${pkgs.lightlocker}/bin/light-locker --idle-hint &
-  # '';
-  # systemd.targets.hybrid-sleep.enable = true;
-  # services.logind.extraConfig = ''
-  #   IdleAction=hybrid-sleep
-  #   IdleActionSec=20s
-  # '';
-
-  # Configure keymap in X11
-  # services.xserver = {
-  #   layout = "us";
-  #   xkbVariant = "";
-  # };
+  xdg.portal = {
+    enable = true;
+    xdgOpenUsePortal = true;
+    wlr.enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  };
 
   # Capslock as Control + Escape everywhere
   services.interception-tools = let
@@ -259,13 +253,17 @@
     '';
   };
 
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
+  services.printing = {
+    enable = true;
+    browsing = true;
+  };
+  # services.blueman.enable = true;
 
   # Enable sound with pipewire.
   sound.enable = true;
   hardware.pulseaudio.enable = false;
-  security.rtkit.enable = true;
+  hardware.bluetooth.enable = true;
+  # security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
     alsa.enable = true;

@@ -9,12 +9,12 @@
 }: {
   # You can import other home-manager modules here
   imports = [
-    # If you want to use home-manager modules from other flakes (such as nix-colors):
     # inputs.nix-colors.homeManagerModule
-
-    # You can also split up your configuration and import pieces of it here:
-    # ./nvim.nix
+    inputs.nix-colors.homeManagerModules.default
+    # ./features/alacritty.nix
   ];
+
+  colorScheme = inputs.nix-colors.colorSchemes.gruvbox-dark-medium;
 
   nixpkgs = {
     # You can add overlays here
@@ -31,10 +31,9 @@
     ];
     # Configure your nixpkgs instance
     config = {
-      # Disable if you don't want unfree packages
       allowUnfree = true;
       # Workaround for https://github.com/nix-community/home-manager/issues/2942
-      allowUnfreePredicate = _: true;
+      # allowUnfreePredicate = _: true;
     };
   };
 
@@ -46,11 +45,13 @@
   # Add stuff for your user as you see fit:
   # programs.mtr.enable = true;
   home.packages = with pkgs; [ microsoft-edge firefox anydesk
-                               # kdenlive mpv ispell redshift
+                               # kdenlive ispell redshift
                                kate onlyoffice-bin
                                tikzit motrix
                                fd
                                # zotero -> insecure, see how to fix it
+
+                               # mako
                              ];
   programs.starship.enable = true;
   programs.fish = {
@@ -59,6 +60,8 @@
       set fish_greeting
       fish_vi_key_bindings
       alias e "emacsclient -a 'nvim'"
+      alias nshell "nix-shell --command fish -p"
+      alias ns "nix search nixpkgs"
       zoxide init fish | source
     '';
     # plugins = with pkgs.fishPlugins; [ bass ];
@@ -84,6 +87,7 @@
   # Nicely reload system units when changing configs
   systemd.user.startServices = "sd-switch";
   services.emacs.startWithUserSession = "graphical";
+  services.picom.enable = true;
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   home.stateVersion = "23.05";
