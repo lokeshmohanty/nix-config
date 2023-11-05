@@ -48,8 +48,9 @@
   home.packages = with pkgs; [ microsoft-edge firefox anydesk
                                # kdenlive mpv ispell redshift
                                kate onlyoffice-bin
-                               tikzit zotero motrix
-			       fd
+                               tikzit motrix
+                               fd
+                               # zotero -> insecure, see how to fix it
                              ];
   programs.starship.enable = true;
   programs.fish = {

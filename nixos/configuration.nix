@@ -140,9 +140,9 @@
 
     # hyprland
     waybar eww
-    (pkgs.waybar.overrideAttrs (oldAttrs: {
-        mesonFlags = oldAttrs.mesonFlags ++ ["-Dexperimental=true"];
-      }))
+    # (pkgs.waybar.overrideAttrs (oldAttrs: {
+    #     mesonFlags = oldAttrs.mesonFlags ++ ["-Dexperimental=true"];
+    #   }))
 
     dunst libnotify             # mako
     swww                        # hyprpaper swaybg wpaperd mpvpaper
@@ -157,7 +157,7 @@
     plasma-browser-integration
   ];
 
-  fonts.fonts = with pkgs; [
+  fonts.packages = with pkgs; [
     roboto-mono
     fira-code
     font-awesome
@@ -183,7 +183,7 @@
 
   services.locate = {
     enable = true;
-    locate = pkgs.plocate;
+    package = pkgs.plocate;
     localuser = null;
   };
 
@@ -200,7 +200,7 @@
   ## Hyprland
   programs.hyprland = {
     enable = true;
-    nvidiaPatches = true;
+    enableNvidiaPatches = true;
     xwayland.enable = true;
   };
 
