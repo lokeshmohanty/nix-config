@@ -168,6 +168,7 @@
     ];
   };
 
+  services.flatpak.enable = true;
   services.locate = {
     enable = true;
     package = pkgs.plocate;

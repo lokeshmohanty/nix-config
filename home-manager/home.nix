@@ -1,4 +1,4 @@
-# This is your home-manager configuration file
+# This is your home-manage file
 # Use this to configure your home environment (it replaces ~/.config/nixpkgs/home.nix)
 {
   inputs,
@@ -32,8 +32,7 @@
     # Configure your nixpkgs instance
     config = {
       allowUnfree = true;
-      # Workaround for https://github.com/nix-community/home-manager/issues/2942
-      # allowUnfreePredicate = _: true;
+      permittedInsecurePackages = [ "zotero-6.0.27" ];
     };
   };
 
@@ -49,9 +48,9 @@
                                kate onlyoffice-bin
                                tikzit motrix
                                fd
-                               # zotero -> insecure, see how to fix it
-
-                               # mako
+                               zotero
+                               jetbrains.clion jetbrains.pycharm-professional
+                               vscode.fhs
                              ];
   programs.starship.enable = true;
   programs.fish = {
