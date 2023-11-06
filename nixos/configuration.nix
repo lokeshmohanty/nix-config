@@ -216,6 +216,11 @@
   };
   security.pam.services.swaylock = {};
 
+  security.pam.services.kwallet = {
+    name = "kwallet";
+    enableKwallet = true;
+  };
+
   security.polkit.enable = true;
 
   environment.sessionVariables = {

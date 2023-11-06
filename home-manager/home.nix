@@ -79,6 +79,10 @@
     '';
     plugins = with pkgs.vimPlugins; [ vim-commentary  vim-surround ];
   };
+  programs.keychain = {
+    enable = true;
+    keys = [ "id_ed25519" ];
+  };
 
   # Enable home-manager and git
   programs.home-manager.enable = true;
