@@ -1,3 +1,4 @@
+// Configuration: https://github.com/Alexays/Waybar/wiki/Configuration
 {
     // "layer": "top", // Waybar at top layer
     // "position": "bottom", // Waybar position (top|bottom|left|right)
@@ -5,7 +6,6 @@
     // "width": 1280, // Waybar width
     "spacing": 4, // Gaps between modules (4px)
     // Choose the order of the modules
-    // "modules-left": ["hyprland/workspaces", "hyprland/mode", "hyprland/scratchpad", "custom/media"],
     "modules-left": ["hyprland/workspaces"],
     "modules-center": ["hyprland/window"],
     "modules-right": ["pulseaudio", "network", "cpu", "memory", "temperature", "backlight", "battery", "clock", "tray"],
@@ -94,12 +94,11 @@
     },
     "cpu": {
         "format": "{usage}% ",
-        "tooltip": false,
-				"actions": { "on-click": "alacritty -e htop" }
+				"on-click": "alacritty -e htop"
     },
     "memory": {
         "format": "{}% ",
-				"actions": { "on-click": "alacritty -e btm" }
+				"on-click": "alacritty -e btm"
     },
     "temperature": {
         // "thermal-zone": 2,
