@@ -59,12 +59,20 @@
     interactiveShellInit = ''
       set fish_greeting
       fish_vi_key_bindings
-      alias e "emacsclient -a 'nvim'"
-      alias nshell "nix-shell --command fish -p"
-      alias ns "nix search nixpkgs"
       zoxide init fish | source
     '';
-    # plugins = with pkgs.fishPlugins; [ bass ];
+    shellAbbrs = {
+      e = "emacsclient -nw -a 'nvim'";
+      g = "git";
+      x = "env -u WAYLAND_DISPLAY";
+      nl = "nix-locate";
+      ns = "nix search nixpkgs";
+      nsh = "nix-shell --command fish -p";
+    };
+    functions = {
+      nr = "nix run nixpkgs#$argv";
+    };
+    plugins = [ { name = "bass"; src = pkgs.fishPlugins.bass; } ];
   };
   programs.fzf = {
     enable = true;
@@ -77,7 +85,7 @@
     extraConfig = ''
       set number relativenumber
     '';
-    plugins = with pkgs.vimPlugins; [ vim-commentary  vim-surround ];
+    plugins = with pkgs.vimPlugins; [ vim-commentary  vim-surround vim-unimpaired ];
   };
   programs.keychain = {
     enable = true;
