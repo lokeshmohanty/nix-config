@@ -7,9 +7,7 @@
   pkgs,
   ...
 }: {
-  # You can import other home-manager modules here
   imports = [
-    # inputs.nix-colors.homeManagerModule
     inputs.nix-colors.homeManagerModules.default
     # ./features/alacritty.nix
   ];
@@ -17,7 +15,6 @@
   colorScheme = inputs.nix-colors.colorSchemes.gruvbox-dark-medium;
 
   nixpkgs = {
-    # You can add overlays here
     overlays = [
       # If you want to use overlays exported from other flakes:
       # neovim-nightly-overlay.overlays.default
@@ -41,17 +38,20 @@
     homeDirectory = "/home/lokesh";
   };
 
-  # Add stuff for your user as you see fit:
-  # programs.mtr.enable = true;
-  home.packages = with pkgs; [ microsoft-edge firefox anydesk
-                               # kdenlive ispell redshift
-                               kate onlyoffice-bin
-                               tikzit motrix
-                               fd
-                               zotero
-                               jetbrains.clion jetbrains.pycharm-professional
-                               vscode.fhs
-                             ];
+  home.packages = with pkgs; [
+    microsoft-edge firefox anydesk onlyoffice-bin
+    tikzit motrix zotero kdenlive
+    vscode.fhs jetbrains.clion jetbrains.pycharm-professional
+    fd
+  ];
+  programs.obs-studio = {
+    enable = true;
+    plugins = with pkgs.obs-studio-plugins; [
+      obs-backgroundremoval
+      obs-move-transition
+      advanced-scene-switcher
+    ];
+  };
   programs.starship.enable = true;
   programs.fish = {
     enable = true;
@@ -91,14 +91,15 @@
     keys = [ "id_ed25519" ];
   };
 
+  services.emacs.startWithUserSession = "graphical";
+  services.picom.enable = true;
+
   # Enable home-manager and git
   programs.home-manager.enable = true;
   programs.git.enable = true;
 
   # Nicely reload system units when changing configs
   systemd.user.startServices = "sd-switch";
-  services.emacs.startWithUserSession = "graphical";
-  services.picom.enable = true;
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   home.stateVersion = "23.05";
