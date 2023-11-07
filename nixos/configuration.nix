@@ -119,12 +119,11 @@
     XDG_STATE_HOME = "$HOME/.local/state";
 
     PATH = [ "$HOME/.local/bin" ];
-    EDITOR = "emacsclient -nw -a 'nvim'";
+    EDITOR = "nvim";
   };
 
   environment.systemPackages = with pkgs; [
-    gitFull gh zoxide
-    vim emacs29 emacsPackages.vterm ledger notmuch
+    gitFull gh
     inxi neofetch powertop shellcheck
     ripgrep tldr yt-dlp ffmpeg
     zip unzip file htop bottom

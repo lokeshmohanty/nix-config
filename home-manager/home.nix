@@ -1,4 +1,3 @@
-# This is your home-manage file
 # Use this to configure your home environment (it replaces ~/.config/nixpkgs/home.nix)
 {
   inputs,
@@ -9,7 +8,8 @@
 }: {
   imports = [
     inputs.nix-colors.homeManagerModules.default
-    # ./features/alacritty.nix
+    ./features/terminal.nix
+    ./features/shell.nix
   ];
 
   colorScheme = inputs.nix-colors.colorSchemes.gruvbox-dark-medium;
@@ -36,14 +36,15 @@
   home = {
     username = "lokesh";
     homeDirectory = "/home/lokesh";
+    sessionVariables = { EDITOR = "emacsclient -nw a 'vi'"; };
+    packages = with pkgs; [
+      microsoft-edge firefox anydesk onlyoffice-bin
+      tikzit motrix zotero kdenlive
+      vscode.fhs jetbrains.clion jetbrains.pycharm-professional
+      fd emacsPackages.vterm ledger notmuch zoxide
+    ];
   };
 
-  home.packages = with pkgs; [
-    microsoft-edge firefox anydesk onlyoffice-bin
-    tikzit motrix zotero kdenlive
-    vscode.fhs jetbrains.clion jetbrains.pycharm-professional
-    fd
-  ];
   programs.obs-studio = {
     enable = true;
     plugins = with pkgs.obs-studio-plugins; [
@@ -52,31 +53,6 @@
       advanced-scene-switcher
     ];
   };
-  programs.starship.enable = true;
-  programs.fish = {
-    enable = true;
-    interactiveShellInit = ''
-      set fish_greeting
-      fish_vi_key_bindings
-      zoxide init fish | source
-    '';
-    shellAbbrs = {
-      e = "emacsclient -nw -a 'nvim'";
-      g = "git";
-      x = "env -u WAYLAND_DISPLAY";
-      nl = "nix-locate";
-      ns = "nix search nixpkgs";
-      nsh = "nix-shell --command fish -p";
-    };
-    functions = {
-      nr = "nix run nixpkgs#$argv";
-    };
-    plugins = [ { name = "bass"; src = pkgs.fishPlugins.bass; } ];
-  };
-  programs.fzf = {
-    enable = true;
-    enableFishIntegration = true;
-  };
   programs.neovim = {
     enable = true;
     viAlias = true;
@@ -84,14 +60,21 @@
     extraConfig = ''
       set number relativenumber
     '';
-    plugins = with pkgs.vimPlugins; [ vim-commentary  vim-surround vim-unimpaired ];
+    plugins = with pkgs.vimPlugins; [
+      vim-commentary
+      vim-surround
+      vim-unimpaired
+    ];
   };
   programs.keychain = {
     enable = true;
     keys = [ "id_ed25519" ];
   };
 
-  services.emacs.startWithUserSession = "graphical";
+  services.emacs = {
+    enable = true;
+    package = pkgs.emacs29;
+  };
   services.picom.enable = true;
 
   # Enable home-manager and git
