@@ -150,8 +150,14 @@
       nerdfonts
       google-fonts
       font-awesome
-      emojione
+      noto-fonts-emoji
     ];
+    # fontconfig.defaultFonts = {
+    #   emoji = "";
+    #   serif = "";
+    #   sansSerif = "";
+    #   monospace = "";
+    # };
   };
 
   services.flatpak.enable = true;

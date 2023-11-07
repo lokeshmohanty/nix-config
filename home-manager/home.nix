@@ -46,7 +46,6 @@
       tikzit motrix zotero kdenlive fractal
       vscode.fhs jetbrains.clion jetbrains.pycharm-professional
       fd libvterm ledger notmuch zoxide
-      gammastep
     ];
   };
   xdg = {
