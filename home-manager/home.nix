@@ -36,13 +36,22 @@
   home = {
     username = "lokesh";
     homeDirectory = "/home/lokesh";
-    sessionVariables = { EDITOR = "emacsclient -nw a 'vi'"; };
+    sessionPath = [ "$HOME/.local/bin" ];
+    sessionVariables = {
+      EDITOR = "emacsclient -nw a 'vi'";
+      BROWSER = "microsoft-edge";
+    };
     packages = with pkgs; [
       microsoft-edge firefox anydesk onlyoffice-bin
-      tikzit motrix zotero kdenlive
+      tikzit motrix zotero kdenlive fractal
       vscode.fhs jetbrains.clion jetbrains.pycharm-professional
-      fd emacsPackages.vterm ledger notmuch zoxide
+      fd libvterm ledger notmuch zoxide
+      gammastep
     ];
+  };
+  xdg = {
+    enable = true;
+    userDirs.enable = true;
   };
 
   programs.obs-studio = {
@@ -54,28 +63,24 @@
     ];
   };
   programs.neovim = {
-    enable = true;
-    viAlias = true;
-    vimAlias = true;
-    extraConfig = ''
-      set number relativenumber
-    '';
-    plugins = with pkgs.vimPlugins; [
-      vim-commentary
-      vim-surround
-      vim-unimpaired
-    ];
+    enable = true; viAlias = true; vimAlias = true;
+    plugins = with pkgs.vimPlugins; [ vim-commentary vim-surround vim-unimpaired ];
   };
-  programs.keychain = {
-    enable = true;
-    keys = [ "id_ed25519" ];
-  };
+  programs.emacs = { enable = true; package = pkgs.emacs29; };
+  programs.keychain = { enable = true; keys = [ "id_ed25519" ]; };
+  programs.gh = { enable = true; extensions = [ pkgs.gh-dash ]; };
 
   services.emacs = {
     enable = true;
     package = pkgs.emacs29;
   };
-  services.picom.enable = true;
+  services.gammastep = {
+    enable = true;
+    # temperature = { day = 5000; night = 3000; };
+    # dawnTime = "6:00-7:45", duskTime = "18:30-20:15";
+    latitude = 13.0; longitude = 77.5;
+    tray = true;
+  };
 
   # Enable home-manager and git
   programs.home-manager.enable = true;

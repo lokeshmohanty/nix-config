@@ -110,24 +110,13 @@
   };
   users.defaultUserShell = pkgs.fish;
 
-  programs.neovim.enable = true;
   environment.binsh = "${pkgs.dash}/bin/dash";
-  environment.sessionVariables = {
-    XDG_CACHE_HOME = "$HOME/.cache";
-    XDG_CONFIG_HOME = "$HOME/.config";
-    XDG_DATA_HOME = "$HOME/.local/share";
-    XDG_STATE_HOME = "$HOME/.local/state";
-
-    PATH = [ "$HOME/.local/bin" ];
-    EDITOR = "nvim";
-  };
-
   environment.systemPackages = with pkgs; [
-    gitFull gh
     inxi neofetch powertop shellcheck
     ripgrep tldr yt-dlp ffmpeg
     zip unzip file htop bottom
     nodejs                     # use fnm after configuring it
+    gh                         # to fix auth error, remove it later
 
     pandoc pass rclone rsync
 
@@ -136,18 +125,16 @@
     nix-index
 
     # hyprland
-    waybar eww
-    dunst libnotify
-    alacritty
-    wofi rofi-wayland
+    polkit-kde-agent pinentry-qt
+    waybar dunst libnotify alacritty
+    wofi rofi-wayland swaybg waypaper
     networkmanagerapplet mpv
     grim slurp swappy wl-clipboard
     swayidle swaylock-effects wlogout
-    swaybg waypaper
-    pamixer pavucontrol killall
-    cliphist pywal
-
-    pinentry-qt lxde.lxsession
+    pamixer pavucontrol
+    nwg-displays wlr-randr
+    qt5.qtwayland qt6.qtwayland
+    cliphist pywal hyprpicker
   ];
 
   environment.plasma5.excludePackages = with pkgs.libsForQt5; [
@@ -173,27 +160,11 @@
     package = pkgs.plocate;
     localuser = null;
   };
-  services.redshift = {
-    enable = true;
-    brightness = {
-      day = "0.8";
-      night = "0.4";
-    };
-    temperature = {
-      day = 5000;
-      night = 3000;
-    };
-  };
-  location = {
-    latitude = 13.0;
-    longitude = 77.5;
-  };
 
   # Enable the X11 windowing system.
   services.xserver = {
     enable = true;
 
-    # Enable the KDE Plasma Desktop Environment.
     displayManager = {
       sddm.enable = true;
       sddm.theme = "breeze";
@@ -216,11 +187,7 @@
   };
   security.pam.services.swaylock = {};
 
-  security.pam.services.kwallet = {
-    name = "kwallet";
-    enableKwallet = true;
-  };
-
+  security.pam.services.login.enableKwallet = true;
   security.polkit.enable = true;
 
   environment.sessionVariables = {
@@ -275,10 +242,6 @@
     alsa.support32Bit = true;
     pulse.enable = true;
     jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
   };
   virtualisation.docker = {
     enable = true;
