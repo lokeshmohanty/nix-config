@@ -46,6 +46,15 @@
       tikzit motrix zotero kdenlive fractal
       vscode.fhs jetbrains.clion jetbrains.pycharm-professional
       fd libvterm ledger notmuch zoxide
+
+      # unityhub
+
+      nodejs     # use fnm instead
+      micromamba # python3 python310
+      (pkgs.python310.withPackages (ps: with ps; [
+        jupyter numpy pandas
+        torch transformers
+      ]))
     ];
   };
   xdg = {

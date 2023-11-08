@@ -115,7 +115,6 @@
     inxi neofetch powertop shellcheck
     ripgrep tldr yt-dlp ffmpeg
     zip unzip file htop bottom
-    nodejs                     # use fnm after configuring it
     gh                         # to fix auth error, remove it later
 
     pandoc pass rclone rsync
