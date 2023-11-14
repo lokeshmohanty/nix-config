@@ -39,28 +39,52 @@
     sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables = {
       EDITOR = "emacsclient -nw a 'vi'";
-      BROWSER = "microsoft-edge";
+      BROWSER = "firefox";
     };
     packages = with pkgs; [
-      microsoft-edge firefox anydesk onlyoffice-bin
+      microsoft-edge onlyoffice-bin
       tikzit motrix zotero kdenlive fractal
       vscode.fhs jetbrains.clion jetbrains.pycharm-professional
-      fd libvterm ledger notmuch zoxide
+      fd ledger notmuch zoxide quarto imagemagick
+      zathura kitty foot
 
-      # unityhub
+      tree-sitter
 
+      # language servers
+      marksman                  # markdown
+
+      texlive.combined.scheme-full
+      unityhub zoom-us
+
+      gcc
+      lua lua-language-server
       nodejs     # use fnm instead
       micromamba # python3 python310
       (pkgs.python310.withPackages (ps: with ps; [
-        jupyter numpy pandas
-        torch transformers
+        jupyter dvc
+        numpy pandas matplotlib seaborn
+        scikit-learn # tensorflow 
+	      pytorch # keras
+        transformers
+
+        plotly
       ]))
+      # (rWrapper.override{ packages = with rPackages; [
+      #                       magick languageserver 
+      #                       jsonlite rlang
+      #                     ]; }
+      # )
     ];
   };
-  xdg = {
-    enable = true;
-    userDirs.enable = true;
-  };
+  # xdg = {
+  #   enable = true;
+  #   userDirs.enable = true;
+  #   # mimeApps = {
+  #   #   enable = true;
+  #   #   # defaultApplications = {};
+  #   #   associations.added = { "application/octet-stream" = [ "microsoft-edge.desktop" ]; };
+  #   # };
+  # };
 
   programs.obs-studio = {
     enable = true;
@@ -70,24 +94,51 @@
       advanced-scene-switcher
     ];
   };
+  programs.firefox.enable = true;
+  # programs.browserpass.enable = true;
   programs.neovim = {
     enable = true; viAlias = true; vimAlias = true;
-    plugins = with pkgs.vimPlugins; [ vim-commentary vim-surround vim-unimpaired ];
+    plugins = with pkgs.vimPlugins; [
+      vim-commentary
+      vim-surround
+      vim-unimpaired
+      nvim-treesitter.withAllGrammars
+      mason-nvim
+      lazy-nvim
+      # quarto-nvim
+    ];
   };
-  programs.emacs = { enable = true; package = pkgs.emacs29; };
-  programs.keychain = { enable = true; keys = [ "id_ed25519" ]; };
+  programs.helix = {
+    enable = true;
+    settings = { theme = "base16_transparent"; };
+  };
+  programs.emacs = {
+    enable = true;
+    package = pkgs.emacs29;
+    # package = pkgs.emacs29-pgtk;
+    extraPackages = epkgs: [ epkgs.vterm ];
+  };
+  # programs.keychain = { enable = true; keys = [ "id_ed25519" ]; };
   programs.gh = { enable = true; extensions = [ pkgs.gh-dash ]; };
 
+  # services.udiskie.enable = true;
   services.emacs = {
     enable = true;
     package = pkgs.emacs29;
   };
   services.gammastep = {
     enable = true;
-    # temperature = { day = 5000; night = 3000; };
+    temperature = { day = 5000; night = 3000; };
     # dawnTime = "6:00-7:45", duskTime = "18:30-20:15";
     latitude = 13.0; longitude = 77.5;
     tray = true;
+  };
+
+  dconf.settings = {
+    "org/virt-manager/virt-manager/connections" = {
+      autoconnect = ["qemu:///system"];
+      uris = ["qemu:///system"];
+    };
   };
 
   # Enable home-manager and git

@@ -9,10 +9,12 @@
       opacity = 1.0;
     };
     font = {
-      normal.family = "Iosevka Comfy Fixed";
-      bold.family = "Iosevka Comfy Fixed";
-      italic.family = "Iosevka Comfy Fixed";
-      bold_italic.family = "Iosevka Comfy Fixed";
+      normal.family = "Victor Mono";
+      normal.style = "Italic";
+      bold.family = "Victor Mono";
+      bold.style = "Bold Italic";
+      italic.family = "Victor Mono";
+      bold_italic.family = "Victor Mono";
       size = 15;
     };
     colors = with config.colorScheme.colors; {

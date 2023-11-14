@@ -90,6 +90,7 @@
     LC_TIME = "en_US.UTF-8";
   };
 
+  # programs.ssh.startAgent = true;
   programs.gnupg.agent = {
     enable = true;
     pinentryFlavor = "qt";
@@ -105,14 +106,14 @@
       initialPassword = "nixos";
       isNormalUser = true;
       description = "Lokesh Mohanty";
-      extraGroups = [ "wheel" "input" "video" "networkmanager" "docker" ];
+      extraGroups = [ "wheel" "input" "video" "networkmanager" "docker" "libvirtd" ];
     };
   };
   users.defaultUserShell = pkgs.fish;
 
   environment.binsh = "${pkgs.dash}/bin/dash";
   environment.systemPackages = with pkgs; [
-    inxi neofetch powertop shellcheck
+    inxi neofetch powertop shellcheck bat
     ripgrep tldr yt-dlp ffmpeg
     zip unzip file htop bottom
     gh                         # to fix auth error, remove it later
@@ -123,22 +124,22 @@
     cmakeWithGui
     nix-index
 
+    quickemu                   # for easy vm creation
+
     # hyprland
     polkit-kde-agent pinentry-qt
     waybar dunst libnotify alacritty
-    wofi rofi-wayland swaybg waypaper
-    networkmanagerapplet mpv
+    fuzzel swaybg waypaper
+    networkmanagerapplet mpv vimiv-qt gimp
     grim slurp swappy wl-clipboard
     swayidle swaylock-effects wlogout
     pamixer pavucontrol
     nwg-displays wlr-randr
     qt5.qtwayland qt6.qtwayland
     cliphist pywal hyprpicker
-  ];
 
-  environment.plasma5.excludePackages = with pkgs.libsForQt5; [
-    oxygen
-    plasma-browser-integration
+    # udisks2 gvfs
+    jmtpfs
   ];
 
   fonts = {
@@ -160,6 +161,8 @@
   };
 
   services.flatpak.enable = true;
+  services.gvfs.enable = true;
+  # services.udisks2.enable = true;
   services.locate = {
     enable = true;
     package = pkgs.plocate;
@@ -167,22 +170,23 @@
   };
 
   # Enable the X11 windowing system.
-  services.xserver = {
-    enable = true;
+  # services.xserver = {
+  #   enable = true;
 
-    displayManager = {
-      sddm.enable = true;
-      sddm.theme = "breeze";
-      # defaultSession = "plasmawayland";
-    };
-    desktopManager.plasma5.enable = true;
+  #   displayManager = {
+  #     sddm.enable = true;
+  #     sddm.wayland.enable = true;
+  #     # sddm.theme = "breeze";
+  #     defaultSession = "Hyprland";
+  #   };
+  #   desktopManager.plasma5.enable = true;
 
-    # Enable touchpad support (enabled default in most desktopManager).
-    libinput = {
-      enable = true;
-      touchpad.tapping = true;
-    };
-  };
+  #   # Enable touchpad support (enabled default in most desktopManager).
+  #   # libinput = {
+  #   #   enable = true;
+  #   #   touchpad.tapping = true;
+  #   # };
+  # };
 
   ## Hyprland
   programs.hyprland = {
@@ -192,8 +196,11 @@
   };
   security.pam.services.swaylock = {};
 
-  security.pam.services.login.enableKwallet = true;
-  security.polkit.enable = true;
+  # security.polkit.enable = true;
+  # security.pam.services.login.enableKwallet = true;
+  # security.pam.services.kwallet.enableKwallet = true;
+  # security.pam.services.kde.enableKwallet = true;
+  # security.pam.services.sddm.enableKwallet = true;
 
   environment.sessionVariables = {
     WLR_NO_HARDWARE_CURSORS = "1"; # prevent cursor from becoming invisible
@@ -248,11 +255,17 @@
     pulse.enable = true;
     jack.enable = true;
   };
-  virtualisation.docker = {
-    enable = true;
-    rootless.enable = true;
-    rootless.setSocketVariable = true;
+  virtualisation = {
+    docker = {
+      enable = true;
+      rootless.enable = true;
+      rootless.setSocketVariable = true;
+    };
+    libvirtd.enable = true;
+    # waydroid.enable = true;
   };
+  programs.virt-manager.enable = true;
+
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "23.05";

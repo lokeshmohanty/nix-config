@@ -20,6 +20,7 @@
       nl = "nix-locate";
       ns = "nix search nixpkgs";
       nsh = "nix-shell --command fish -p";
+      hypr = "dbus-run-session Hyprland";
     };
     functions = {
       nr = "nix run nixpkgs#$argv";
