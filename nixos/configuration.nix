@@ -192,6 +192,7 @@
   ## Hyprland
   programs.hyprland.enable = true;
   security.pam.services.swaylock = {};
+  security.polkit.enable = true;
 
   environment.sessionVariables = {
     WLR_NO_HARDWARE_CURSORS = "1"; # prevent cursor from becoming invisible

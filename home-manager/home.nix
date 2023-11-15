@@ -117,8 +117,7 @@
   # };
   programs.emacs = {
     enable = true;
-    package = pkgs.emacs29;
-    # package = pkgs.emacs29-pgtk;
+    package = pkgs.emacs29-pgtk;
     extraPackages = epkgs: [ epkgs.vterm ];
   };
   # programs.keychain = { enable = true; keys = [ "id_ed25519" ]; };
@@ -127,7 +126,7 @@
   # services.udiskie.enable = true;
   services.emacs = {
     enable = true;
-    package = pkgs.emacs29;
+    package = pkgs.emacs29-pgtk;
   };
   services.gammastep = {
     enable = true;
