@@ -138,6 +138,8 @@
     qt5.qtwayland qt6.qtwayland
     cliphist pywal hyprpicker
 
+    waypipe
+
     # udisks2 gvfs
     jmtpfs
   ];
@@ -177,30 +179,19 @@
   #     sddm.enable = true;
   #     sddm.wayland.enable = true;
   #     # sddm.theme = "breeze";
-  #     defaultSession = "Hyprland";
+  #     # defaultSession = "Hyprland";
   #   };
-  #   desktopManager.plasma5.enable = true;
-
-  #   # Enable touchpad support (enabled default in most desktopManager).
-  #   # libinput = {
-  #   #   enable = true;
-  #   #   touchpad.tapping = true;
-  #   # };
+  #   # desktopManager.plasma5.enable = true;
   # };
 
-  ## Hyprland
-  programs.hyprland = {
-    enable = true;
-    enableNvidiaPatches = true;
-    xwayland.enable = true;
-  };
-  security.pam.services.swaylock = {};
+ # environment.plasma5.excludePackages = with pkgs.libsForQt5; [
+ #   oxygen
+ #   plasma-browser-integration
+ # ];
 
-  # security.polkit.enable = true;
-  # security.pam.services.login.enableKwallet = true;
-  # security.pam.services.kwallet.enableKwallet = true;
-  # security.pam.services.kde.enableKwallet = true;
-  # security.pam.services.sddm.enableKwallet = true;
+  ## Hyprland
+  programs.hyprland.enable = true;
+  security.pam.services.swaylock = {};
 
   environment.sessionVariables = {
     WLR_NO_HARDWARE_CURSORS = "1"; # prevent cursor from becoming invisible
@@ -211,7 +202,7 @@
   xdg.portal = {
     enable = true;
     xdgOpenUsePortal = true;
-    wlr.enable = true;
+    # wlr.enable = true;
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
 

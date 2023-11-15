@@ -13,6 +13,11 @@
   ];
 
   colorScheme = inputs.nix-colors.colorSchemes.gruvbox-dark-medium;
+  qt = {
+    enable = true;
+    platformTheme = "qtct";
+    # style.name = "breeze";
+  };
 
   nixpkgs = {
     overlays = [
@@ -46,7 +51,10 @@
       tikzit motrix zotero kdenlive fractal
       vscode.fhs jetbrains.clion jetbrains.pycharm-professional
       fd ledger notmuch zoxide quarto imagemagick
-      zathura kitty foot
+      zathura kitty pcmanfm-qt qalculate-qt
+
+      whitesur-icon-theme capitaine-cursors
+      breeze-qt5
 
       tree-sitter
 
@@ -59,8 +67,8 @@
       gcc
       lua lua-language-server
       nodejs     # use fnm instead
-      micromamba # python3 python310
-      (pkgs.python310.withPackages (ps: with ps; [
+      micromamba # python3 python311
+      (pkgs.python311.withPackages (ps: with ps; [
         jupyter dvc
         numpy pandas matplotlib seaborn
         scikit-learn # tensorflow 
@@ -68,12 +76,9 @@
         transformers
 
         plotly
+
+        # qtpy pyqt6 pyqt5 pyqt3d
       ]))
-      # (rWrapper.override{ packages = with rPackages; [
-      #                       magick languageserver 
-      #                       jsonlite rlang
-      #                     ]; }
-      # )
     ];
   };
   # xdg = {
@@ -88,14 +93,13 @@
 
   programs.obs-studio = {
     enable = true;
-    plugins = with pkgs.obs-studio-plugins; [
-      obs-backgroundremoval
-      obs-move-transition
-      advanced-scene-switcher
-    ];
+    # plugins = with pkgs.obs-studio-plugins; [
+    #   obs-backgroundremoval
+    #   obs-move-transition
+    #   advanced-scene-switcher
+    # ];
   };
   programs.firefox.enable = true;
-  # programs.browserpass.enable = true;
   programs.neovim = {
     enable = true; viAlias = true; vimAlias = true;
     plugins = with pkgs.vimPlugins; [
@@ -105,13 +109,12 @@
       nvim-treesitter.withAllGrammars
       mason-nvim
       lazy-nvim
-      # quarto-nvim
     ];
   };
-  programs.helix = {
-    enable = true;
-    settings = { theme = "base16_transparent"; };
-  };
+  # programs.helix = {
+  #   enable = true;
+  #   settings = { theme = "base16_transparent"; };
+  # };
   programs.emacs = {
     enable = true;
     package = pkgs.emacs29;
