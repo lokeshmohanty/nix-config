@@ -52,11 +52,12 @@
       vscode.fhs jetbrains.clion jetbrains.pycharm-professional
       fd ledger notmuch zoxide quarto imagemagick
       zathura kitty pcmanfm-qt qalculate-qt
+      lxmenu-data               # pcmanfm applicatoins menu
 
       whitesur-icon-theme capitaine-cursors
       breeze-qt5
 
-      tree-sitter
+      # tree-sitter
 
       # language servers
       marksman                  # markdown
@@ -84,11 +85,9 @@
   # xdg = {
   #   enable = true;
   #   userDirs.enable = true;
-  #   # mimeApps = {
-  #   #   enable = true;
-  #   #   # defaultApplications = {};
-  #   #   associations.added = { "application/octet-stream" = [ "microsoft-edge.desktop" ]; };
-  #   # };
+  #   mimeApps = {
+  #     enable = true;
+  #   };
   # };
 
   programs.obs-studio = {
@@ -111,27 +110,18 @@
       lazy-nvim
     ];
   };
-  # programs.helix = {
-  #   enable = true;
-  #   settings = { theme = "base16_transparent"; };
-  # };
   programs.emacs = {
     enable = true;
     package = pkgs.emacs29-pgtk;
-    extraPackages = epkgs: [ epkgs.vterm ];
+    extraPackages = epkgs: [ epkgs.multi-vterm ];
   };
   # programs.keychain = { enable = true; keys = [ "id_ed25519" ]; };
   programs.gh = { enable = true; extensions = [ pkgs.gh-dash ]; };
 
-  # services.udiskie.enable = true;
-  services.emacs = {
-    enable = true;
-    package = pkgs.emacs29-pgtk;
-  };
+  services.emacs.enable = true;
   services.gammastep = {
     enable = true;
     temperature = { day = 5000; night = 3000; };
-    # dawnTime = "6:00-7:45", duskTime = "18:30-20:15";
     latitude = 13.0; longitude = 77.5;
     tray = true;
   };

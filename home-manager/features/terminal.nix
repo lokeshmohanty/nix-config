@@ -15,7 +15,7 @@
       bold.style = "Bold Italic";
       italic.family = "Victor Mono";
       bold_italic.family = "Victor Mono";
-      size = 15;
+      size = 18;
     };
     colors = with config.colorScheme.colors; {
       bright = {

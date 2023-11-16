@@ -114,6 +114,7 @@
   environment.binsh = "${pkgs.dash}/bin/dash";
   environment.systemPackages = with pkgs; [
     inxi neofetch powertop shellcheck bat
+    gnumake libtool
     ripgrep tldr yt-dlp ffmpeg
     zip unzip file htop bottom
     gh                         # to fix auth error, remove it later
@@ -146,20 +147,15 @@
 
   fonts = {
     fontDir.enable = true;
+    enableDefaultPackages = true;
     packages = with pkgs; [
       iosevka-comfy.comfy-duo
       iosevka-comfy.comfy-fixed
       nerdfonts
       google-fonts
       font-awesome
-      noto-fonts-emoji
+      # noto-fonts-emoji symbola
     ];
-    # fontconfig.defaultFonts = {
-    #   emoji = "";
-    #   serif = "";
-    #   sansSerif = "";
-    #   monospace = "";
-    # };
   };
 
   services.flatpak.enable = true;
