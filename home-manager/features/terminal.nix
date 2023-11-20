@@ -6,7 +6,7 @@
     env.TERM = "xterm-256color";
     window = {
       padding.x = 10;
-      opacity = 1.0;
+      opacity = 0.7;
     };
     font = {
       normal.family = "Victor Mono";
@@ -15,7 +15,7 @@
       bold.style = "Bold Italic";
       italic.family = "Victor Mono";
       bold_italic.family = "Victor Mono";
-      size = 18;
+      size = 15;
     };
     colors = with config.colorScheme.colors; {
       bright = {

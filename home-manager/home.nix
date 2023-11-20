@@ -47,15 +47,17 @@
       BROWSER = "firefox";
     };
     packages = with pkgs; [
-      microsoft-edge onlyoffice-bin
+      microsoft-edge onlyoffice-bin betterbird
       tikzit motrix zotero kdenlive fractal
       vscode.fhs jetbrains.clion jetbrains.pycharm-professional
       fd ledger notmuch zoxide quarto imagemagick
       zathura kitty pcmanfm-qt qalculate-qt
       lxmenu-data               # pcmanfm applicatoins menu
 
-      whitesur-icon-theme capitaine-cursors
+      whitesur-icon-theme capitaine-cursors whitesur-cursors
       breeze-qt5
+
+      btop
 
       # tree-sitter
 
@@ -70,15 +72,12 @@
       nodejs     # use fnm instead
       micromamba # python3 python311
       (pkgs.python311.withPackages (ps: with ps; [
-        jupyter dvc
+        pip jupyter dvc mlflow setuptools
         numpy pandas matplotlib seaborn
-        scikit-learn # tensorflow 
-	      pytorch # keras
+        scikit-learn 
+	      pytorch
         transformers
-
         plotly
-
-        # qtpy pyqt6 pyqt5 pyqt3d
       ]))
     ];
   };
@@ -121,7 +120,7 @@
   services.emacs.enable = true;
   services.gammastep = {
     enable = true;
-    temperature = { day = 5000; night = 3000; };
+    temperature = { day = 5000; night = 2500; };
     latitude = 13.0; longitude = 77.5;
     tray = true;
   };

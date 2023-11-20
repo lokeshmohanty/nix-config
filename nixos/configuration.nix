@@ -6,7 +6,24 @@
   config,
   pkgs,
   ...
-}: {
+}:
+
+let
+  configure-gtk = pkgs.writeTextFile {
+    name = "configure-gtk";
+    destination = "/bin/configure-gtk";
+    executable = true;
+    text = let
+      schema = pkgs.gsettings-desktop-schemas;
+      datadir = "${schema}/share/gsettings-schemas/${schema.name}";
+    in ''
+      export XDG_DATA_DIRS=${datadir}:$XDG_DATA_DIRS
+      gnome_schema=org.gnome.desktop.interface
+      gsettings set $gnome_schema gtk-theme 'Dracula'
+    '';
+  };
+in
+{
   # You can import other NixOS modules here
   imports = [
     # If you want to use modules from other flakes (such as nixos-hardware):
@@ -106,17 +123,17 @@
       initialPassword = "nixos";
       isNormalUser = true;
       description = "Lokesh Mohanty";
-      extraGroups = [ "wheel" "input" "video" "networkmanager" "docker" "libvirtd" ];
+      extraGroups = [ "wheel" "input" "video" "networkmanager" "libvirtd" ];
     };
   };
   users.defaultUserShell = pkgs.fish;
-
   environment.binsh = "${pkgs.dash}/bin/dash";
+
   environment.systemPackages = with pkgs; [
-    inxi neofetch powertop shellcheck bat
-    gnumake libtool
+    inxi neofetch shellcheck bat
+    gnumake libtool zip unzip file
     ripgrep tldr yt-dlp ffmpeg
-    zip unzip file htop bottom
+    powertop nvtop htop bottom
     gh                         # to fix auth error, remove it later
 
     pandoc pass rclone rsync
@@ -138,11 +155,13 @@
     nwg-displays wlr-randr
     qt5.qtwayland qt6.qtwayland
     cliphist pywal hyprpicker
+    # udisks2 gvfs
+    jmtpfs
 
     waypipe
 
-    # udisks2 gvfs
-    jmtpfs
+    configure-gtk glib whitesur-gtk-theme
+    gsettings-desktop-schemas
   ];
 
   fonts = {
@@ -180,10 +199,10 @@
   #   # desktopManager.plasma5.enable = true;
   # };
 
- # environment.plasma5.excludePackages = with pkgs.libsForQt5; [
- #   oxygen
- #   plasma-browser-integration
- # ];
+  # environment.plasma5.excludePackages = with pkgs.libsForQt5; [
+  #   oxygen
+  #   plasma-browser-integration
+  # ];
 
   ## Hyprland
   programs.hyprland.enable = true;
