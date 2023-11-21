@@ -54,6 +54,8 @@
       zathura kitty pcmanfm-qt qalculate-qt
       lxmenu-data               # pcmanfm applicatoins menu
 
+      discord steam steam-run
+
       whitesur-icon-theme capitaine-cursors whitesur-cursors
       breeze-qt5
 
@@ -65,20 +67,21 @@
       marksman                  # markdown
 
       texlive.combined.scheme-full
+      distrobox
       unityhub zoom-us
 
-      gcc
-      lua lua-language-server
+      gcc ghc
+      # lua lua-language-server
       nodejs     # use fnm instead
       micromamba # python3 python311
-      (pkgs.python311.withPackages (ps: with ps; [
-        pip jupyter dvc mlflow setuptools
-        numpy pandas matplotlib seaborn
-        scikit-learn 
-	      pytorch
-        transformers
-        plotly
-      ]))
+      # (pkgs.python311.withPackages (ps: with ps; [
+      #   pip jupyter dvc mlflow setuptools
+      #   numpy pandas matplotlib seaborn
+      #   scikit-learn 
+	    #   pytorch
+      #   transformers
+      #   plotly
+      # ]))
     ];
   };
   # xdg = {
