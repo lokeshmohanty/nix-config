@@ -8,8 +8,11 @@
 }: {
   imports = [
     inputs.nix-colors.homeManagerModules.default
-    ./features/terminal.nix
+    ./features/terminal
+    ./features/editor
     ./features/shell.nix
+    ./features/fuzzel.nix
+    ./features/lf.nix
   ];
 
   colorScheme = inputs.nix-colors.colorSchemes.gruvbox-dark-medium;
@@ -31,7 +34,6 @@
       #   });
       # })
     ];
-    # Configure your nixpkgs instance
     config = {
       allowUnfree = true;
       permittedInsecurePackages = [ "zotero-6.0.27" ];
@@ -43,15 +45,14 @@
     homeDirectory = "/home/lokesh";
     sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables = {
-      EDITOR = "emacsclient -nw a 'vi'";
       BROWSER = "firefox";
     };
     packages = with pkgs; [
       microsoft-edge onlyoffice-bin betterbird
-      tikzit motrix zotero kdenlive fractal
-      vscode.fhs jetbrains.clion jetbrains.pycharm-professional
+      tikzit motrix zotero kdenlive 
+      vscode.fhs jetbrains.clion
       fd ledger notmuch zoxide quarto imagemagick
-      zathura kitty pcmanfm-qt qalculate-qt
+      zathura pcmanfm-qt qalculate-qt
       lxmenu-data               # pcmanfm applicatoins menu
 
       discord steam steam-run
@@ -62,9 +63,6 @@
       btop
 
       # tree-sitter
-
-      # language servers
-      marksman                  # markdown
 
       texlive.combined.scheme-full
       distrobox
@@ -101,26 +99,9 @@
     # ];
   };
   programs.firefox.enable = true;
-  programs.neovim = {
-    enable = true; viAlias = true; vimAlias = true;
-    plugins = with pkgs.vimPlugins; [
-      vim-commentary
-      vim-surround
-      vim-unimpaired
-      nvim-treesitter.withAllGrammars
-      mason-nvim
-      lazy-nvim
-    ];
-  };
-  programs.emacs = {
-    enable = true;
-    package = pkgs.emacs29-pgtk;
-    extraPackages = epkgs: [ epkgs.multi-vterm ];
-  };
   # programs.keychain = { enable = true; keys = [ "id_ed25519" ]; };
   programs.gh = { enable = true; extensions = [ pkgs.gh-dash ]; };
 
-  services.emacs.enable = true;
   services.gammastep = {
     enable = true;
     temperature = { day = 5000; night = 2500; };
