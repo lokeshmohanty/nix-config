@@ -49,29 +49,19 @@
     };
     packages = with pkgs; [
       microsoft-edge onlyoffice-bin betterbird
-      tikzit motrix zotero kdenlive 
-      vscode.fhs jetbrains.clion
-      fd ledger notmuch zoxide quarto imagemagick
-      zathura pcmanfm-qt qalculate-qt
-      lxmenu-data               # pcmanfm applicatoins menu
+      tikzit motrix zotero kdenlive okular inkscape
+      fd ledger notmuch imagemagick zoxide
+      pcmanfm-qt qalculate-qt
+      lxmenu-data               # pcmanfm applications menu
+      # btop
 
-      discord steam steam-run
-
-      whitesur-icon-theme capitaine-cursors whitesur-cursors
-      breeze-qt5
-
-      btop
-
-      # tree-sitter
-
-      texlive.combined.scheme-full
-      distrobox
+      vscode.fhs discord steam steam-run distrobox
       unityhub zoom-us
 
-      gcc ghc
-      # lua lua-language-server
-      nodejs     # use fnm instead
-      micromamba # python3 python311
+      whitesur-icon-theme capitaine-cursors whitesur-cursors breeze-qt5
+
+      texlive.combined.scheme-full
+      gcc ghc nodejs micromamba # lua lua-language-server
       # (pkgs.python311.withPackages (ps: with ps; [
       #   pip jupyter dvc mlflow setuptools
       #   numpy pandas matplotlib seaborn
