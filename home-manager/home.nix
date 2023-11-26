@@ -61,15 +61,7 @@
       whitesur-icon-theme capitaine-cursors whitesur-cursors breeze-qt5
 
       texlive.combined.scheme-full
-      gcc ghc nodejs micromamba # lua lua-language-server
-      # (pkgs.python311.withPackages (ps: with ps; [
-      #   pip jupyter dvc mlflow setuptools
-      #   numpy pandas matplotlib seaborn
-      #   scikit-learn 
-	    #   pytorch
-      #   transformers
-      #   plotly
-      # ]))
+      gcc ghc nodejs micromamba
     ];
   };
   # xdg = {
