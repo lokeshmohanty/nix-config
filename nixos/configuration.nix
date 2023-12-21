@@ -36,6 +36,7 @@ in
     # Import your generated (nixos-generate-config) hardware configuration
     ./hardware-configuration.nix
     ./syncthing.nix
+    ./gaming.nix
   ];
 
   nixpkgs = {
@@ -70,6 +71,10 @@ in
       experimental-features = "nix-command flakes";
       auto-optimise-store = true;
       trusted-users = [ "lokesh" ];
+
+      # cachix
+    substituters = [ "https://nix-gaming.cachix.org" ];
+    trusted-public-keys = [ "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4=" ];
     };
   };
 
@@ -132,7 +137,7 @@ in
   environment.binsh = "${pkgs.dash}/bin/dash";
 
   environment.systemPackages = with pkgs; [
-    inxi neofetch shellcheck bat
+    inxi neofetch shellcheck bat duf
     gnumake libtool zip unzip file
     ripgrep tldr yt-dlp ffmpeg
     powertop nvtop htop bottom
@@ -224,25 +229,18 @@ in
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
 
-  # Capslock as Control + Escape everywhere
-  services.interception-tools = let
-    dfkConfig = pkgs.writeText "dual-function-keys.yaml" ''
-      MAPPINGS:
-        - KEY: KEY_CAPSLOCK
-          TAP: KEY_ESC
-          HOLD: KEY_LEFTCTRL
-    '';
-  in {
+  # Capslock as Control + Escape, Escape as Capslock 
+  services.interception-tools = {
     enable = true;
     plugins = lib.mkForce [
-      pkgs.interception-tools-plugins.dual-function-keys
+      pkgs.interception-tools-plugins.caps2esc
     ];
     udevmonConfig = ''
-      - JOB: "${pkgs.interception-tools}/bin/intercept -g $DEVNODE | ${pkgs.interception-tools-plugins.dual-function-keys}/bin/dual-function-keys -c ${dfkConfig} | ${pkgs.interception-tools}/bin/uinput -d $DEVNODE"
+      - JOB: "${pkgs.interception-tools}/bin/intercept -g $DEVNODE | ${pkgs.interception-tools-plugins.caps2esc}/bin/caps2esc | ${pkgs.interception-tools}/bin/uinput -d $DEVNODE"
         DEVICE:
           NAME: "AT Translated Set 2 keyboard"
           EVENTS:
-            EV_KEY: [[KEY_CAPSLOCK, KEY_ESC, KEY_LEFTCTRL]]
+            EV_KEY: [[KEY_CAPSLOCK, KEY_ESC]]
     '';
   };
 

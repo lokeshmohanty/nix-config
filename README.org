@@ -26,6 +26,12 @@
   curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 #+end_src
 
+- Copy packages across systems over ssh ([[https://nixos.org/manual/nix/stable/package-management/copy-closure][package management]])
+  
+#+begin_src shell
+  nix-copy-closure --to <username>@<ip> $(type -p <package-name>)
+#+end_src
+
 * References
 - *Template* : [[https://github.com/Misterio77/nix-starter-configs][nix-starter-configs]]
 - *Official* : [[https://nixos.org/learn.html][nixos]], [[https://nix-community.github.io/home-manager/index.html][home-manager]], [[https://nixos.wiki/wiki/Flakes][flakes]]

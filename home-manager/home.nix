@@ -55,8 +55,9 @@
       lxmenu-data               # pcmanfm applications menu
       # btop
 
-      vscode.fhs discord steam steam-run distrobox
+      vscode.fhs discord distrobox
       unityhub zoom-us
+      lutris wineWowPackages.waylandFull winetricks
 
       whitesur-icon-theme capitaine-cursors whitesur-cursors breeze-qt5
 
