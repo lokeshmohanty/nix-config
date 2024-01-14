@@ -1,6 +1,7 @@
 { pkgs, config, ... }:
 
 {
+  home.packages = with pkgs; [ zoxide ];
   programs.starship.enable = true;
   programs.fzf = {
     enable = true;

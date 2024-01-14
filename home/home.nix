@@ -8,18 +8,23 @@
 }: {
   imports = [
     inputs.nix-colors.homeManagerModules.default
-    ./features/terminal
-    ./features/editor
-    ./features/shell.nix
-    ./features/fuzzel.nix
-    ./features/lf.nix
   ];
 
   colorScheme = inputs.nix-colors.colorSchemes.gruvbox-dark-medium;
+
   qt = {
     enable = true;
     platformTheme = "qtct";
     # style.name = "breeze";
+  };
+  gtk = {
+    enable = true;
+    theme = {
+      package = pkgs.flat-remix-gtk;
+      name = "Flat-Remis-GTK-Grey-Darkest";
+    };
+    iconTheme = {package = pkgs.gnome.adwaita-icon-theme; name = "Adwaita";};
+    font = {name = "Sans"; size = 11;};
   };
 
   nixpkgs = {
@@ -36,7 +41,6 @@
     ];
     config = {
       allowUnfree = true;
-      permittedInsecurePackages = [ "zotero-6.0.27" ];
     };
   };
 
@@ -44,20 +48,16 @@
     username = "lokesh";
     homeDirectory = "/home/lokesh";
     sessionPath = [ "$HOME/.local/bin" ];
-    sessionVariables = {
-      BROWSER = "firefox";
-    };
     packages = with pkgs; [
-      microsoft-edge onlyoffice-bin betterbird
+      google-chrome onlyoffice-bin
       tikzit motrix zotero kdenlive okular inkscape
-      fd ledger notmuch imagemagick zoxide
+      fd ledger notmuch imagemagick
       pcmanfm-qt qalculate-qt
-      lxmenu-data               # pcmanfm applications menu
-      # btop
+      lxmenu-data gtk3               # pcmanfm applications menu
 
       vscode.fhs discord distrobox
       unityhub zoom-us
-      lutris wineWowPackages.waylandFull winetricks
+      lutris wineWowPackages.waylandFull winetricks bottles gamescope
 
       whitesur-icon-theme capitaine-cursors whitesur-cursors breeze-qt5
 

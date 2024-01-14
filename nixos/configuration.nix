@@ -8,21 +8,6 @@
   ...
 }:
 
-let
-  configure-gtk = pkgs.writeTextFile {
-    name = "configure-gtk";
-    destination = "/bin/configure-gtk";
-    executable = true;
-    text = let
-      schema = pkgs.gsettings-desktop-schemas;
-      datadir = "${schema}/share/gsettings-schemas/${schema.name}";
-    in ''
-      export XDG_DATA_DIRS=${datadir}:$XDG_DATA_DIRS
-      gnome_schema=org.gnome.desktop.interface
-      gsettings set $gnome_schema gtk-theme 'Dracula'
-    '';
-  };
-in
 {
   # You can import other NixOS modules here
   imports = [
@@ -34,9 +19,9 @@ in
     # ./users.nix
 
     # Import your generated (nixos-generate-config) hardware configuration
-    ./hardware-configuration.nix
-    ./syncthing.nix
-    ./gaming.nix
+    # ./hardware-configuration.nix
+    # ./syncthing.nix
+    # ./gaming.nix
   ];
 
   nixpkgs = {
@@ -75,6 +60,11 @@ in
       # cachix
     substituters = [ "https://nix-gaming.cachix.org" ];
     trusted-public-keys = [ "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4=" ];
+    };
+    gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 7d";
     };
   };
 
@@ -115,6 +105,7 @@ in
   };
 
   # programs.ssh.startAgent = true;
+  programs.dconf.enable = true;
   programs.gnupg.agent = {
     enable = true;
     pinentryFlavor = "qt";
@@ -151,24 +142,7 @@ in
 
     quickemu                   # for easy vm creation
 
-    # hyprland
-    polkit-kde-agent pinentry-qt
-    waybar dunst libnotify alacritty
-    fuzzel swaybg waypaper
-    networkmanagerapplet mpv vimiv-qt gimp
-    grim slurp swappy wl-clipboard
-    swayidle swaylock-effects wlogout
-    pamixer pavucontrol
-    nwg-displays wlr-randr
-    qt5.qtwayland qt6.qtwayland
-    cliphist pywal hyprpicker
-    # udisks2 gvfs
-    jmtpfs
-
     waypipe
-
-    configure-gtk glib whitesur-gtk-theme
-    gsettings-desktop-schemas
   ];
 
   fonts = {
@@ -184,16 +158,32 @@ in
     ];
   };
 
-  services.flatpak.enable = true;
+  services.teamviewer.enable = true;
   services.gvfs.enable = true;
-  # services.udisks2.enable = true;
   services.locate = {
     enable = true;
     package = pkgs.plocate;
     localuser = null;
   };
+  # services.greetd = {
+  #   enable = true;
+  #   settings = rec {
+  #     default_session = {
+  #       command = "dbus-run-session Hyprland";
+  #       user = "lokesh";
+  #     };
+  #   };
+  # };
+  # environment.etc."greetd/environments".text = ''
+  #   sway
+  #   fish
+  #   bash
+  #   startxfce4
+  #   Hyprland
+  # '';
 
   # Enable the X11 windowing system.
+  # services.xserver.libinput.touchpad.disalbeWhileTyping = false;
   # services.xserver = {
   #   enable = true;
 
@@ -205,29 +195,6 @@ in
   #   };
   #   # desktopManager.plasma5.enable = true;
   # };
-
-  # environment.plasma5.excludePackages = with pkgs.libsForQt5; [
-  #   oxygen
-  #   plasma-browser-integration
-  # ];
-
-  ## Hyprland
-  programs.hyprland.enable = true;
-  security.pam.services.swaylock = {};
-  security.polkit.enable = true;
-
-  environment.sessionVariables = {
-    WLR_NO_HARDWARE_CURSORS = "1"; # prevent cursor from becoming invisible
-    NIXOS_OZONE_WL = "1";          # hint electron apps to use wayland
-  };
-
-  # XDG portal
-  xdg.portal = {
-    enable = true;
-    xdgOpenUsePortal = true;
-    # wlr.enable = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-  };
 
   # Capslock as Control + Escape, Escape as Capslock 
   services.interception-tools = {
@@ -254,7 +221,6 @@ in
   sound.enable = true;
   hardware.pulseaudio.enable = false;
   hardware.bluetooth.enable = true;
-  # security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
     alsa.enable = true;

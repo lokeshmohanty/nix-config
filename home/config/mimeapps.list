@@ -1,0 +1,27 @@
+[Added Associations]
+inode/directory=org.kde.dolphin.desktop;
+x-scheme-handler/geo=qwant-maps-geo-handler.desktop;
+x-scheme-handler/http=microsoft-edge.desktop;firefox.desktop;
+x-scheme-handler/https=microsoft-edge.desktop;firefox.desktop;
+x-scheme-handler/mailto=emacsclient-mail.desktop;
+text/html=firefox.desktop;
+
+[Default Applications]
+inode/directory=org.kde.dolphin.desktop;
+x-scheme-handler/geo=qwant-maps-geo-handler.desktop;
+x-scheme-handler/http=firefox.desktop
+x-scheme-handler/https=firefox.desktop
+x-scheme-handler/mailto=emacsclient-mail.desktop;
+text/html=firefox.desktop
+x-scheme-handler/mo=motrix.desktop
+x-scheme-handler/motrix=motrix.desktop
+x-scheme-handler/magnet=motrix.desktop
+x-scheme-handler/jetbrains-gateway=jetbrains-gateway.desktop
+x-scheme-handler/element=Element.desktop
+x-scheme-handler/chrome=firefox.desktop
+application/x-extension-htm=firefox.desktop
+application/x-extension-html=firefox.desktop
+application/x-extension-shtml=firefox.desktop
+application/xhtml+xml=firefox.desktop
+application/x-extension-xhtml=firefox.desktop
+application/x-extension-xht=firefox.desktop
