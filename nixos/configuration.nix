@@ -21,7 +21,11 @@
     # Import your generated (nixos-generate-config) hardware configuration
     # ./hardware-configuration.nix
     # ./syncthing.nix
-    # ./gaming.nix
+    ./hardware-configuration.nix
+    ./security.nix
+    ./greeter.nix
+    ./gaming.nix
+    ./syncthing.nix
   ];
 
   nixpkgs = {
@@ -58,8 +62,8 @@
       trusted-users = [ "lokesh" ];
 
       # cachix
-    substituters = [ "https://nix-gaming.cachix.org" ];
-    trusted-public-keys = [ "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4=" ];
+      substituters = [ "https://nix-gaming.cachix.org" ];
+      trusted-public-keys = [ "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4=" ];
     };
     gc = {
       automatic = true;
@@ -105,6 +109,10 @@
   };
 
   # programs.ssh.startAgent = true;
+  services.openssh = {
+    enable = true;
+    settings.PasswordAuthentication = true;
+  };
   programs.dconf.enable = true;
   programs.gnupg.agent = {
     enable = true;
@@ -143,7 +151,38 @@
     quickemu                   # for easy vm creation
 
     waypipe
+
+    xdg-desktop-portal xdg-desktop-portal-hyprland
+    pinentry-qt
+    waybar dunst libnotify
+    fuzzel swaybg waypaper
+    networkmanagerapplet mpv vimiv-qt gimp
+    grim slurp swappy wl-clipboard
+    swayidle swaylock-effects wlogout
+    pamixer pavucontrol
+    nwg-displays wlr-randr
+    qt5.qtwayland qt6.qtwayland
+    cliphist pywal hyprpicker
+    # udisks2 gvfs
+    jmtpfs
+    tesseract
   ];
+
+  programs.hyprland = {
+    enable = true;
+    # package = inputs.hyprland.packages.${pkgs.system}.hyprland;
+  };
+  xdg.portal = {
+    enable = true;
+    xdgOpenUsePortal = true;
+    config = {
+      common = {
+        default = [ "gtk" ];
+      };
+    };
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  };
+  services.flatpak.enable = true;
 
   fonts = {
     fontDir.enable = true;
@@ -165,36 +204,6 @@
     package = pkgs.plocate;
     localuser = null;
   };
-  # services.greetd = {
-  #   enable = true;
-  #   settings = rec {
-  #     default_session = {
-  #       command = "dbus-run-session Hyprland";
-  #       user = "lokesh";
-  #     };
-  #   };
-  # };
-  # environment.etc."greetd/environments".text = ''
-  #   sway
-  #   fish
-  #   bash
-  #   startxfce4
-  #   Hyprland
-  # '';
-
-  # Enable the X11 windowing system.
-  # services.xserver.libinput.touchpad.disalbeWhileTyping = false;
-  # services.xserver = {
-  #   enable = true;
-
-  #   displayManager = {
-  #     sddm.enable = true;
-  #     sddm.wayland.enable = true;
-  #     # sddm.theme = "breeze";
-  #     # defaultSession = "Hyprland";
-  #   };
-  #   # desktopManager.plasma5.enable = true;
-  # };
 
   # Capslock as Control + Escape, Escape as Capslock 
   services.interception-tools = {
@@ -215,7 +224,7 @@
     enable = true;
     browsing = true;
   };
-  # services.blueman.enable = true;
+  services.blueman.enable = true;
 
   # Enable sound with pipewire.
   sound.enable = true;
@@ -238,7 +247,6 @@
     # waydroid.enable = true;
   };
   programs.virt-manager.enable = true;
-
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "23.05";

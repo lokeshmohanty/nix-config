@@ -57,13 +57,26 @@
 
       vscode.fhs discord distrobox
       unityhub zoom-us
-      lutris wineWowPackages.waylandFull winetricks bottles gamescope
+
+      gnome.nautilus
 
       whitesur-icon-theme capitaine-cursors whitesur-cursors breeze-qt5
 
+      bottles gamescope
+      lutris wineWowPackages.waylandFull winetricks
+
+      openconnect networkmanager-openconnect
+
       texlive.combined.scheme-full
       gcc ghc nodejs micromamba
-    ];
+
+      python311Full
+    ] ++ (with pkgs.python311Packages; [ 
+      pip jupyter dvc mlflow ipython
+      numpy pandas
+      pydantic rich
+    ]);
+    # ];
   };
   # xdg = {
   #   enable = true;

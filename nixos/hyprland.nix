@@ -23,19 +23,19 @@
   };
 
   environment.systemPackages = with pkgs; [
-    pinentry-qt
-    waybar dunst libnotify
-    fuzzel swaybg waypaper
-    networkmanagerapplet mpv vimiv-qt gimp
-    grim slurp swappy wl-clipboard
-    swayidle swaylock-effects wlogout
-    pamixer pavucontrol
-    nwg-displays wlr-randr
-    qt5.qtwayland qt6.qtwayland
-    cliphist pywal hyprpicker
-    # udisks2 gvfs
-    jmtpfs
-    tesseract
+    # pinentry-qt
+    # waybar dunst libnotify
+    # fuzzel swaybg waypaper
+    # networkmanagerapplet mpv vimiv-qt gimp
+    # grim slurp swappy wl-clipboard
+    # swayidle swaylock-effects wlogout
+    # pamixer pavucontrol
+    # nwg-displays wlr-randr
+    # qt5.qtwayland qt6.qtwayland
+    # cliphist pywal hyprpicker
+    # # udisks2 gvfs
+    # jmtpfs
+    # tesseract
 
     # configure-gtk glib whitesur-gtk-theme
     # gsettings-desktop-schemas
