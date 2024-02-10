@@ -2,13 +2,6 @@
   sudarshan = nixpkgs.lib.nixosSystem {
     specialArgs = { inherit self inputs; };
     system = "x86_64-linux";
-    modules = [
-      # ./hardware-configuration.nix
-      ./configuration.nix
-      # ./security.nix
-      # ./greeter.nix
-      # ./gaming.nix
-      # ./syncthing.nix
-    ];
+    modules = [ ./configuration.nix ];
   };
 }

@@ -48,43 +48,9 @@
     username = "lokesh";
     homeDirectory = "/home/lokesh";
     sessionPath = [ "$HOME/.local/bin" ];
-    packages = with pkgs; [
-      google-chrome onlyoffice-bin
-      tikzit motrix zotero kdenlive okular inkscape
-      fd ledger notmuch imagemagick
-      pcmanfm-qt qalculate-qt
-      lxmenu-data gtk3               # pcmanfm applications menu
-
-      vscode.fhs discord distrobox
-      unityhub zoom-us
-
-      gnome.nautilus
-
-      whitesur-icon-theme capitaine-cursors whitesur-cursors breeze-qt5
-
-      bottles gamescope
-      lutris wineWowPackages.waylandFull winetricks
-
-      openconnect networkmanager-openconnect
-
-      texlive.combined.scheme-full
-      gcc ghc nodejs micromamba
-
-      python311Full
-    ] ++ (with pkgs.python311Packages; [ 
-      pip jupyter ipython
-      numpy pandas matplotlib
-      pydantic rich dvc mlflow
-    ]);
-    # ];
+    sessionVariables = { BROWSER = "firefox"; };
+    # packages = with pkgs; [];
   };
-  # xdg = {
-  #   enable = true;
-  #   userDirs.enable = true;
-  #   mimeApps = {
-  #     enable = true;
-  #   };
-  # };
 
   programs.obs-studio = {
     enable = true;

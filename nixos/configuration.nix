@@ -19,13 +19,13 @@
     # ./users.nix
 
     # Import your generated (nixos-generate-config) hardware configuration
-    # ./hardware-configuration.nix
-    # ./syncthing.nix
     ./hardware-configuration.nix
     ./security.nix
     ./greeter.nix
+    ./hyprland.nix
     ./gaming.nix
     ./syncthing.nix
+    ./services.nix
     # ./ssh.nix
   ];
 
@@ -140,53 +140,42 @@
   environment.binsh = "${pkgs.dash}/bin/dash";
 
   environment.systemPackages = with pkgs; [
-    inxi neofetch shellcheck bat duf
-    gnumake libtool zip unzip file
-    ripgrep tldr yt-dlp ffmpeg
-    powertop nvtop htop bottom
-    gh                         # to fix auth error, remove it later
+    # gui applications
+    google-chrome onlyoffice-bin
+    tikzit motrix zotero kdenlive okular inkscape
+    vscode.fhs
+    zoom-us
+    unityhub
 
-    pandoc pass rclone rsync
-
-    interception-tools
-    cmakeWithGui
-    nix-index
-
-    quickemu                   # for easy vm creation
-
-    waypipe
-
-    xdg-desktop-portal xdg-desktop-portal-hyprland
-    pinentry-qt
-    waybar dunst libnotify
-    fuzzel swaybg waypaper
-    networkmanagerapplet mpv vimiv-qt gimp
-    grim slurp swappy wl-clipboard
-    swayidle swaylock-effects wlogout
-    pamixer pavucontrol
-    nwg-displays wlr-randr
-    qt5.qtwayland qt6.qtwayland
-    cliphist pywal hyprpicker
-    # udisks2 gvfs
-    jmtpfs
+    # cli applications
+    fd ledger notmuch imagemagick
+    ripgrep pandoc pass rclone rsync
     tesseract
-  ];
+    nix-index
+    yt-dlp ffmpeg tldr 
+    gh                          # prevent error from magit
 
-  programs.hyprland = {
-    enable = true;
-    # package = inputs.hyprland.packages.${pkgs.system}.hyprland;
-  };
-  xdg.portal = {
-    enable = true;
-    xdgOpenUsePortal = true;
-    config = {
-      common = {
-        default = [ "gtk" ];
-      };
-    };
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-  };
-  services.flatpak.enable = true;
+    # system utilities
+    inxi neofetch bat duf
+    libtool zip unzip unrar file
+    powertop nvtop htop bottom
+    openconnect networkmanager-openconnect
+
+    # other utilities
+    quickemu
+    waypipe
+    distrobox
+
+    # programming languages
+    python311Full
+    texlive.combined.scheme-full
+    gnumake gcc ghc nodejs micromamba
+    cmakeWithGui shellcheck 
+  ] ++ (with pkgs.python311Packages; [ 
+    pip jupyter ipython
+    numpy pandas matplotlib
+    pydantic rich dvc mlflow
+  ]);
 
   fonts = {
     fontDir.enable = true;
@@ -200,35 +189,6 @@
       # noto-fonts-emoji symbola
     ];
   };
-
-  # services.teamviewer.enable = true;
-  services.gvfs.enable = true;
-  services.locate = {
-    enable = true;
-    package = pkgs.plocate;
-    localuser = null;
-  };
-
-  # Capslock as Control + Escape, Escape as Capslock 
-  services.interception-tools = {
-    enable = true;
-    plugins = lib.mkForce [
-      pkgs.interception-tools-plugins.caps2esc
-    ];
-    udevmonConfig = ''
-      - JOB: "${pkgs.interception-tools}/bin/intercept -g $DEVNODE | ${pkgs.interception-tools-plugins.caps2esc}/bin/caps2esc | ${pkgs.interception-tools}/bin/uinput -d $DEVNODE"
-        DEVICE:
-          NAME: "AT Translated Set 2 keyboard"
-          EVENTS:
-            EV_KEY: [[KEY_CAPSLOCK, KEY_ESC]]
-    '';
-  };
-
-  services.printing = {
-    enable = true;
-    browsing = true;
-  };
-  services.blueman.enable = true;
 
   # Enable sound with pipewire.
   sound.enable = true;
