@@ -26,6 +26,7 @@
     ./greeter.nix
     ./gaming.nix
     ./syncthing.nix
+    # ./ssh.nix
   ];
 
   nixpkgs = {
@@ -108,11 +109,6 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  # programs.ssh.startAgent = true;
-  services.openssh = {
-    enable = true;
-    settings.PasswordAuthentication = true;
-  };
   programs.dconf.enable = true;
   programs.gnupg.agent = {
     enable = true;
