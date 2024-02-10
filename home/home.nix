@@ -72,9 +72,9 @@
 
       python311Full
     ] ++ (with pkgs.python311Packages; [ 
-      pip jupyter dvc mlflow ipython
-      numpy pandas
-      pydantic rich
+      pip jupyter ipython
+      numpy pandas matplotlib
+      pydantic rich dvc mlflow
     ]);
     # ];
   };
@@ -102,7 +102,6 @@
     enable = true;
     temperature = { day = 5000; night = 2500; };
     latitude = 13.0; longitude = 77.5;
-    tray = true;
   };
 
   dconf.settings = {

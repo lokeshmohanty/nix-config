@@ -1,7 +1,6 @@
 { pkgs, ... }: {
 
   # Enable the X11 windowing system.
-  # services.xserver.libinput.touchpad.disalbeWhileTyping = false;
   # services.xserver = {
   #   enable = true;
 
@@ -11,7 +10,7 @@
   #     # sddm.theme = "breeze";
   #     # defaultSession = "Hyprland";
   #   };
-  #   # desktopManager.plasma5.enable = true;
+  #   desktopManager.plasma5.enable = true;
   # };
   services.greetd = {
     enable = true;
