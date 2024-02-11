@@ -3,7 +3,7 @@
 {
   # icons file
   # nix run nixpkgs#wget -- "https://raw.githubusercontent.com/gokcehan/lf/master/etc/icons.example" -O icons
-  xdg.configFile."lf/icons".source = ./icons;
+  xdg.configFile."lf/icons".source = ./config/icons;
 
   programs.lf = {
     enable = true;

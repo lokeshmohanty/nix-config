@@ -14,18 +14,28 @@
 
   qt = {
     enable = true;
-    platformTheme = "qtct";
-    # style.name = "breeze";
+    platformTheme = "gtk";
+    style.name = "adwaita-dark"; # bb10dark, breeze, motif, plastique
+    style.package = pkgs.adwaita-qt;
   };
   gtk = {
     enable = true;
-    theme = {
-      package = pkgs.flat-remix-gtk;
-      name = "Flat-Remis-GTK-Grey-Darkest";
+    cursorTheme = {
+      package = pkgs.bibata-cursors;
+      name = "Bibata-Modern-Ice"; # Bibata-Modern-Amber
     };
-    iconTheme = {package = pkgs.gnome.adwaita-icon-theme; name = "Adwaita";};
-    font = {name = "Sans"; size = 11;};
+    theme = {
+      package = pkgs.adw-gtk3;
+      name = "adw-gtk3";
+    };
+    iconTheme = {
+      package = import ./gruvbox-plus.nix { inherit pkgs; };
+      name = "GruvboxPlus";
+    };
+    # font = {name = "Sans"; size = 11;};
   };
+  xdg.configFile."gtk-3.0/gtk.css".source = ./config/gtk.css;
+  xdg.configFile."gtk-4.0/gtk.css".source = ./config/gtk.css;
 
   nixpkgs = {
     overlays = [
