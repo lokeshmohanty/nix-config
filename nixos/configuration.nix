@@ -21,8 +21,7 @@
     # Import your generated (nixos-generate-config) hardware configuration
     ./hardware-configuration.nix
     ./security.nix
-    ./greeter.nix
-    ./hyprland.nix
+    ./desktop-environment.nix
     ./gaming.nix
     ./syncthing.nix
     ./services.nix
