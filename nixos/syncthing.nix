@@ -29,6 +29,10 @@
           path = "/home/lokesh/Documents/Books";
           devices = [ "lab" ];
         };
+        "Courses" = {
+          path = "/home/lokesh/Documents/Courses";
+          devices = [ "lab" ];
+        };
         "Practice" = {
           path = "/home/lokesh/Desktop/Practice";
           devices = [ "lab" ];

@@ -164,17 +164,19 @@
     quickemu
     waypipe
     distrobox
+    docker-compose
 
     # programming languages
-    python311Full
-    texlive.combined.scheme-full
+    python3
+    (pkgs.python3.withPackages (ps: with ps; [
+      # ipython jupyterlab pip
+      # numpy pandas matplotlib
+      # pydantic rich dvc mlflow
+    ]))
     gnumake gcc ghc nodejs micromamba
+    texlive.combined.scheme-full
     cmakeWithGui shellcheck 
-  ] ++ (with pkgs.python311Packages; [ 
-    pip jupyter ipython
-    numpy pandas matplotlib
-    pydantic rich dvc mlflow
-  ]);
+  ];
 
   fonts = {
     fontDir.enable = true;
@@ -201,10 +203,15 @@
     jack.enable = true;
   };
   virtualisation = {
-    docker = {
+    # docker = {
+    #   enable = true;
+    #   rootless.enable = true;
+    #   rootless.setSocketVariable = true;
+    # };
+    podman = {
       enable = true;
-      rootless.enable = true;
-      rootless.setSocketVariable = true;
+      dockerCompat = true;
+      defaultNetwork.settings.dns_enabled = true;
     };
     libvirtd.enable = true;
     # waydroid.enable = true;

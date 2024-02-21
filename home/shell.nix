@@ -26,6 +26,7 @@
       x = "env -u WAYLAND_DISPLAY";
       di = "docker image";
       dc = "docker container";
+      de = "distrobox enter";
       nl = "nix-locate";
       ns = "nix search nixpkgs";
       nq = "nix-env -qaP";
