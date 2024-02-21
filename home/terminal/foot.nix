@@ -7,7 +7,7 @@
       term = "xterm-256color";
       font = "Victor Mono:style=Italic:size=15";
     };
-    settings.colors = with config.colorScheme.colors; {
+    settings.colors = with config.colorScheme.palette; {
       regular0 = "0x${base00}"; # black, ARGB format
       regular1 = "0x${base08}"; # red
       regular2 = "0x${base0B}"; # green

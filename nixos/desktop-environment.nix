@@ -10,48 +10,49 @@
   #   })
   # ];
   environment.systemPackages = with pkgs; [
-    # (hyprland.overrideAttrs (prevAttrs: rec {
-    #   postInstall =
-    #     ''
-    #      substituteInPlace $out/share/wayland-sessions/hyprland.desktop --replace "Exec=Hyprland" "Exec=dbus-run-session Hyprland"
-    #     '';
-    # }))
-    where-is-my-sddm-theme
-
     xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
-    pinentry-qt
-    waybar dunst libnotify
-    swaybg waypaper
-    networkmanagerapplet mpv vimiv-qt gimp
+    pinentry-qt jmtpfs
+    waybar dunst libnotify swaybg waypaper
     grim slurp swappy wl-clipboard
+    networkmanagerapplet
     swayidle swaylock-effects wlogout
+    cliphist pywal hyprpicker
+
+    mate.caja mate.mate-polkit
+
+    # whitesur-icon-theme capitaine-cursors whitesur-cursors breeze-qt5
+    qt5.qtwayland qt6.qtwayland
+
+    mpv vimiv-qt gimp
     pamixer pavucontrol
     nwg-displays wlr-randr
-    qt5.qtwayland qt6.qtwayland
-    cliphist pywal hyprpicker
-    jmtpfs
-
-    mate.caja
-    whitesur-icon-theme capitaine-cursors whitesur-cursors breeze-qt5
-
     qalculate-qt
   ];
 
-  services.xserver = {
+  # services.xserver = {
+  #   enable = true;
+  #   displayManager = {
+  #     sddm.enable = true;
+  #     # sddm.theme = "${import ./sddm-theme.nix { inherit pkgs; }}";
+  #     sddm.theme = "where_is_my_sddm_theme";
+  #     sddm.wayland.enable = true;
+  #     defaultSession = "hyprland";
+  #   };
+  #   # desktopManager.mate.enable = true;
+  # };
+  services.greetd = {
     enable = true;
-    displayManager = {
-      sddm.enable = true;
-      # sddm.theme = "${import ./sddm-theme.nix { inherit pkgs; }}";
-      sddm.theme = "where_is_my_sddm_theme";
-      sddm.wayland.enable = true;
-      defaultSession = "hyprland";
+    settings = {
+      default_session = {
+        command = "${pkgs.hyprland}/bin/Hyprland";
+        user = "lokesh";
+      };
     };
-    desktopManager.mate.enable = true;
   };
 
   programs.hyprland = {
     enable = true;
-    # package = inputs.hyprland.packages.${pkgs.system}.hyprland;
+    package = inputs.hyprland.packages.${pkgs.system}.hyprland;
   };
   xdg.portal = {
     enable = true;

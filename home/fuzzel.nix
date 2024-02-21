@@ -12,7 +12,7 @@
       # exit-on-keyboard-focus-loss = "no";
       # inner-pad = 15;
     };
-    settings.colors = with config.colorScheme.colors; {
+    settings.colors = with config.colorScheme.palette; {
       background = "${base00}ff"; # RGBA format
       text = "${base06}ff";
       match = "8b39fdff";
