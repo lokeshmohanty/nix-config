@@ -76,11 +76,11 @@
     },
     "cpu": {
         "format": "{usage}% ",
-				"on-click": "alacritty -e htop"
+				"on-click": "footclient htop"
     },
     "memory": {
         "format": "{}% ",
-				"on-click": "alacritty -e btm"
+				"on-click": "footclient btm"
     },
     "temperature": {
         // "thermal-zone": 2,

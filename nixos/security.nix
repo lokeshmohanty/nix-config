@@ -2,7 +2,7 @@
   security = {
     rtkit.enable = true;
     pam.services.swaylock = {};
-    pam.services.sddm.enableGnomeKeyring = true;
+    pam.services.greetd.enableGnomeKeyring = true;
     # polkit.enable = true;
   };
 }

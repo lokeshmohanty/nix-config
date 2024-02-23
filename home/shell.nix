@@ -23,6 +23,7 @@
       d = "docker";
       g = "git";
       s = "sudo -u lokesh";
+      p = "python";
       x = "env -u WAYLAND_DISPLAY";
       di = "docker image";
       dc = "docker container";
