@@ -10,7 +10,7 @@
     settings = {
       devices = {
         "lab" = { id = "BKTCSPE-QCLARTR-5UVN7OB-NRHFAJI-SG36GWR-6NDDDO7-FLQVPV6-MGIU6AT"; }; 
-        "phone" = { id = "KFX44SL-S6S375R-BJGJWI7-PM74ONC-MNYVYF4-YNDSESJ-EQWEWKE-JZHHJQN"; };
+        "phone" = { id = "VYT5TLD-2QCG3JR-6B2L32R-SHIHGQQ-6ZFR62Q-M32KCDL-MZUXSNS-LNKFCQQ"; };
       };
       folders = {
         "Projects" = {
@@ -39,6 +39,10 @@
         };
         "Org" = {
           path = "/home/lokesh/Documents/Org";
+          devices = [ "phone" ];
+        };
+        "Personal" = {
+          path = "/home/lokesh/Documents/Personal";
           devices = [ "phone" ];
         };
       };

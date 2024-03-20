@@ -146,7 +146,7 @@
     unityhub
 
     # cli applications
-    fd ledger notmuch imagemagick
+    fd imagemagick
     ripgrep pandoc pass rclone rsync
     tesseract
     nix-index
@@ -166,15 +166,22 @@
     docker-compose
 
     # programming languages
-    python3
+    python3 poetry mujoco
     (pkgs.python3.withPackages (ps: with ps; [
-      # ipython jupyterlab pip
-      # numpy pandas matplotlib
-      # pydantic rich dvc mlflow
+      pip ipython jupyterlab jupytext
+      numpy pandas matplotlib seaborn tqdm
+      scikit-learn tensorflow torch
+      gymnasium pygame pybox2d mujoco
+
+      pydantic rich dvc mlflow tensorboard
+      huggingface-hub
     ]))
     gnumake gcc ghc nodejs micromamba
-    texlive.combined.scheme-full
     cmakeWithGui shellcheck 
+
+    ## latex
+    texlive.combined.scheme-full
+    texlab tectonic
   ];
 
   fonts = {
