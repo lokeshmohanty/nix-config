@@ -131,7 +131,7 @@
       initialPassword = "nixos";
       isNormalUser = true;
       description = "Lokesh Mohanty";
-      extraGroups = [ "wheel" "input" "video" "networkmanager" "libvirtd" ];
+      extraGroups = [ "wheel" "input" "video" "networkmanager" "libvirtd" "docker"];
     };
   };
   users.defaultUserShell = pkgs.fish;
@@ -166,11 +166,11 @@
     docker-compose
 
     # programming languages
-    python3 poetry mujoco
-    (pkgs.python3.withPackages (ps: with ps; [
+    poetry mujoco
+    (pkgs.python311.withPackages (ps: with ps; [
       pip ipython jupyterlab jupytext
       numpy pandas matplotlib seaborn tqdm
-      scikit-learn tensorflow torch
+      scikit-learn torch
       gymnasium pygame pybox2d mujoco
 
       pydantic rich dvc mlflow tensorboard
