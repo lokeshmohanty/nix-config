@@ -140,14 +140,13 @@
     fd imagemagick
     ripgrep pandoc pass rclone rsync
     tesseract
-    nix-index
     yt-dlp ffmpeg tldr 
     gh                          # prevent error from magit
 
     # system utilities
     inxi neofetch bat duf
     libtool zip unzip unrar file
-    powertop nvtop htop bottom
+    powertop htop bottom
     openconnect networkmanager-openconnect
 
     # other utilities
@@ -156,17 +155,17 @@
     distrobox
     docker-compose
 
-    # programming languages
+    ## programming languages
     poetry # mujoco
-    (pkgs.python311.withPackages (ps: with ps; [
-      pip ipython jupyterlab jupytext
-      numpy pandas matplotlib seaborn tqdm
-      scikit-learn torch
-      gymnasium pygame pybox2d mujoco imageio
+    # (pkgs.python3.withPackages (ps: with ps; [
+    #   pip ipython jupyterlab jupytext
+    #   numpy pandas matplotlib seaborn tqdm
+    #   scikit-learn torch
+    #   gymnasium pygame pybox2d mujoco imageio
 
-      pydantic rich dvc mlflow tensorboard
-      huggingface-hub
-    ]))
+    #   pydantic rich dvc mlflow tensorboard
+    #   huggingface-hub
+    # ]))
     gnumake gcc ghc nodejs micromamba
     cmakeWithGui shellcheck 
 

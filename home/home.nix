@@ -73,6 +73,7 @@
   programs.firefox.enable = true;
   # programs.keychain = { enable = true; keys = [ "id_ed25519" ]; };
   programs.gh = { enable = true; extensions = [ pkgs.gh-dash ]; };
+  programs.nix-index.enable = true;
 
   services.gammastep = {
     enable = true;

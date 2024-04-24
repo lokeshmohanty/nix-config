@@ -9,11 +9,11 @@
     clean.extraArgs = "--keep-since 4d --keep 3";
     flake = "/home/lokesh/Documents/nix-config";
   };
-
+  programs.nix-ld.enable = true;
   programs.dconf.enable = true;
   programs.gnupg.agent = {
     enable = true;
-    pinentryFlavor = "qt";
+    pinentryPackage = pkgs.pinentry-qt;
     enableSSHSupport = true;
   };
   programs.light.enable = true;
