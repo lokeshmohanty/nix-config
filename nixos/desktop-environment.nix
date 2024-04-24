@@ -18,7 +18,9 @@
     swayidle swaylock-effects wlogout
     cliphist pywal hyprpicker
 
-    mate.caja mate.mate-polkit
+    # mate.caja
+    mate.mate-polkit
+    gnome.nautilus
 
     # whitesur-icon-theme capitaine-cursors whitesur-cursors breeze-qt5
     qt5.qtwayland qt6.qtwayland

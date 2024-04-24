@@ -21,6 +21,7 @@
     ./gaming.nix
     ./syncthing.nix
     ./services.nix
+    ./programs.nix
     # ./ssh.nix
 
     # Import your generated (nixos-generate-config) hardware configuration
@@ -115,14 +116,6 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  programs.dconf.enable = true;
-  programs.gnupg.agent = {
-    enable = true;
-    pinentryFlavor = "qt";
-    enableSSHSupport = true;
-  };
-  programs.light.enable = true;
-  programs.fish.enable = true;
   users.users = {
     lokesh = {
       # If you do, you can skip setting a root password by
@@ -142,8 +135,6 @@
     google-chrome onlyoffice-bin
     tikzit motrix zotero kdenlive okular inkscape
     vscode.fhs
-    zoom-us
-    unityhub
 
     # cli applications
     fd imagemagick
@@ -166,12 +157,12 @@
     docker-compose
 
     # programming languages
-    poetry mujoco
+    poetry # mujoco
     (pkgs.python311.withPackages (ps: with ps; [
       pip ipython jupyterlab jupytext
       numpy pandas matplotlib seaborn tqdm
       scikit-learn torch
-      gymnasium pygame pybox2d mujoco
+      gymnasium pygame pybox2d mujoco imageio
 
       pydantic rich dvc mlflow tensorboard
       huggingface-hub
@@ -222,7 +213,6 @@
     libvirtd.enable = true;
     # waydroid.enable = true;
   };
-  programs.virt-manager.enable = true;
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "23.05";
