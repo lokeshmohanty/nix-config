@@ -154,6 +154,7 @@
     waypipe
     distrobox
     docker-compose
+    hledger
 
     ## programming languages
     poetry # mujoco

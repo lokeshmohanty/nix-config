@@ -45,6 +45,10 @@
           path = "/home/lokesh/Documents/Personal";
           devices = [ "phone" ];
         };
+        "Roam" = {
+          path = "/home/lokesh/Documents/Org/Roam";
+          devices = [ "lab" ];
+        };
       };
     };
   };
