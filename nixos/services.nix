@@ -7,6 +7,7 @@
     package = pkgs.plocate;
     localuser = null;
   };
+
   # Capslock as Control + Escape, Escape as Capslock 
   services.interception-tools = {
     enable = true;
@@ -21,10 +22,20 @@
             EV_KEY: [[KEY_CAPSLOCK, KEY_ESC]]
     '';
   };
+
+  # https://nixos.wiki/wiki/Printing  
+  # Access CUPS interface at http://localhost:631
   services.printing = {
     enable = true;
-    browsing = true;
+    # Run 'sudo -E hp-setup' or 'sudo hp-setup -i -a'
+    # drivers = with pkgs; [ hplipWithPlugin ]; 
   };
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
+  };
+
   services.blueman.enable = true;
   services.flatpak.enable = true;
 }
