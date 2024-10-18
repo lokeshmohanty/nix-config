@@ -19,7 +19,8 @@
       zoxide init fish | source
     '';
     shellAbbrs = {
-      e = "emacsclient -nw -a 'nvim'";
+      e = "emacsclient -c -a 'nvim'";
+      # e = "emacsclient -nw -a 'nvim'";
       d = "docker";
       g = "git";
       s = "sudo -u lokesh";

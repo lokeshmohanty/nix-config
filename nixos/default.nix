@@ -2,6 +2,11 @@
   sudarshan = nixpkgs.lib.nixosSystem {
     specialArgs = { inherit self inputs; };
     system = "x86_64-linux";
-    modules = [ ./configuration.nix ];
+    modules = [
+      inputs.stylix.nixosModules.stylix
+      inputs.nixos-hardware.nixosModules.lenovo-thinkpad-l14-amd
+      ./configuration.nix
+      ./desktop-environment.nix
+    ];
   };
 }

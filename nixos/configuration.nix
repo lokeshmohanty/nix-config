@@ -17,12 +17,12 @@
 
     # You can also split up your configuration and import pieces of it here:
     ./security.nix
-    ./desktop-environment.nix
     ./gaming.nix
     ./syncthing.nix
     ./services.nix
     ./programs.nix
     # ./ssh.nix
+    ./stylix.nix
 
     # Import your generated (nixos-generate-config) hardware configuration
     ./hardware-configuration.nix
@@ -82,7 +82,6 @@
 
   hardware.opengl = {
     enable = true;
-    driSupport = true;
     driSupport32Bit = true;
     extraPackages = [
       pkgs.rocm-opencl-icd
@@ -90,6 +89,7 @@
       pkgs.amdvlk
     ];
   };
+  services.xserver.videoDrivers = ["amdgpu"];
 
   networking.hostName = "sudarshan";
   networking.networkmanager.enable = true;
@@ -148,6 +148,7 @@
     libtool zip unzip unrar file
     powertop htop bottom
     openconnect networkmanager-openconnect
+    bluetuith
 
     # other utilities
     quickemu
@@ -169,6 +170,7 @@
     # ]))
     gnumake gcc ghc nodejs micromamba
     cmakeWithGui shellcheck 
+    quarto
 
     ## latex
     texlive.combined.scheme-full
@@ -189,7 +191,6 @@
   };
 
   # Enable sound with pipewire.
-  sound.enable = true;
   hardware.pulseaudio.enable = false;
   hardware.bluetooth.enable = true;
   services.pipewire = {

@@ -6,41 +6,40 @@
   pkgs,
   ...
 }: {
-  imports = [
-    inputs.nix-colors.homeManagerModules.default
-  ];
+  imports = [];
 
-  colorScheme = inputs.nix-colors.colorSchemes.gruvbox-dark-medium;
-
-  qt = {
-    enable = true;
-    platformTheme = "gtk";
-    style.name = "adwaita-dark"; # bb10dark, breeze, motif, plastique
-    style.package = pkgs.adwaita-qt;
-  };
-  gtk = {
-    enable = true;
-    cursorTheme = {
-      package = pkgs.bibata-cursors;
-      name = "Bibata-Modern-Ice"; # Bibata-Modern-Amber
-    };
-    theme = {
-      package = pkgs.adw-gtk3;
-      name = "adw-gtk3";
-    };
-    iconTheme = {
-      package = import ./gruvbox-plus.nix { inherit pkgs; };
-      name = "GruvboxPlus";
-    };
-    # font = {name = "Sans"; size = 11;};
-  };
-  xdg.configFile."gtk-3.0/gtk.css".source = ./config/gtk.css;
-  xdg.configFile."gtk-4.0/gtk.css".source = ./config/gtk.css;
+  # qt = {
+  #   enable = true;
+  #   platformTheme = "gtk";
+  #   style.name = "adwaita-dark"; # bb10dark, breeze, motif, plastique
+  #   style.package = pkgs.adwaita-qt;
+  # };
+  # gtk = {
+  #   enable = true;
+  #   cursorTheme = {
+  #     package = pkgs.bibata-cursors;
+  #     name = "Bibata-Modern-Ice"; # Bibata-Modern-Amber
+  #   };
+  #   theme = {
+  #     package = pkgs.adw-gtk3;
+  #     name = "adw-gtk3";
+  #   };
+  #   iconTheme = {
+  #     package = import ./gruvbox-plus.nix { inherit pkgs; };
+  #     name = "GruvboxPlus";
+  #   };
+  #   # font = {name = "Sans"; size = 11;};
+  # };
+  # xdg.configFile."gtk-3.0/gtk.css".source = ./config/gtk.css;
+  # xdg.configFile."gtk-4.0/gtk.css".source = ./config/gtk.css;
 
   nixpkgs = {
     overlays = [
       # If you want to use overlays exported from other flakes:
       # neovim-nightly-overlay.overlays.default
+
+      # my neovim config
+      inputs.neovim-config.overlays.default
 
       # Or define it inline, for example:
       # (final: prev: {

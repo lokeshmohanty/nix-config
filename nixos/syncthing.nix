@@ -10,7 +10,7 @@
     settings = {
       devices = {
         "lab" = { id = "BKTCSPE-QCLARTR-5UVN7OB-NRHFAJI-SG36GWR-6NDDDO7-FLQVPV6-MGIU6AT"; }; 
-        "phone" = { id = "VYT5TLD-2QCG3JR-6B2L32R-SHIHGQQ-6ZFR62Q-M32KCDL-MZUXSNS-LNKFCQQ"; };
+        "phone" = { id = "KITNSPR-KMBOSUP-RLJS4XX-KILL76P-SR3HAEL-VKQR4U3-JN636OM-FXNZ3AX"; };
       };
       folders = {
         "Projects" = {
@@ -39,15 +39,15 @@
         };
         "Org" = {
           path = "/home/lokesh/Documents/Org";
-          devices = [ "phone" ];
+          devices = [ "phone" "lab" ];
         };
         "Personal" = {
           path = "/home/lokesh/Documents/Personal";
           devices = [ "phone" ];
         };
-        "Roam" = {
-          path = "/home/lokesh/Documents/Org/Roam";
-          devices = [ "lab" ];
+        "Camera" = {
+          path = "/home/lokesh/Pictures/Phone";
+          devices = [ "phone" ];
         };
       };
     };

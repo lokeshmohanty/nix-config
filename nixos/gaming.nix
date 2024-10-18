@@ -3,10 +3,13 @@
     enable = true;
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = true;
+    gamescopeSession.enable = true;
   };
   programs.gamemode.enable = true;
   environment.systemPackages = with pkgs; [
-    bottles gamescope
-    lutris wineWowPackages.waylandFull winetricks
-  ]; # mangohud 
+    # wineWowPackages.waylandFull
+    # winetricks
+    mangohud                    # monitor CPU/GPU/temperature, ...
+    protonup                    # install proton ge
+  ];
 }
