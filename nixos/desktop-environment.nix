@@ -17,6 +17,8 @@
     networkmanagerapplet
     swayidle swaylock-effects wlogout
     cliphist pywal hyprpicker
+    graphviz
+    flameshot
 
     # mate.caja
     mate.mate-polkit
@@ -25,7 +27,8 @@
     # whitesur-icon-theme capitaine-cursors whitesur-cursors breeze-qt5
     qt5.qtwayland qt6.qtwayland
 
-    mpv vimiv-qt gimp
+    gwenview vlc
+    mpv imv gimp
     pamixer pavucontrol
     nwg-displays wlr-randr
     qalculate-qt
@@ -56,6 +59,9 @@
     enable = true;
     # package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
   };
+  programs.nautilus-open-any-terminal.enable = true;
+  programs.nautilus-open-any-terminal.terminal = "${pkgs.foot}/bin/footclient";
+  services.gnome.sushi.enable = true;
   xdg.portal = {
     enable = true;
     xdgOpenUsePortal = true;

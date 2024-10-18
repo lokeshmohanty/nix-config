@@ -8,8 +8,8 @@
       ./terminal
       ./home.nix
       ./fuzzel.nix
-      ./lf.nix
       ./shell.nix
+      ./xdg.nix
     ];
   };
 }

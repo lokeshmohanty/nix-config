@@ -8,8 +8,7 @@
   programs.gamemode.enable = true;
   environment.systemPackages = with pkgs; [
     # wineWowPackages.waylandFull
-    # winetricks
-    mangohud                    # monitor CPU/GPU/temperature, ...
-    protonup                    # install proton ge
+    winetricks
+    gamescope
   ];
 }

@@ -8,45 +8,9 @@
 }: {
   imports = [];
 
-  # qt = {
-  #   enable = true;
-  #   platformTheme = "gtk";
-  #   style.name = "adwaita-dark"; # bb10dark, breeze, motif, plastique
-  #   style.package = pkgs.adwaita-qt;
-  # };
-  # gtk = {
-  #   enable = true;
-  #   cursorTheme = {
-  #     package = pkgs.bibata-cursors;
-  #     name = "Bibata-Modern-Ice"; # Bibata-Modern-Amber
-  #   };
-  #   theme = {
-  #     package = pkgs.adw-gtk3;
-  #     name = "adw-gtk3";
-  #   };
-  #   iconTheme = {
-  #     package = import ./gruvbox-plus.nix { inherit pkgs; };
-  #     name = "GruvboxPlus";
-  #   };
-  #   # font = {name = "Sans"; size = 11;};
-  # };
-  # xdg.configFile."gtk-3.0/gtk.css".source = ./config/gtk.css;
-  # xdg.configFile."gtk-4.0/gtk.css".source = ./config/gtk.css;
-
   nixpkgs = {
     overlays = [
-      # If you want to use overlays exported from other flakes:
-      # neovim-nightly-overlay.overlays.default
-
-      # my neovim config
       inputs.neovim-config.overlays.default
-
-      # Or define it inline, for example:
-      # (final: prev: {
-      #   hi = final.hello.overrideAttrs (oldAttrs: {
-      #     patches = [ ./change-hello-to-hi.patch ];
-      #   });
-      # })
     ];
     config = {
       allowUnfree = true;
@@ -57,8 +21,67 @@
     username = "lokesh";
     homeDirectory = "/home/lokesh";
     sessionPath = [ "$HOME/.local/bin" ];
-    sessionVariables = { BROWSER = "firefox"; };
-    # packages = with pkgs; [];
+    sessionVariables = {
+      LESSHISTFILE = config.xdg.cacheHome + "/less/history";
+      LESSKEY = config.xdg.configHome + "/less/lesskey";
+      WINEPREFIX = config.xdg.dataHome + "/wine";
+
+      # set default applications
+      BROWSER = "firefox";
+
+      # enable scrolling in git diff
+      DELTA_PAGER = "less -R";
+    };
+    packages = with pkgs; [
+      # Misc
+      tldr
+      cowsay
+      gnupg
+      gnumake
+
+      imagemagick
+      pandoc pass rclone 
+      yt-dlp ffmpeg
+
+      # Modern cli tools, replacement of grep/sed/...
+
+      # Interactively filter its input using fuzzy searching, not limit to filenames.
+      fzf
+      fd # search for files by name, faster than find
+      ripgrep
+      ast-grep # A fast and polyglot tool for code searching, linting, rewriting at large scale
+
+      yq-go # yaml processor https://github.com/mikefarah/yq
+      just # a command runner like make, but simpler
+      delta # A viewer for git and diff output
+      lazygit # Git terminal UI.
+      hyperfine # command-line benchmarking tool
+      gping # ping, but with a graph(TUI)
+      doggo # DNS client for humans
+      duf # Disk Usage/Free Utility - a better 'df' alternative
+      gdu # disk usage analyzer(replacement of `du`)
+
+      # nix related
+      #
+      # it provides the command `nom` works just like `nix
+      # with more details log output
+      nix-output-monitor
+      nix-index # A small utility to index nix store paths
+      nix-init # generate nix derivation from url
+      # https://github.com/nix-community/nix-melt
+      nix-melt # A TUI flake.lock viewer
+      # https://github.com/utdemir/nix-tree
+      nix-tree # A TUI to visualize the dependency graph of a nix derivation
+
+      # productivity
+      # caddy # A webserver with automatic HTTPS via Let's Encrypt(replacement of nginx)
+      # croc # File transfer between computers securely and easily
+
+      # other
+      remmina freerdp # remote desktop client
+      ventoy # multi-boot USB creator
+      joplin
+    ];
   };
 
   programs.obs-studio = {

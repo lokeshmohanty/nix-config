@@ -1,6 +1,7 @@
 { pkgs, lib, ... }: {
   # services.teamviewer.enable = true;
-  services.gvfs.enable = true;
+  services.gvfs.enable = true;  # mount, trash and other functionalities
+  services.tumbler.enable = true;  # thumbnail support for images
   services.locate = {
     enable = true;
     package = pkgs.plocate;

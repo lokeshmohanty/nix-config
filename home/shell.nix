@@ -1,7 +1,11 @@
 { pkgs, config, ... }:
 
 {
-  home.packages = with pkgs; [ zoxide ];
+  home.packages = with pkgs; [
+    zoxide                      #  A faster way to navigate your filesystem
+    yazi                        #  A fast and minimalistic fuzzy finder
+    exiftool                    #  Read and write meta information in files
+  ];
   programs.starship.enable = true;
   programs.fzf = {
     enable = true;
@@ -10,6 +14,10 @@
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
+  };
+  programs.yazi = {
+    enable = true;
+    enableFishIntegration = true;
   };
   programs.fish = {
     enable = true;
@@ -38,6 +46,14 @@
     functions = {
       nr = "nix run nixpkgs#$argv";
       gitignore = "curl -sL https://www.gitignore.io/api/$argv";
+      y = ''
+        set tmp (mktemp -t "yazi-cwd.XXXXXX")
+        yazi $argv --cwd-file="$tmp"
+        if set cwd (command cat -- "$tmp"); and [ -n "$cwd" ]; and [ "$cwd" != "$PWD" ]
+          builtin cd -- "$cwd"
+        end
+        rm -f -- "$tmp"
+      '';
 
       haskellEnv = ''
         for el in $argv

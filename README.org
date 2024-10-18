@@ -37,3 +37,9 @@
 - *Official* : [[https://nixos.org/learn.html][nixos]], [[https://nix-community.github.io/home-manager/index.html][home-manager]], [[https://nixos.wiki/wiki/Flakes][flakes]]
 - *Examples* : [[https://github.com/misterio77/nix-config][misterio77]]
 - *Blogs*    : [[https://www.tweag.io/blog/2020-05-25-flakes/][flakes: tweag]], [[https://tech.aufomm.com/my-nixos-journey-flakes/][flakes: Li Yang]], [[https://tech.aufomm.com/my-nix-journey-use-nix-with-ubuntu/][nix: Li Yang]]
+
+* TODO
+
+- Modularize (https://www.youtube.com/watch?v=vYc6IzKvAJQ)
+- Enable secure boot (https://github.com/nix-community/lanzaboote/blob/master/docs/QUICK_START.md)
+- Use https://github.com/fufexan/nix-gaming

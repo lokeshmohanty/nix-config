@@ -132,15 +132,13 @@
 
   environment.systemPackages = with pkgs; [
     # gui applications
-    google-chrome onlyoffice-bin
-    tikzit motrix zotero kdenlive okular inkscape
+    google-chrome onlyoffice-bin okular 
+    tikzit motrix zotero
+    kdenlive inkscape krita
     vscode.fhs
 
     # cli applications
-    fd imagemagick
-    ripgrep pandoc pass rclone rsync
     tesseract
-    yt-dlp ffmpeg tldr 
     gh                          # prevent error from magit
 
     # system utilities
