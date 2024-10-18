@@ -2,33 +2,53 @@
 
 {
   home.packages = with pkgs; [
-    zoxide                      #  A faster way to navigate your filesystem
-    yazi                        #  A fast and minimalistic fuzzy finder
     exiftool                    #  Read and write meta information in files
   ];
-  programs.starship.enable = true;
-  programs.fzf = {
-    enable = true;
-    enableFishIntegration = true;
+  programs = {
+    fzf = {
+      enable = true;
+      enableBashIntegration = true;
+      enableFishIntegration = true;
+    };
+    zoxide = {
+      enable = true;
+      enableBashIntegration = true;
+      enableFishIntegration = true;
+      enableNushellIntegration = true;
+    };
+    starship = {
+      enable = true;
+      enableBashIntegration = true;
+      enableFishIntegration = true;
+      enableNushellIntegration = true;
+    };
+    yazi = {
+      enable = true;
+      enableBashIntegration = true;
+      enableFishIntegration = true;
+      enableNushellIntegration = true;
+    };
+    direnv = {
+      enable = true;
+      nix-direnv.enable = true;
+    };
   };
-  programs.direnv = {
+  programs.nushell = {
     enable = true;
-    nix-direnv.enable = true;
-  };
-  programs.yazi = {
-    enable = true;
-    enableFishIntegration = true;
+    configFile.text = ''
+      $env.config = {
+        edit_mode: vi
+      }
+    '';
   };
   programs.fish = {
     enable = true;
     interactiveShellInit = ''
       set fish_greeting
       fish_vi_key_bindings
-      zoxide init fish | source
     '';
     shellAbbrs = {
       e = "emacsclient -c -a 'nvim'";
-      # e = "emacsclient -nw -a 'nvim'";
       d = "docker";
       g = "git";
       s = "sudo -u lokesh";
@@ -38,13 +58,13 @@
       dc = "docker container";
       de = "distrobox enter";
       nl = "nix-locate";
+      nr = "nix run nixpkgs#";
       ns = "nix search nixpkgs";
       nq = "nix-env -qaP";
       nsh = "nix-shell --command fish -p";
       hypr = "dbus-run-session Hyprland";
     };
     functions = {
-      nr = "nix run nixpkgs#$argv";
       gitignore = "curl -sL https://www.gitignore.io/api/$argv";
       y = ''
         set tmp (mktemp -t "yazi-cwd.XXXXXX")

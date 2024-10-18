@@ -11,6 +11,7 @@
   nixpkgs = {
     overlays = [
       inputs.neovim-config.overlays.default
+      inputs.nix-alien.overlays.default
     ];
     config = {
       allowUnfree = true;
@@ -63,6 +64,7 @@
 
       # nix related
       #
+      nix-alien # run unpatched binaries
       # it provides the command `nom` works just like `nix
       # with more details log output
       nix-output-monitor
@@ -80,7 +82,6 @@
       # other
       remmina freerdp # remote desktop client
       ventoy # multi-boot USB creator
-      joplin
     ];
   };
 
