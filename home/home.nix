@@ -10,7 +10,6 @@
 
   nixpkgs = {
     overlays = [
-      inputs.neovim-config.overlays.default
       inputs.nix-alien.overlays.default
     ];
     config = {
@@ -84,6 +83,10 @@
       ventoy # multi-boot USB creator
     ];
   };
+
+  stylixConfig.enable = true;
+  stylixConfig.theme = "everforest";
+  wallpaper = ./../wallpapers/0016.jpg;
 
   programs.obs-studio = {
     enable = true;

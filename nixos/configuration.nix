@@ -22,7 +22,6 @@
     ./services.nix
     ./programs.nix
     # ./ssh.nix
-    ./stylix.nix
 
     # Import your generated (nixos-generate-config) hardware configuration
     ./hardware-configuration.nix

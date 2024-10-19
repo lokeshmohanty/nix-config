@@ -117,6 +117,10 @@
         '';
       };
     };
-    plugins = [ { name = "bass"; src = pkgs.fishPlugins.bass; } ];
+    plugins = [
+      { name = "bass"; src = pkgs.fishPlugins.bass; }
+      { name = "colored-man-output"; src = pkgs.fishPlugins.colored-man-pages.src; }
+      { name = "autopair"; src = pkgs.fishPlugins.autopair.src; }
+    ];
   };
 }

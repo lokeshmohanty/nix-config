@@ -147,6 +147,22 @@
         "type": "github"
       }
     },
+    "betterfox": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1727376228,
+        "narHash": "sha256-s54Y6Ix7W942T+TIwGudoqDzUHifMBJOU9AWqpqIKl4=",
+        "owner": "yokoffing",
+        "repo": "Betterfox",
+        "rev": "ab5ede0fef39f02f0ef2bd119879226e3ab71f9f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "yokoffing",
+        "repo": "Betterfox",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -587,6 +603,26 @@
         "type": "github"
       }
     },
+    "nh": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1728371783,
+        "narHash": "sha256-ufI7115ims2PPxggpWQhigAUrwlwu155wVgngZzzyZ0=",
+        "owner": "viperML",
+        "repo": "nh",
+        "rev": "afdff9ab4fdb9c329b5d97c5b742242b97f8754d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "viperML",
+        "repo": "nh",
+        "type": "github"
+      }
+    },
     "nix-alien": {
       "inputs": {
         "flake-compat": "flake-compat_2",
@@ -786,13 +822,32 @@
     },
     "root": {
       "inputs": {
+        "betterfox": "betterfox",
         "home-manager": "home-manager",
         "hyprland": "hyprland",
         "neovim-config": "neovim-config",
+        "nh": "nh",
         "nix-alien": "nix-alien",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_5",
+        "shyfox": "shyfox",
         "stylix": "stylix"
+      }
+    },
+    "shyfox": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1727885752,
+        "narHash": "sha256-3OEAuNqqUimhWA04qA19InCSsDFWoVWX5A48pF2mNEY=",
+        "owner": "Naezr",
+        "repo": "ShyFox",
+        "rev": "233e22466161f96316ec76957c8cb803629b47a8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Naezr",
+        "repo": "ShyFox",
+        "type": "github"
       }
     },
     "stylix": {

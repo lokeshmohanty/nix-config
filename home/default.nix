@@ -3,13 +3,14 @@
     extraSpecialArgs = { inherit self inputs; };
     pkgs = nixpkgs.legacyPackages.x86_64-linux;
     modules = [
-      inputs.stylix.homeManagerModules.stylix
+      # inputs.stylix.homeManagerModules.stylix
       ./editor
       ./terminal
       ./home.nix
       ./fuzzel.nix
       ./shell.nix
       ./xdg.nix
+      ./stylix.nix
     ];
   };
 }

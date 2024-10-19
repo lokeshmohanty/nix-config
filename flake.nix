@@ -8,17 +8,46 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Nix User Repository
+    # nurpkgs = {
+    #   url = "github:/nix-community/NUR";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
+
+    # Nix command helper
+    nh = {
+      url = "github:viperML/nh";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };    
+
     nixos-hardware.url = "github:NixOS/nixos-hardware";
     neovim-config.url = "github:lokeshmohanty/neovim-config";
     nix-alien.url = "github:thiagokokada/nix-alien";
 
     stylix.url = "github:danth/stylix";
+
+    # Firefox extensions
+    shyfox = {
+      url = "github:Naezr/ShyFox";
+      flake = false;
+    };
+    betterfox = {
+      url = "github:yokoffing/Betterfox";
+      flake = false;
+    };
   };
 
   outputs = { nixpkgs, self, ... } @ inputs:
     {
       nixosConfigurations = import ./nixos { inherit self nixpkgs inputs; };
       homeConfigurations = import ./home { inherit self nixpkgs inputs; };
+      # packages = import nixpks {
+      #   # inherit system;
+      #   overlays = [
+      #     (test-pkg = )
+      #   ];
+      # };
     };
 
   # outputs = {
