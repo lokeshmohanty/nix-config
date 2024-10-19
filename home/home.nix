@@ -35,7 +35,7 @@
     };
     packages = with pkgs; [
       # Misc
-      tldr
+      tlrc # rust client for tldr
       cowsay
       gnupg
       gnumake
