@@ -3,6 +3,7 @@
 {
   ## Documentation: https://github.com/viperML/nh
   ## Video: https://www.youtube.com/watch?v=DnA4xNTrrqY
+  ## Nix Helper
   programs.nh = {
     enable = true;
     clean.enable = true;

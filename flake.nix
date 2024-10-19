@@ -15,11 +15,11 @@
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
 
-    # Nix command helper
-    nh = {
-      url = "github:viperML/nh";
+    # Lix is a modern, delicious implementation of the Nix
+    lix-module = {
+      url = "https://git.lix.systems/lix-project/nixos-module/archive/2.91.1-1.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs";
-    };    
+    };
 
     nixos-hardware.url = "github:NixOS/nixos-hardware";
     neovim-config.url = "github:lokeshmohanty/neovim-config";
