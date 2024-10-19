@@ -1,14 +1,4 @@
 { pkgs, inputs, ... }: {
-  ## overlays are better than package overrides
-  # nixpkgs.overlays = [
-  #   (final: prev: {
-  #     hyprland = prev.hyprland.overrideAttrs (oldAttrs: {
-  #       postInstall = oldAttrs.postInstall or "" + ''
-  #                   substituteInPlace $out/share/wayland-sessions/hyprland.desktop --replace "Exec=Hyprland" "Exec=wrappedhl"        
-  #         	'';
-  #     });
-  #   })
-  # ];
   environment.systemPackages = with pkgs; [
     xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
     pinentry-qt jmtpfs
@@ -16,7 +6,7 @@
     grim slurp swappy wl-clipboard
     networkmanagerapplet
     swayidle swaylock-effects wlogout
-    cliphist pywal hyprpicker
+    cliphist hyprpicker
     graphviz
     flameshot
 

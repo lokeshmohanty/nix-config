@@ -1,2 +1,0 @@
-
-~/.gnupg/gpg-agent.conf
