@@ -35,6 +35,7 @@
       enableNushellIntegration = true;
       icons = true;
       extraOptions = [
+        "--grid"
         "--group-directories-first"
         "--color=always"
         "--long"
@@ -74,6 +75,7 @@
       di = "docker image";
       dc = "docker container";
       de = "distrobox enter";
+      nd = "nix develop";
       nl = "nix-locate";
       nr = "nix run nixpkgs#";
       ns = "nix search nixpkgs";
@@ -107,7 +109,7 @@
             # set pythonVersion $argv[1]
             set argv $argv[2..-1]
           end
-          echo "$pythonVersion"
+          echo "Python Version: $pythonVersion"
 
           for el in $argv
             set ppkgs $ppkgs "python"$pythonVersion"Packages.$el"
