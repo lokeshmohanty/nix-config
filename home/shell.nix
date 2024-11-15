@@ -33,7 +33,7 @@
       enableBashIntegration = true;
       enableFishIntegration = true;
       enableNushellIntegration = true;
-      icons = true;
+      icons = "auto";
       extraOptions = [
         "--grid"
         "--group-directories-first"
@@ -64,6 +64,7 @@
     interactiveShellInit = ''
       set fish_greeting
       fish_vi_key_bindings
+      eval "$(${pkgs.micromamba}/bin/micromamba shell hook -s fish)"
     '';
     shellAbbrs = {
       e = "emacsclient -c -a 'nvim'";
@@ -75,6 +76,7 @@
       di = "docker image";
       dc = "docker container";
       de = "distrobox enter";
+      mm = "micromamba";
       nd = "nix develop";
       nl = "nix-locate";
       nr = "nix run nixpkgs#";

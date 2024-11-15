@@ -79,12 +79,11 @@
     };
   };
 
-  hardware.opengl = {
+  hardware.graphics = {
     enable = true;
-    driSupport32Bit = true;
+    enable32Bit = true;
     extraPackages = [
-      pkgs.rocm-opencl-icd
-      pkgs.rocm-opencl-runtime
+      pkgs.rocmPackages.clr.icd
       pkgs.amdvlk
     ];
   };

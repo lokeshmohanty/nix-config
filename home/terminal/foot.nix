@@ -10,7 +10,7 @@
         dpi-aware = "yes";
         pad = "3x3";
       };
-      # colors.alpha = 0.8;
+      colors.alpha = 0.5;
     };
   };
 }
