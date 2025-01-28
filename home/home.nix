@@ -55,6 +55,7 @@
       just # a command runner like make, but simpler
       delta # A viewer for git and diff output
       lazygit # Git terminal UI.
+      git-lfs
       hyperfine # command-line benchmarking tool
       gping # ping, but with a graph(TUI)
       doggo # DNS client for humans
@@ -75,7 +76,6 @@
       nix-tree # A TUI to visualize the dependency graph of a nix derivation
 
       # productivity
-      # caddy # A webserver with automatic HTTPS via Let's Encrypt(replacement of nginx)
       # croc # File transfer between computers securely and easily
 
       # other
@@ -87,6 +87,16 @@
   stylixConfig.enable = true;
   stylixConfig.theme = "everforest";
   wallpaper = ./../wallpapers/0016.jpg;
+
+  # Hyprland
+  home.sessionVariables.NIXOS_OZONE_WL = "1";
+  # wayland.windowManager.hyprland = {
+  #   enable = true;
+  #   plugins = [
+  #     # inputs.hyprspace.packages.${pkgs.system}.Hyprspace
+  #     inputs.woomer.packages.${pkgs.system}.default
+  #   ];
+  # };
 
   programs.obs-studio = {
     enable = true;

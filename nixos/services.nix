@@ -1,11 +1,18 @@
 { pkgs, lib, ... }: {
-  # services.teamviewer.enable = true;
+  # Enable sound with pipewire.
+  services.pulseaudio.enable = false;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    jack.enable = true;
+  };
   services.gvfs.enable = true;  # mount, trash and other functionalities
   services.tumbler.enable = true;  # thumbnail support for images
   services.locate = {
     enable = true;
     package = pkgs.plocate;
-    localuser = null;
   };
 
   # Capslock as Control + Escape, Escape as Capslock 

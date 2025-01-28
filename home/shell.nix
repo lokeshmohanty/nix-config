@@ -28,24 +28,6 @@
       enableFishIntegration = true;
       enableNushellIntegration = true;
     };
-    eza = {
-      enable = true;
-      enableBashIntegration = true;
-      enableFishIntegration = true;
-      enableNushellIntegration = true;
-      icons = "auto";
-      extraOptions = [
-        "--grid"
-        "--group-directories-first"
-        "--color=always"
-        "--long"
-        "--git"
-        "--no-user"
-        "--no-time"
-        "--no-filesize"
-        "--no-permissions"
-      ];
-    };
     direnv = {
       enable = true;
       nix-direnv.enable = true;
@@ -56,7 +38,7 @@
     configFile.text = ''
       $env.config = {
         edit_mode: vi
-      }
+          }
     '';
   };
   programs.fish = {

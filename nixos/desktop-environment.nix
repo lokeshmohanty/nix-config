@@ -12,7 +12,8 @@
 
     # mate.caja
     mate.mate-polkit
-    gnome.nautilus
+    nautilus
+    ffmpegthumbnailer
 
     # whitesur-icon-theme capitaine-cursors whitesur-cursors breeze-qt5
     qt5.qtwayland qt6.qtwayland
@@ -22,6 +23,7 @@
     pamixer pavucontrol
     nwg-displays wlr-randr
     qalculate-qt
+    ntfs3g
   ];
 
   # services.xserver = {

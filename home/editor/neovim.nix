@@ -11,6 +11,7 @@
       lightline-vim
       lightline-bufferline
       telescope-nvim
+      snacks-nvim
     ];
   };
 }

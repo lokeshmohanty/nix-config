@@ -72,11 +72,12 @@
         # "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4="
       ];
     };
-    gc = {
-      automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 7d";
-    };
+    # Garbage collection is being handled by "nix-helper (nh)"
+    # gc = {
+    #   automatic = true;
+    #   dates = "weekly";
+    #   options = "--delete-older-than 7d";
+    # };
   };
 
   hardware.graphics = {
@@ -91,6 +92,7 @@
 
   networking.hostName = "sudarshan";
   networking.networkmanager.enable = true;
+  networking.firewall.enable = false;
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -155,15 +157,12 @@
 
     ## programming languages
     poetry # mujoco
-    # (pkgs.python3.withPackages (ps: with ps; [
-    #   pip ipython jupyterlab jupytext
-    #   numpy pandas matplotlib seaborn tqdm
-    #   scikit-learn torch
-    #   gymnasium pygame pybox2d mujoco imageio
-
-    #   pydantic rich dvc mlflow tensorboard
-    #   huggingface-hub
-    # ]))
+    (pkgs.python311.withPackages (ps: with ps; [
+      pip ipython jupyterlab jupytext
+      numpy pandas matplotlib seaborn tqdm
+      pillow pydantic rich tensorboard
+      huggingface-hub
+    ]))
     gnumake gcc ghc nodejs micromamba
     cmakeWithGui shellcheck 
     quarto
@@ -179,34 +178,26 @@
     packages = with pkgs; [
       iosevka-comfy.comfy-duo
       iosevka-comfy.comfy-fixed
-      nerdfonts
+      nerd-fonts.inconsolata-go
+      nerd-fonts.victor-mono
       google-fonts
       font-awesome
       # noto-fonts-emoji symbola
     ];
   };
 
-  # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
   hardware.bluetooth.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-    jack.enable = true;
-  };
   virtualisation = {
-    # docker = {
-    #   enable = true;
-    #   rootless.enable = true;
-    #   rootless.setSocketVariable = true;
-    # };
-    podman = {
+    docker = {
       enable = true;
-      dockerCompat = true;
-      defaultNetwork.settings.dns_enabled = true;
+      rootless.enable = true;
+      rootless.setSocketVariable = true;
     };
+    # podman = {
+    #   enable = true;
+    #   dockerCompat = true;
+    #   defaultNetwork.settings.dns_enabled = true;
+    # };
     libvirtd.enable = true;
     # waydroid.enable = true;
   };
