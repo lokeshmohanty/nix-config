@@ -1,11 +1,13 @@
 { pkgs, inputs, ... }:
 
 {
-  imports = [
-    ./emacs.nix
-    ./neovim.nix
-  ];
+  imports = [ ./emacs.nix ];
 
   home.sessionVariables.EDITOR = "emacsclient -c -a 'vi'";
-  # home.sessionVariables.EDITOR = "emacsclient -nw -a 'vi'";
+  home.packages = [
+    (inputs.nvf.lib.neovimConfiguration {
+      inherit pkgs;
+      modules = [ ../../modules/neovim.nix ];
+    }).neovim
+  ];
 }

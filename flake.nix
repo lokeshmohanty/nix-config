@@ -14,7 +14,8 @@
     };
 
     nixos-hardware.url = "github:NixOS/nixos-hardware";
-    neovim-config.url = "github:lokeshmohanty/neovim-config";
+    # neovim-config.url = "github:lokeshmohanty/neovim-config";
+    nvf.url = "github:notashelf/nvf";
     nix-alien.url = "github:thiagokokada/nix-alien";
     stylix.url = "github:danth/stylix";
   };
@@ -23,11 +24,10 @@
     {
       nixosConfigurations = import ./nixos { inherit self nixpkgs inputs; };
       homeConfigurations = import ./home { inherit self nixpkgs inputs; };
-      # packages = import nixpks {
-      #   # inherit system;
-      #   overlays = [
-      #     (test-pkg = )
-      #   ];
-      # };
+      packages."x86_64-linux".neovim =
+        (inputs.nvf.lib.neovimConfiguration {
+          pkgs = nixpkgs.legacyPackages."x86_64-linux";
+          modules = [ ./modules/neovim.nix ];
+        }).neovim;
     };
 }
