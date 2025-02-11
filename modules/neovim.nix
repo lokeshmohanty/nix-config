@@ -12,17 +12,21 @@
     keymaps = [
       { key = "<leader><leader>i"; mode = "n"; 
         action = "<cmd>IconPickerYank<cr>"; }
-      { key = "<leader><leader>a"; mode = "n"; 
+      { key = "<leader><leader>s"; mode = "n"; 
         action = "<cmd>AerialToggle<cr>"; }
-      { key = "<leader>ad"; mode = "n";
+      { key = "<leader>sd"; mode = "n";
         action = "<cmd>lua MiniFiles.open()<cr>"; }
-      { key = "<leader>af"; mode = "n";
+      { key = "<leader>sf"; mode = "n";
         action = "<cmd>Pick files<cr>"; }
-      { key = "<leader>ab"; mode = "n";
+      { key = "<leader>sb"; mode = "n";
         action = "<cmd>Pick buffers<cr>"; }
-      { key = "<leader>ag"; mode = "n";
+      { key = "<leader>ss"; mode = "n";
+        action = "<cmd>Pick grep_live<cr>"; }
+      { key = "<leader>sm"; mode = "n";
         action = "<cmd>Neogit<cr>"; }
     ];
+    spellcheck.enable = true;
+    spellcheck.programmingWordlist.enable = true;
     statusline.lualine.enable = true;
     autocomplete.nvim-cmp = {
       enable = true;
@@ -32,6 +36,7 @@
 
     binds.whichKey.enable = true;
     telescope.enable = true;
+    projects.project-nvim.enable = true;
 
     snippets.luasnip.enable = true;
     treesitter.context.enable = true;
@@ -74,7 +79,7 @@
     };
 
     ui = {
-      borders.enable = true;
+      borders.enable = false;
       noice.enable = false;
       colorizer.enable = true;
       fastaction.enable = true;

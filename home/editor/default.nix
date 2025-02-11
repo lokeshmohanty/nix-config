@@ -3,7 +3,8 @@
 {
   imports = [ ./emacs.nix ];
 
-  home.sessionVariables.EDITOR = "emacsclient -c -a 'vi'";
+  home.sessionVariables.EDITOR = "vi";
+  # home.sessionVariables.EDITOR = "emacsclient -c -a 'vi'";
   home.packages = [
     (inputs.nvf.lib.neovimConfiguration {
       inherit pkgs;
