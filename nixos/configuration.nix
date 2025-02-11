@@ -135,7 +135,8 @@
     google-chrome onlyoffice-bin okular 
     tikzit motrix zotero
     kdenlive inkscape krita
-    vscode.fhs
+    code-cursor
+    
 
     # cli applications
     tesseract
@@ -179,7 +180,8 @@
       iosevka-comfy.comfy-duo
       iosevka-comfy.comfy-fixed
       nerd-fonts.inconsolata-go
-      nerd-fonts.victor-mono
+      # nerd-fonts.victor-mono
+      victor-mono
       google-fonts
       font-awesome
       # noto-fonts-emoji symbola

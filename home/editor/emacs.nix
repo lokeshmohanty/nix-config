@@ -4,7 +4,7 @@
   home.packages = with pkgs; [ pyright ledger notmuch ];
   programs.emacs = {
     enable = true;
-    package = pkgs.emacs29-pgtk;
+    package = pkgs.emacs30;
     # extraPackages = epkgs: [ epkgs.multi-vterm ];
   };
 
