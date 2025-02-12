@@ -56,8 +56,8 @@
         serif = config.stylix.fonts.monospace;
         sansSerif = config.stylix.fonts.monospace;
         monospace = {
-          package = pkgs.victor-mono;
-          name = "Victor Mono Font";
+          package = pkgs.cascadia-code;
+          name = "Cascadia Code";
         };
         emoji = {
           package = pkgs.noto-fonts-emoji;

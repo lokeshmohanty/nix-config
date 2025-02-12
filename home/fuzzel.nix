@@ -4,7 +4,7 @@
   programs.fuzzel = {
     enable = true;
     settings.main = {
-      font = "Victor Mono:style=Italic:size=15";
+      font = "Cascadia Code:style=Italic:size=15";
       terminal = "${pkgs.foot}/bin/footclient";
       dpi-aware = "no";
       width = 50;               # default: 30

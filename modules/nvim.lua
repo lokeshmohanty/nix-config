@@ -1,3 +1,42 @@
+vim.keymap.set('n', '<leader>mss', function()
+    local input = vim.fn.input('Create session: ')
+    vim.cmd('lua MiniSessions.write(input)')
+    end, { noremap = true })
+
+vim.keymap.set('n', '<leader>msd', function()
+    local input = vim.fn.input('Delete session: ')
+    vim.cmd('lua MiniSessions.write(input)')
+    end, { noremap = true })
+
+require('lualine').setup {
+  options = {
+    component_separators = '',
+    section_separators = { left = '', right = '' },
+  },
+  sections = {
+    lualine_a = { { 'mode', separator = { left = '' }, right_padding = 2 } },
+    lualine_b = { 'filename', 'branch' },
+    lualine_c = {
+      '%=', --[[ add your center compoentnts here in place of this comment ]]
+    },
+    lualine_x = {},
+    lualine_y = { 'filetype', 'progress' },
+    lualine_z = {
+      { 'location', separator = { right = '' }, left_padding = 2 },
+    },
+  },
+  inactive_sections = {
+    lualine_a = { 'filename' },
+    lualine_b = {},
+    lualine_c = {},
+    lualine_x = {},
+    lualine_y = {},
+    lualine_z = { 'location' },
+  },
+  tabline = {},
+  extensions = {},
+}
+
 -- Jupytext Configuration
 require("jupytext").setup({
     style = "markdown",
@@ -69,26 +108,6 @@ vim.keymap.set("n", "<localleader>mi", ":MoltenInit<CR>", { desc = "Initialize M
 -- if you work with html outputs:
 vim.keymap.set("n", "<localleader>mx", ":MoltenOpenInBrowser<CR>", { desc = "open output in browser", silent = true })
 
--- Toggle Quarto Notebook
-local python_term = require("toggleterm.terminal").Terminal:new({ cmd = 'python3', hidden = true, direction = 'float'})
-
-vim.keymap.set('n', '<C-p>', function() python_term:toggle() end, { noremap = true, silent = true })
-
-local function markdown_codeblock(language, content)
-  return '```{' .. language .. '}\n' .. content .. '\n```'
-end
-
-local quarto_notebook_cmd = 'nvim -c enew -c "set filetype=quarto"' ..
-' -c "norm GO## IPython\nThis is Quarto IPython notebook. Syntax is the same as in markdown\n\n' .. markdown_codeblock('python', '# enter code here\n') .. '"' ..
-' -c "norm Gkk"' ..
-' -c "MoltenInit python3" -c QuartoActivate -c startinsert'
-
-local molten_term = require("toggleterm.terminal").Terminal:new({ cmd = quarto_notebook_cmd, hidden = true, direction = 'float'})
-vim.keymap.set('n', '<C-p>', function () molten_term:toggle() end, { noremap = true, silent = true })
-vim.keymap.set('t', '<C-p>', function ()
-  vim.cmd 'stopinsert'
-  molten_term:toggle()
-end, { noremap = true, silent = true })
 
 -- Disable annoying pyright diagnostic
 require("lspconfig")["pyright"].setup({

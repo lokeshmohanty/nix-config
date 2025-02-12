@@ -1,4 +1,5 @@
 { pkgs, ... }: {
+
   vim = {
     useSystemClipboard = true;
     enableLuaLoader = true;
@@ -28,43 +29,24 @@
         action = "<cmd>Pick grep_live<cr>"; }
       { key = "<leader>sm"; mode = "n";
         action = "<cmd>Neogit<cr>"; }
-
-      # { key = "<localleader>mi"; mode = "n";
-      #   action = "<cmd>MoltenInit<cr>"; }
-      # { key = "<localleader>e"; mode = "n";
-      #   action = "<cmd>MoltenEvaluateOperator<cr>"; }
-      # { key = "<localleader>rl"; mode = "n";
-      #   action = "<cmd>MoltenEvaluateLine<cr>"; }
-      # { key = "<localleader>rr"; mode = "n";
-      #   action = "<cmd>MoltenReevaluateCell<cr>"; }
-      # { key = "<localleader>r"; mode = "v";
-      #   action = "<cmd>MoltenEvaluateVisual<cr>"; }
-      # { key = "<localleader>rd"; mode = "n";
-      #   action = "<cmd>MoltenDelete<cr>"; }
-      # { key = "<localleader>oh"; mode = "n";
-      #   action = "<cmd>MoltenHideOutput<cr>"; }
-      # { key = "<localleader>os"; mode = "n";
-      #   action = "<cmd>MoltenEnterOuput<cr>"; }
     ];
     spellcheck.enable = false;
     spellcheck.programmingWordlist.enable = true;
-    statusline.lualine.enable = true;
+    statusline.lualine = {
+      enable = true;
+    };
     autocomplete.nvim-cmp = {
       enable = true;
       mappings.next = "<C-n>";
       mappings.previous = "<C-p>";
     };
 
-    terminal.toggleterm.enable = true;
     binds.whichKey.enable = true;
-    dashboard.startify.enable = true;
     telescope.enable = true;
-    projects.project-nvim.enable = true;
 
     snippets.luasnip.enable = true;
     treesitter.context.enable = true;
 
-    # runner.run-nvim.enable = true;
     debugger.nvim-dap.enable = true;
     debugger.nvim-dap.ui.enable = true;
     lsp.enable = true;
@@ -91,7 +73,7 @@
       icons.enable = true;
       files.enable = true;
       basics.enable = true;
-      surround.enable = true;
+      # surround.enable = true;
       pairs.enable = true;
       comment.enable = true;
       bracketed.enable = true;
@@ -100,7 +82,10 @@
       notify.enable = true;
       pick.enable = true;
       sessions.enable = true;
-      # starter.enable = true;
+      sessions.setupOpts = { 
+        directory = "~/.config/nvf/sessions"; 
+      };
+      starter.enable = true;
     };
     utility = {
       # ccc.enable = true;
@@ -111,6 +96,7 @@
         integrations.markdown.downloadRemoteImages = true;
       };
       surround.enable = true;
+      surround.useVendoredKeybindings = false;
       outline.aerial-nvim.enable = true;
       preview.markdownPreview.enable = true;
     };
@@ -122,18 +108,29 @@
       fastaction.enable = true;
     };
 
-    assistant = {
-      copilot = {
-        enable = true;
-        cmp.enable = true;
-      };
-    };
+    # assistant = {
+    #   copilot = {
+    #     enable = true;
+    #     cmp.enable = true;
+    #   };
+    # };
 
     # can use lazy.plugins as well
     extraPlugins = with pkgs.vimPlugins; {
       neogit.package = neogit;
-      jupytext.package = jupytext-nvim;
-      jupytext.setup = "require('jupytext').setup()";
+      supermaven = {
+        package = supermaven-nvim;
+        setup = "require('supermaven-nvim').setup({})";
+      };
+      jupytext = {
+        package = jupytext-nvim;
+        setup = "require('jupytext').setup({})";
+      };
+      vimtex = {
+        package = vimtex;
+        setup = "vim.g.vimtex_view_method = 'zathura'";
+      };
+      cmp-vimtex.package = cmp-vimtex;
       quarto.package = quarto-nvim;
       molten = {
         package = molten-nvim;
@@ -143,7 +140,10 @@
       };
     };
     withPython3 = true; withNodeJs = true;
-    extraPackages = with pkgs; [ ripgrep imagemagick ];
+    extraPackages = with pkgs; [ 
+      ripgrep 
+      imagemagick 
+    ];
     luaPackages = [ "magick" ];
     python3Packages = [
       "pynvim" 

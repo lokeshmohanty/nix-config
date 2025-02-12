@@ -180,11 +180,10 @@
       iosevka-comfy.comfy-duo
       iosevka-comfy.comfy-fixed
       nerd-fonts.inconsolata-go
-      # nerd-fonts.victor-mono
+      cascadia-code
       victor-mono
       google-fonts
       font-awesome
-      # noto-fonts-emoji symbola
     ];
   };
 
