@@ -158,10 +158,10 @@
 
     ## programming languages
     poetry # mujoco
-    (pkgs.python311.withPackages (ps: with ps; [
-      pip ipython jupyterlab jupytext
+    (pkgs.python3.withPackages (ps: with ps; [
+      pip ipython jupyterlab jupytext notebook
       numpy pandas matplotlib seaborn tqdm
-      pillow pydantic rich tensorboard
+      pillow pydantic rich tensorboard ueberzug
       huggingface-hub
     ]))
     gnumake gcc ghc nodejs micromamba
