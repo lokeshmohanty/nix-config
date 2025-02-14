@@ -166,7 +166,7 @@
     extraPackages = with pkgs; [ 
       ripgrep 
       imagemagick 
-      neovim-remote
+      ueberzugpp
     ];
     luaPackages = [ "magick" ];
     python3Packages = [
@@ -177,6 +177,8 @@
       "pnglatex"
       "plotly" 
       "pyperclip" 
+      "jupytext" 
+      "notebook"
     ];
   };
 }

@@ -140,7 +140,8 @@
 
     # cli applications
     tesseract
-    gh                          # prevent error from magit
+    aria2
+    gh
 
     # system utilities
     inxi neofetch bat duf
@@ -159,9 +160,9 @@
     ## programming languages
     poetry # mujoco
     (pkgs.python3.withPackages (ps: with ps; [
-      pip ipython jupyterlab jupytext notebook
+      pip ipython jupyterlab
       numpy pandas matplotlib seaborn tqdm
-      pillow pydantic rich tensorboard ueberzug
+      pillow pydantic rich tensorboard
       huggingface-hub
     ]))
     gnumake gcc ghc nodejs micromamba
