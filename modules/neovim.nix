@@ -1,9 +1,11 @@
 { pkgs, ... }: {
-
+  
   vim = {
+    searchCase = "smart";
     useSystemClipboard = true;
     enableLuaLoader = true;
-    luaConfigPost = "${builtins.readFile ./nvim.lua}";
+    additionalRuntimePaths = [ ./nvim ];
+    luaConfigPost = "${builtins.readFile ./nvim/lua/main.lua}";
     options = { 
       tabstop = 2; 
       shiftwidth = 0; 
@@ -39,12 +41,21 @@
       enable = true;
       mappings.next = "<C-n>";
       mappings.previous = "<C-p>";
+      # sourcePlugins = with pkgs.vimPlugins; [ lazydev-nvim ];
     };
 
     binds.whichKey.enable = true;
     telescope.enable = true;
+    
 
-    snippets.luasnip.enable = true;
+    snippets.luasnip = {
+      enable = true;
+      loaders = ''
+        require("luasnip.loaders.from_snipmate").lazy_load()
+        require("luasnip.loaders.from_lua").load({ paths = "~/.config/nvf/snippets" })
+      '';
+      providers = with pkgs.vimPlugins; [ vim-snippets ];
+    };
     treesitter.context.enable = true;
 
     debugger.nvim-dap.enable = true;
@@ -100,6 +111,17 @@
       outline.aerial-nvim.enable = true;
       preview.markdownPreview.enable = true;
     };
+    assistant.copilot = {
+      enable = true;
+      mappings = {
+        suggestion = {
+          accept = "<C-Enter>";
+          acceptLine = "<C-l>";
+          next = "<M-]>";
+          prev = "<M-[>";
+        };
+      };
+    };
 
     ui = {
       borders.enable = false;
@@ -108,29 +130,30 @@
       fastaction.enable = true;
     };
 
-    # assistant = {
-    #   copilot = {
-    #     enable = true;
-    #     cmp.enable = true;
-    #   };
-    # };
-
-    # can use lazy.plugins as well
+    lazy.plugins = {
+      vimtex = {
+        enabled = true;
+        package = pkgs.vimPlugins.vimtex;
+        lazy = true;
+        ft = "tex";
+        setupOpts = {
+          init = ''
+            vim.g.vimtex_view_general_viewer = "okular"
+            vim.g.vimtex_view_general_options = "--unique file:@pdf\#src:@line@tex"
+          '';
+        };
+        after =  ''
+          vim.api.nvim_command('unlet b:did_ftplugin')
+          vim.api.nvim_command('call vimtex#init()')
+        '';
+      };
+    };
     extraPlugins = with pkgs.vimPlugins; {
       neogit.package = neogit;
-      supermaven = {
-        package = supermaven-nvim;
-        setup = "require('supermaven-nvim').setup({})";
-      };
       jupytext = {
         package = jupytext-nvim;
         setup = "require('jupytext').setup({})";
       };
-      vimtex = {
-        package = vimtex;
-        setup = "vim.g.vimtex_view_method = 'zathura'";
-      };
-      cmp-vimtex.package = cmp-vimtex;
       quarto.package = quarto-nvim;
       molten = {
         package = molten-nvim;
@@ -143,6 +166,7 @@
     extraPackages = with pkgs; [ 
       ripgrep 
       imagemagick 
+      neovim-remote
     ];
     luaPackages = [ "magick" ];
     python3Packages = [
