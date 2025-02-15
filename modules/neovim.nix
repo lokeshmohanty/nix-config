@@ -4,6 +4,8 @@
     searchCase = "smart";
     useSystemClipboard = true;
     enableLuaLoader = true;
+    withPython3 = true; 
+    withNodeJs = true;
     additionalRuntimePaths = [ ./nvim ];
     luaConfigPost = "${builtins.readFile ./nvim/lua/main.lua}";
     options = { 
@@ -148,21 +150,14 @@
         '';
       };
     };
-    extraPlugins = with pkgs.vimPlugins; {
-      neogit.package = neogit;
-      jupytext = {
-        package = jupytext-nvim;
-        setup = "require('jupytext').setup({})";
-      };
-      quarto.package = quarto-nvim;
-      molten = {
-        package = molten-nvim;
-        setup = ''
-          vim.g.molten_image_provider = "image.nvim"
-        '';
-      };
-    };
-    withPython3 = true; withNodeJs = true;
+    startPlugins = with pkgs.vimPlugins ; [
+      render-markdown-nvim
+      neogit                # magit alternative for vim
+      jupytext-nvim         # convert ipynb to markdown
+      quarto-nvim           # empowered markdown
+      molten-nvim           # run ipynb from vim
+      lazydev-nvim          # neovim library for lua lsp
+    ];
     extraPackages = with pkgs; [ 
       ripgrep 
       imagemagick 

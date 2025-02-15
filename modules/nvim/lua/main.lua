@@ -252,3 +252,11 @@ end, {
   nargs = 1,
   complete = 'file'
 })
+
+-- -- Create autocommand for markdown and ipynb files
+-- vim.api.nvim_create_autocmd("BufEnter", {
+--     pattern = { "*.md", "*.ipynb" },
+--     callback = function()
+--         vim.opt_local.wrap = false
+--     end
+-- })
