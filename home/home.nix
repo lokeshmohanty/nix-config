@@ -85,7 +85,7 @@
   };
 
   stylixConfig.enable = true;
-  stylixConfig.theme = "everforest";
+  stylixConfig.theme = "terracotta";
   wallpaper = ./../wallpapers/0016.jpg;
 
   # Hyprland

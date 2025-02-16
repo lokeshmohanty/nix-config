@@ -13,10 +13,10 @@
       # inner-pad = 15;
     };
     settings.colors = {
-      background = "1f1d2eff";
-      text = "6e6a86ff";
-      selection = "908caaff";
-      selection-text = "1f1d2eff";
+      background = "d0c1bbff";     # "#d0c1bb"
+      text = "352a25ff";           # "#352a25"
+      selection = "ce943eff";      # "#ce943e"
+      selection-text = "241c19ff"; # "#241c19"
     };
   };
 }

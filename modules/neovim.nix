@@ -15,8 +15,26 @@
     };
     theme = {
       enable = true;
-      name = "gruvbox";
-      style = "dark";
+      name = "mini-base16";
+      # style = "terracotta";
+      base16-colors = {
+        base00 = "#efeae8";
+        base01 = "#dfd6d1";
+        base02 = "#d0c1bb";
+        base03 = "#c0aca4";
+        base04 = "#59453d";
+        base05 = "#473731";
+        base06 = "#352a25";
+        base07 = "#241c19";
+        base08 = "#a75045";
+        base09 = "#bd6942";
+        base0A = "#ce943e";
+        base0B = "#7a894a";
+        base0C = "#847f9e";
+        base0D = "#625574";
+        base0E = "#8d5968";
+        base0F = "#b07158";
+      };
     };
     keymaps = [
       { key = "<leader><leader>i"; mode = "n"; 
@@ -86,11 +104,9 @@
       icons.enable = true;
       files.enable = true;
       basics.enable = true;
-      # surround.enable = true;
       pairs.enable = true;
       comment.enable = true;
       bracketed.enable = true;
-      move.enable = true;
       jump2d.enable = true;
       notify.enable = true;
       pick.enable = true;
@@ -101,12 +117,17 @@
       starter.enable = true;
     };
     utility = {
-      # ccc.enable = true;
-      icon-picker.enable = true;
-      # diffview-nvim.enable = true;
+      ccc.enable = true;
+      icon-picker.enable = true;       # :IconPicker
+      diffview-nvim.enable = true;     # :Diffview
       images.image-nvim.enable = true;
       images.image-nvim.setupOpts = {
-        integrations.markdown.downloadRemoteImages = true;
+        maxWidth = 60;
+        maxHeight = 12;
+        integrations.markdown = {
+          downloadRemoteImages = true;
+          onlyRenderAtCursor = true;
+        };
       };
       surround.enable = true;
       surround.useVendoredKeybindings = false;
@@ -150,13 +171,14 @@
         '';
       };
     };
-    startPlugins = with pkgs.vimPlugins ; [
+    startPlugins = with pkgs.vimPlugins; [
       render-markdown-nvim
       neogit                # magit alternative for vim
       jupytext-nvim         # convert ipynb to markdown
       quarto-nvim           # empowered markdown
       molten-nvim           # run ipynb from vim
       lazydev-nvim          # neovim library for lua lsp
+      everforest            # green based colorscheme
     ];
     extraPackages = with pkgs; [ 
       ripgrep 
