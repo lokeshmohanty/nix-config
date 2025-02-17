@@ -160,7 +160,7 @@
     ## programming languages
     poetry # mujoco
     (pkgs.python3.withPackages (ps: with ps; [
-      pip ipython jupyterlab
+      pip ipython jupyterlab jupytext
       numpy pandas matplotlib seaborn tqdm
       pillow pydantic rich tensorboard
       huggingface-hub

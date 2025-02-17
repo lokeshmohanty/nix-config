@@ -38,7 +38,7 @@
     configFile.text = ''
       $env.config = {
         edit_mode: vi
-          }
+      }
     '';
   };
   programs.fish = {
@@ -52,7 +52,7 @@
       e = "emacsclient -c -a 'nvim'";
       d = "docker";
       g = "git";
-      s = "sudo -u lokesh";
+      s = "sudo -E";
       p = "python";
       x = "env -u WAYLAND_DISPLAY";
       di = "docker image";
