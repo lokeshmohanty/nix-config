@@ -1,3 +1,30 @@
+-- local capabilities = vim.lsp.protocol.make_client_capabilities()
+-- capabilities.textDocument.publishDiagnostics.tagSupport.valueSet = { 2 } 
+-- require('lspconfig')['basedpyright'].setup{
+--     capabilities = capabilities,
+--     on_attach = on_attach
+-- }
+
+require('blink.cmp').setup({
+    sources = {
+        default = { 'lazydev', 'lsp', 'path', 'snippets', 'buffer', 'markdown' },
+        providers = {
+            markdown = {
+                name = 'RenderMarkdown',
+                module = 'render-markdown.integ.blink',
+                fallbacks = { 'lsp' },
+            },
+            lazydev = {
+                name = "LazyDev",
+                module = "lazydev.integrations.blink",
+                -- make lazydev completions top priority (see `:h blink.cmp`)
+                score_offset = 100,
+            },
+        },
+    },
+})
+
+vim.g.lazydev_enabled = true
 vim.keymap.set('n', '<leader>mss', function()
     local input = vim.fn.input('Create session: ')
     vim.cmd('lua MiniSessions.write(input)')
@@ -8,43 +35,6 @@ vim.keymap.set('n', '<leader>msd', function()
     vim.cmd('lua MiniSessions.write(input)')
     end, { noremap = true })
 
-
-local luasnip = require('luasnip')
-local cmp = require('cmp')
-
-cmp.setup({
-  mapping = {
-   ['<CR>'] = cmp.mapping(function(fallback)
-        if cmp.visible() then
-            if luasnip.expandable() then
-                luasnip.expand()
-            else
-                cmp.confirm({
-                    select = true,
-                })
-            end
-        else
-            fallback()
-        end
-    end),
-
-    ["<Tab>"] = cmp.mapping(function(fallback)
-      if luasnip.locally_jumpable(1) then
-        luasnip.jump(1)
-      else
-        fallback()
-      end
-    end, { "i", "s" }),
-
-    ["<S-Tab>"] = cmp.mapping(function(fallback)
-      if luasnip.locally_jumpable(-1) then
-        luasnip.jump(-1)
-      else
-        fallback()
-      end
-    end, { "i", "s" }),
-  }
-})
 
 require('lualine').setup {
   options = {

@@ -57,10 +57,13 @@
     statusline.lualine = {
       enable = true;
     };
-    autocomplete.nvim-cmp = {
+    autocomplete.blink-cmp = {
       enable = true;
-      mappings.next = "<C-n>";
-      mappings.previous = "<C-p>";
+      mappings = {
+        confirm = "<CR>";
+        next = "<C-n>";
+        previous = "<C-p>";
+      };
       # sourcePlugins = with pkgs.vimPlugins; [ lazydev-nvim ];
     };
 
@@ -85,7 +88,7 @@
       enableLSP = true;
       enableDAP = true;
       enableFormat = true;
-      enableExtraDiagnostics = true;
+      enableExtraDiagnostics = false;
       enableTreesitter = true;
 
       nix.enable = true;
@@ -94,6 +97,7 @@
       haskell.enable = true;
       # rust.enable = true;
       markdown.enable = true;
+      typst.enable = true;
       html.enable = true;
       lua.enable = true;
     };
@@ -179,6 +183,8 @@
       molten-nvim           # run ipynb from vim
       lazydev-nvim          # neovim library for lua lsp
       everforest            # green based colorscheme
+      bullets-vim           # markdown insert bulleted lists ...
+      img-clip-nvim         # drag n drop images
     ];
     extraPackages = with pkgs; [ 
       ripgrep 
@@ -194,8 +200,6 @@
       "pnglatex"
       "plotly" 
       "pyperclip" 
-      "jupytext" 
-      "notebook"
     ];
   };
 }

@@ -41,6 +41,10 @@
           path = "/home/lokesh/Documents/Org";
           devices = [ "phone" "lab" ];
         };
+        "Notebook" = {
+          path = "/home/lokesh/Documents/Notebook";
+          devices = [ "phone" "lab" ];
+        };
         "Personal" = {
           path = "/home/lokesh/Documents/Personal";
           devices = [ "phone" ];

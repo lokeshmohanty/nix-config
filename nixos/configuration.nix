@@ -160,7 +160,8 @@
     ## programming languages
     poetry # mujoco
     (pkgs.python3.withPackages (ps: with ps; [
-      pip ipython jupyterlab jupytext
+      pip ipython jupyterlab 
+      jupytext notebook  # required by molten.nvim for ipynb files
       numpy pandas matplotlib seaborn tqdm
       pillow pydantic rich tensorboard
       huggingface-hub
@@ -172,6 +173,7 @@
     ## latex
     texlive.combined.scheme-full
     texlab tectonic
+    typst
   ];
 
   fonts = {
