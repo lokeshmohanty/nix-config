@@ -14,20 +14,52 @@
     };
 
     nixos-hardware.url = "github:NixOS/nixos-hardware";
-    # neovim-config.url = "github:lokeshmohanty/neovim-config";
     nvf.url = "github:notashelf/nvf";
     nix-alien.url = "github:thiagokokada/nix-alien";
     stylix.url = "github:danth/stylix";
   };
 
-  outputs = { nixpkgs, self, ... } @ inputs:
-    {
-      nixosConfigurations = import ./nixos { inherit self nixpkgs inputs; };
-      homeConfigurations = import ./home { inherit self nixpkgs inputs; };
-      packages."x86_64-linux".neovim =
-        (inputs.nvf.lib.neovimConfiguration {
-          pkgs = nixpkgs.legacyPackages."x86_64-linux";
-          modules = [ ./modules/neovim ];
-        }).neovim;
+  outputs = { self, nixpkgs, home-manager, ... } @ inputs:
+    let
+      systems = [
+        "aarch64-linux"
+        "i686-linux"
+        "x86_64-linux"
+        "aarch64-darwin"
+        "x86_64-darwin"
+      ];
+      forAllSystems = nixpkgs.lib.genAttrs systems;
+    in {
+      packages = forAllSystems (system:
+        let pkgs = nixpkgs.legacyPackages.${system};
+        in import ./pkgs { inherit pkgs inputs; }
+      );
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
+      nixosConfigurations = {
+        sudarshan = nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs; };
+          modules = [
+            inputs.nixos-hardware.nixosModules.lenovo-thinkpad-l14-amd
+            inputs.lix-module.nixosModules.default
+            ./nixos/configuration.nix
+            ./nixos/desktop-environment.nix
+          ];
+        };
+      };
+      homeConfigurations = {
+        "lokesh@sudarshan" = home-manager.lib.homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+          extraSpecialArgs = { inherit inputs; };
+          modules = [
+            ./home/editor
+            ./home/terminal
+            ./home/home.nix
+            ./home/fuzzel.nix
+            ./home/shell.nix
+            ./home/xdg.nix
+            ./home/stylix.nix
+          ];
+        };
+      };
     };
 }
