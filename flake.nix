@@ -27,7 +27,7 @@
       packages."x86_64-linux".neovim =
         (inputs.nvf.lib.neovimConfiguration {
           pkgs = nixpkgs.legacyPackages."x86_64-linux";
-          modules = [ ./modules/neovim.nix ];
+          modules = [ ./modules/neovim ];
         }).neovim;
     };
 }

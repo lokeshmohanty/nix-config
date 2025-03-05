@@ -17,6 +17,6 @@
   programs.nvf = {
     enable = true;
     enableManpages = true;
-    settings = import ../../modules/neovim.nix { inherit pkgs; };
+    settings = import ../../modules/neovim { inherit pkgs; };
   };
 }

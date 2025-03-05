@@ -6,8 +6,8 @@
     enableLuaLoader = true;
     withPython3 = true; 
     withNodeJs = true;
-    additionalRuntimePaths = [ ./nvim ];
-    luaConfigPost = "${builtins.readFile ./nvim/lua/main.lua}";
+    additionalRuntimePaths = [ ./lua ];
+    luaConfigPost = "${builtins.readFile ./lua/main.lua}";
     options = { 
       tabstop = 2; 
       shiftwidth = 0; 
@@ -60,7 +60,7 @@
     autocomplete.blink-cmp = {
       enable = true;
       mappings = {
-        confirm = "<CR>";
+        confirm = "<TAB>";
         next = "<C-n>";
         previous = "<C-p>";
       };
