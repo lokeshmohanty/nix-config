@@ -6,8 +6,10 @@
     enableLuaLoader = true;
     withPython3 = true; 
     withNodeJs = true;
-    additionalRuntimePaths = [ ./lua ];
-    luaConfigPost = "${builtins.readFile ./lua/main.lua}";
+    additionalRuntimePaths = [ ./. ];
+    luaConfigRC.myConfig = ''
+      require("myConfig")
+    '';
     options = { 
       tabstop = 2; 
       shiftwidth = 0; 
@@ -16,7 +18,7 @@
     theme = {
       enable = true;
       name = "mini-base16";
-      # style = "terracotta";
+      # base16 stype: terracotta
       base16-colors = {
         base00 = "#efeae8";
         base01 = "#dfd6d1";
@@ -36,22 +38,6 @@
         base0F = "#b07158";
       };
     };
-    keymaps = [
-      { key = "<leader><leader>i"; mode = "n"; 
-        action = "<cmd>IconPickerYank<cr>"; }
-      { key = "<leader><leader>p"; mode = "n"; 
-        action = "<cmd>MarkdownPreviewToggle<cr>"; }
-      { key = "<leader>sd"; mode = "n";
-        action = "<cmd>lua MiniFiles.open()<cr>"; }
-      { key = "<leader>sf"; mode = "n";
-        action = "<cmd>Pick files<cr>"; }
-      { key = "<leader>sb"; mode = "n";
-        action = "<cmd>Pick buffers<cr>"; }
-      { key = "<leader>ss"; mode = "n";
-        action = "<cmd>Pick grep_live<cr>"; }
-      { key = "<leader>sm"; mode = "n";
-        action = "<cmd>Neogit<cr>"; }
-    ];
     spellcheck.enable = false;
     spellcheck.programmingWordlist.enable = true;
     statusline.lualine = {
@@ -59,12 +45,22 @@
     };
     autocomplete.blink-cmp = {
       enable = true;
+      setupOpts = {
+        keymap.preset = "super-tab";
+        snippets.preset = "luasnip";
+        sources.providers = {
+          lazydev = {
+            name = "LazyDev";
+            module = "lazydev.integrations.blink";
+          };
+        };
+        sources.default = [ "lazydev" ];
+      };
       mappings = {
         confirm = "<TAB>";
         next = "<C-n>";
         previous = "<C-p>";
       };
-      # sourcePlugins = with pkgs.vimPlugins; [ lazydev-nvim ];
     };
 
     binds.whichKey.enable = true;
@@ -95,13 +91,11 @@
       clang.enable = true;
       python.enable = true;
       haskell.enable = true;
-      # rust.enable = true;
       markdown.enable = true;
       typst.enable = true;
       html.enable = true;
       lua.enable = true;
     };
-    # notify.nvim-notify.enable = true;
     notes.orgmode.enable = true;
 
     mini = {
@@ -181,15 +175,21 @@
       jupytext-nvim         # convert ipynb to markdown
       quarto-nvim           # empowered markdown
       molten-nvim           # run ipynb from vim
-      lazydev-nvim          # neovim library for lua lsp
       everforest            # green based colorscheme
       bullets-vim           # markdown insert bulleted lists ...
       img-clip-nvim         # drag n drop images
     ];
+    extraPlugins = with pkgs.vimPlugins; {
+      lazydev = {  # neovim library for lua lsp
+        package = lazydev-nvim;
+        setup = "require('lazydev').setup {}";
+      };
+    };
     extraPackages = with pkgs; [ 
       ripgrep 
       imagemagick 
       ueberzugpp
+      basedpyright
     ];
     luaPackages = [ "magick" ];
     python3Packages = [
