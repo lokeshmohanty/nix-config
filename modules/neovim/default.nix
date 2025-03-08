@@ -18,8 +18,7 @@
     theme = {
       enable = true;
       name = "mini-base16";
-      # base16 stype: terracotta
-      base16-colors = {
+      base16-colors = { # style: terracotta
         base00 = "#efeae8";
         base01 = "#dfd6d1";
         base02 = "#d0c1bb";
@@ -62,11 +61,6 @@
         previous = "<C-p>";
       };
     };
-
-    binds.whichKey.enable = true;
-    telescope.enable = true;
-    
-
     snippets.luasnip = {
       enable = true;
       loaders = ''
@@ -97,40 +91,47 @@
       lua.enable = true;
     };
     notes.orgmode.enable = true;
-
+    binds.whichKey.enable = true;
     mini = {
       icons.enable = true;
       files.enable = true;
       basics.enable = true;
       pairs.enable = true;
       comment.enable = true;
-      bracketed.enable = true;
-      jump2d.enable = true;
       notify.enable = true;
-      pick.enable = true;
+      bracketed.enable = true;
       sessions.enable = true;
       sessions.setupOpts = { 
         directory = "~/.config/nvf/sessions"; 
       };
       starter.enable = true;
+      tabline.enable = true;
     };
+    fzf-lua.enable = true;
+    # notify.nvim-notify.enable = true;
     utility = {
       ccc.enable = true;
       icon-picker.enable = true;       # :IconPicker
       diffview-nvim.enable = true;     # :Diffview
-      images.image-nvim.enable = true;
-      images.image-nvim.setupOpts = {
-        maxWidth = 60;
-        maxHeight = 12;
-        integrations.markdown = {
-          downloadRemoteImages = true;
-          onlyRenderAtCursor = true;
-        };
-      };
+      # images.image-nvim.enable = true;
+      # images.image-nvim.setupOpts = {
+      #   maxWidth = 60;
+      #   maxHeight = 12;
+      #   integrations.markdown = {
+      #     downloadRemoteImages = true;
+      #     onlyRenderAtCursor = true;
+      #   };
+      # };
       surround.enable = true;
       surround.useVendoredKeybindings = false;
       outline.aerial-nvim.enable = true;
       preview.markdownPreview.enable = true;
+    };
+    ui = {
+      borders.enable = false;
+      noice.enable = true;
+      colorizer.enable = true;
+      fastaction.enable = true;
     };
     assistant.copilot = {
       enable = true;
@@ -142,13 +143,6 @@
           prev = "<M-[>";
         };
       };
-    };
-
-    ui = {
-      borders.enable = false;
-      noice.enable = false;
-      colorizer.enable = true;
-      fastaction.enable = true;
     };
 
     lazy.plugins = {
@@ -178,6 +172,8 @@
       everforest            # green based colorscheme
       bullets-vim           # markdown insert bulleted lists ...
       img-clip-nvim         # drag n drop images
+      vim-floaterm
+      yazi-nvim
     ];
     extraPlugins = with pkgs.vimPlugins; {
       lazydev = {  # neovim library for lua lsp
