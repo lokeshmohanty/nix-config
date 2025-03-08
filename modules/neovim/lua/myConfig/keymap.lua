@@ -1,4 +1,10 @@
+-- Which-Key
+local wk = require("which-key")
+wk.add({ "<leader>d", desc = "DAP" })
+wk.add({ "<leader>l", desc = "LSP" })
+
 -- Floaterm
+wk.add({ "<leader>t", desc = "Terminal" })
 vim.keymap.set("n", "<leader>to", ":FloatermNew<cr>",
   { desc = "open new term"})
 vim.keymap.set("t", "<leader>to", "<C-\\><C-n>:FloatermNew<cr>",
@@ -21,27 +27,37 @@ vim.keymap.set("t", "<leader>tk", "<C-\\><C-n>:FloatermKill<cr>",
   { desc = "kill term"})
 
 -- Yazi (File manager)
-vim.keymap.set("n", "<leader>.", ":Yazi<cr>", { desc = "open yazi at current file"})
-vim.keymap.set("n", "<leader>,", ":Yazi cwd<cr>", { desc = "open yazi at working directory"})
-vim.keymap.set("n", "<leader>-", ":Yazi toggle<cr>", { desc = "resume yazi at last session"})
+vim.keymap.set("n", "<leader>.", ":Yazi<cr>")
+vim.keymap.set("n", "<leader>,", ":Yazi cwd<cr>")
+vim.keymap.set("n", "<leader>-", ":Yazi toggle<cr>")
 
 -- FzfLua
+wk.add({ "<leader>f", desc = "Fuzzy functions" })
 vim.keymap.set('n', '<leader>ff', ':FzfLua files<cr>')
 vim.keymap.set('n', '<leader>fb', ':FzfLua buffers<cr>')
-vim.keymap.set('n', '<leader>fs', ':FzfLua grep_visual<cr>')
+vim.keymap.set('n', '<leader>fs', ':FzfLua live_grep_native<cr>')
+vim.keymap.set('n', '<leader>fg', ':FzfLua grep<cr>')
+vim.keymap.set('n', '<leader>fh', ':FzfLua helptags<cr>')
+vim.keymap.set('n', '<leader>fB', ':FzfLua builtin<cr>')
 
 -- Mini Files
 vim.keymap.set('n', '<leader>sd', ':lua MiniFiles.open()<cr>')
 
 -- Mini Sessions
+wk.add({ "<leader>ms", desc = "MiniSessions" })
 vim.keymap.set('n', '<leader>mss', function()
-  local input = vim.fn.input('Create session: ')
-  vim.cmd('lua MiniSessions.write(' .. input .. '.vim")')
+  local input = vim.fn.input('Save session as: ')
+  MiniSessions.write(input)
 end)
 vim.keymap.set('n', '<leader>msd', function()
-  local input = vim.fn.input('Delete session: ')
-  vim.cmd('lua MiniSessions.delete("' .. input .. '.vim")')
+  local sessions, i = { "Delete session: " }, 1
+  for k, _ in pairs(MiniSessions.detected) do
+    table.insert(sessions, i .. ". " .. k)
+  end
+  local input = vim.fn.inputlist(sessions)
+  MiniSessions.delete(input)
 end)
+
 
 -- Quarto
 local quarto = require("quarto")
@@ -66,14 +82,22 @@ vim.keymap.set("n", "<localleader>mi", ":MoltenInit<cr>", { desc = "Initialize M
 vim.keymap.set("n", "<localleader>mx", ":MoltenOpenInBrowser<cr>", { desc = "open output in browser", silent = true })
 
 -- External Commands
-vim.keymap.set("n", "<leader>ex", ":.w !bash -e<cr>")
-vim.keymap.set("n", "<leader>eX", ":%w !bash -e<cr>")
-vim.keymap.set("n", "<leader>el", ":.!bash -e<cr>")
-vim.keymap.set("n", "<leader>eL", ":% !bash -e<cr>")
-vim.keymap.set("n", "<leader>ef", ":lua *G.execute*file_and_show_output()<cr>")
-vim.keymap.set("n", "<leader>cx", ":!chmod +x %<cr>")
+wk.add({ "<leader>e", desc = "External commands" })
+vim.keymap.set("n", "<leader>ex", ":.w !bash -e<cr>",
+  { desc = "run bash on current line" })
+vim.keymap.set("n", "<leader>eX", ":%w !bash -e<cr>",
+  { desc = "run bash on all lines" })
+vim.keymap.set("n", "<leader>el", ":.!bash -e<cr>",
+  { desc = "replace bash output on current line" })
+vim.keymap.set("n", "<leader>eL", ":% !bash -e<cr>",
+  { desc = "replace bash output on all lines" })
+vim.keymap.set("n", "<leader>ef", ":lua *G.execute*file_and_show_output()<cr>",
+  { desc = "run current file" })
+vim.keymap.set("n", "<leader>cx", ":!chmod +x %<cr>",
+  { desc = "make current file executable" })
 
 -- Others
+wk.add({ "<leader><leader>", desc = "Others" })
 vim.keymap.set('n', '<leader><leader>i', ':IconPickerYank<cr>')
 vim.keymap.set('n', '<leader><leader>p', ':MarkdownPreviewToggle<cr>')
 vim.keymap.set('n', '<leader><leader>g', ':Neogit<cr>')

@@ -158,7 +158,7 @@
     hledger
 
     ## programming languages
-    poetry # mujoco
+    uv
     (pkgs.python3.withPackages (ps: with ps; [
       pip ipython jupyterlab 
       jupytext notebook  # required by molten.nvim for ipynb files
