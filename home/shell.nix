@@ -27,6 +27,47 @@
       enableBashIntegration = true;
       enableFishIntegration = true;
       enableNushellIntegration = true;
+      settings = {
+        manager = {
+          show_hidden = false;
+          sort_by = "mtime";
+          sort_dir_first = true;
+          sort_reverse = true;
+        };
+      };
+      plugins = let 
+        # nix-prefetch-github <owner> <repo>
+        yazi-plugins = pkgs.fetchFromGitHub {
+          owner = "yazi-rs";
+          repo = "plugins";
+          rev = "2bf70d880e02db95394de360668325b46f804791";
+          hash = "sha256-0A5UVbrP9+GRvX14VQm4Yxw+P9Ca5gtlk9qkLCVf5+Q=";
+        };
+      in {
+        chmod = "${yazi-plugins}/chmod.yazi";
+        smart-enter = "${yazi-plugins}/smart-enter.yazi";
+      };
+      keymap = {
+        manager.prepend_keymap = [
+          { 
+            on = ["<C-n>"];
+            run = ''
+            shell '${pkgs.ripdrag}/bin/ripdrag "$@" -x 2>/dev/null &' --confirm
+            '';
+            desc = "Drag and drop";
+          }
+          { 
+            on = ["c" "m"];
+            run = "plugin chmod";
+            desc = "Chmod on seletected files";
+          }
+          { 
+            on = ["l"];
+            run = "plugin smart-enter";
+            desc = "Enter the child directory, or open the file";
+          }
+        ];
+      };
     };
     direnv = {
       enable = true;
