@@ -9,34 +9,36 @@
     additionalRuntimePaths = [ ./. ];
     luaConfigRC.myConfig = ''
       require("myConfig")
+      vim.cmd("colorscheme modus_operandi")
+      require("leetcode").setup()
     '';
     options = { 
       tabstop = 2; 
       shiftwidth = 0; 
       expandtab = true;
     };
-    theme = {
-      enable = true;
-      name = "mini-base16";
-      base16-colors = { # style: terracotta
-        base00 = "#efeae8";
-        base01 = "#dfd6d1";
-        base02 = "#d0c1bb";
-        base03 = "#c0aca4";
-        base04 = "#59453d";
-        base05 = "#473731";
-        base06 = "#352a25";
-        base07 = "#241c19";
-        base08 = "#a75045";
-        base09 = "#bd6942";
-        base0A = "#ce943e";
-        base0B = "#7a894a";
-        base0C = "#847f9e";
-        base0D = "#625574";
-        base0E = "#8d5968";
-        base0F = "#b07158";
-      };
-    };
+    # theme = {
+    #   enable = true;
+    #   name = "mini-base16";
+    #   base16-colors = { # style: terracotta
+    #     base00 = "#efeae8";
+    #     base01 = "#dfd6d1";
+    #     base02 = "#d0c1bb";
+    #     base03 = "#c0aca4";
+    #     base04 = "#59453d";
+    #     base05 = "#473731";
+    #     base06 = "#352a25";
+    #     base07 = "#241c19";
+    #     base08 = "#a75045";
+    #     base09 = "#bd6942";
+    #     base0A = "#ce943e";
+    #     base0B = "#7a894a";
+    #     base0C = "#847f9e";
+    #     base0D = "#625574";
+    #     base0E = "#8d5968";
+    #     base0F = "#b07158";
+    #   };
+    # };
     spellcheck.enable = false;
     spellcheck.programmingWordlist.enable = true;
     statusline.lualine = {
@@ -164,16 +166,25 @@
       };
     };
     startPlugins = with pkgs.vimPlugins; [
-      render-markdown-nvim
-      neogit                # magit alternative for vim
+      # render-markdown-nvim  # good markdown rendering
+      neogit                # magit alternative
       jupytext-nvim         # convert ipynb to markdown
       quarto-nvim           # empowered markdown
       molten-nvim           # run ipynb from vim
       everforest            # green based colorscheme
       bullets-vim           # markdown insert bulleted lists ...
       img-clip-nvim         # drag n drop images
-      vim-floaterm
-      yazi-nvim
+      vim-floaterm          # terminal
+      yazi-nvim             # file manager
+      lsp_signature-nvim    # display lsp function signature
+      nabla-nvim            # display math expression
+      leetcode-nvim         # enable to solve leetcode problems
+      markview-nvim         # good markdown rendering
+      cyberdream-nvim       # good light transparent colorscheme
+      modus-themes-nvim     # has good light colorscheme
+      # bamboo-nvim         # has good dark colorscheme
+      nvim-treesitter-parsers.latex
+      nvim-treesitter-parsers.html
     ];
     extraPlugins = with pkgs.vimPlugins; {
       lazydev = {  # neovim library for lua lsp

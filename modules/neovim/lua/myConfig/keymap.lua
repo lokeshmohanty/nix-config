@@ -3,6 +3,9 @@ local wk = require("which-key")
 wk.add({ "<leader>d", desc = "DAP" })
 wk.add({ "<leader>l", desc = "LSP" })
 
+vim.keymap.set("n", "<leader>pp", ":lua require('nabla').popup({border = 'rounded'})<cr>")
+vim.keymap.set("n", "<leader>pv", ":lua require('nabla').toggle_virt<cr>")
+
 -- Floaterm
 wk.add({ "<leader>t", desc = "Terminal" })
 vim.keymap.set("n", "<leader>to", ":FloatermNew<cr>",

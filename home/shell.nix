@@ -45,7 +45,7 @@
         };
       in {
         chmod = "${yazi-plugins}/chmod.yazi";
-        smart-enter = "${yazi-plugins}/smart-enter.yazi";
+        # smart-enter = "${yazi-plugins}/smart-enter.yazi";
       };
       keymap = {
         manager.prepend_keymap = [
@@ -61,11 +61,11 @@
             run = "plugin chmod";
             desc = "Chmod on seletected files";
           }
-          { 
-            on = ["l"];
-            run = "plugin smart-enter";
-            desc = "Enter the child directory, or open the file";
-          }
+          # { 
+          #   on = ["l"];
+          #   run = "plugin smart-enter";
+          #   desc = "Enter the child directory, or open the file";
+          # }
         ];
       };
     };
