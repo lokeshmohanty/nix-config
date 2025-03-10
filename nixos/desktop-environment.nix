@@ -10,15 +10,14 @@
     graphviz
     flameshot
 
-    # mate.caja
     mate.mate-polkit
     nautilus
     ffmpegthumbnailer
 
-    # whitesur-icon-theme capitaine-cursors whitesur-cursors breeze-qt5
     qt5.qtwayland qt6.qtwayland
-
-    gwenview vlc
+    kdePackages.okular 
+    kdePackages.kdenlive
+    kdePackages.gwenview vlc
     mpv imv gimp
     pamixer pavucontrol
     nwg-displays wlr-randr
@@ -26,17 +25,6 @@
     ntfs3g
   ];
 
-  # services.xserver = {
-  #   enable = true;
-  #   displayManager = {
-  #     sddm.enable = true;
-  #     # sddm.theme = "${import ./sddm-theme.nix { inherit pkgs; }}";
-  #     sddm.theme = "where_is_my_sddm_theme";
-  #     sddm.wayland.enable = true;
-  #     defaultSession = "hyprland";
-  #   };
-  #   # desktopManager.mate.enable = true;
-  # };
   services.greetd = {
     enable = true;
     settings = {

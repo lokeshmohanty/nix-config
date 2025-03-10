@@ -3,8 +3,10 @@ local wk = require("which-key")
 wk.add({ "<leader>d", desc = "DAP" })
 wk.add({ "<leader>l", desc = "LSP" })
 
+wk.add({ "<leader>p", desc = "Preview" })
 vim.keymap.set("n", "<leader>pp", ":lua require('nabla').popup({border = 'rounded'})<cr>")
 vim.keymap.set("n", "<leader>pv", ":lua require('nabla').toggle_virt<cr>")
+vim.keymap.set("n", "<leader>ps", ":Markview splitToggle<cr>")
 
 -- Floaterm
 wk.add({ "<leader>t", desc = "Terminal" })
@@ -61,28 +63,16 @@ vim.keymap.set('n', '<leader>msd', function()
   MiniSessions.delete(input)
 end)
 
-
--- Quarto
-local quarto = require("quarto")
-local runner = require("quarto.runner")
-vim.keymap.set('n', '<leader>qp', quarto.quartoPreview)
-vim.keymap.set("n", "<localleader>rc", runner.run_cell,  { desc = "run cell", silent = true })
-vim.keymap.set("n", "<localleader>ra", runner.run_above, { desc = "run cell and above", silent = true })
-vim.keymap.set("n", "<localleader>rA", runner.run_all,   { desc = "run all cells", silent = true })
-vim.keymap.set("n", "<localleader>rl", runner.run_line,  { desc = "run line", silent = true })
-vim.keymap.set("v", "<localleader>r",  runner.run_range, { desc = "run visual range", silent = true })
-vim.keymap.set("n", "<localleader>RA", function()
-  runner.run_all(true)
-end, { desc = "run all cells of all languages", silent = true })
-
--- Molten
-vim.keymap.set("n", "<localleader>e", ":MoltenEvaluateOperator<cr>", { desc = "evaluate operator", silent = true })
-vim.keymap.set("n", "<localleader>os", ":noautocmd MoltenEnterOutput<cr>", { desc = "open output window", silent = true })
-vim.keymap.set("n", "<localleader>rr", ":MoltenReevaluateCell<cr>", { desc = "re-eval cell", silent = true })
-vim.keymap.set("n", "<localleader>oh", ":MoltenHideOutput<cr>", { desc = "close output window", silent = true })
-vim.keymap.set("n", "<localleader>md", ":MoltenDelete<cr>", { desc = "delete Molten cell", silent = true })
-vim.keymap.set("n", "<localleader>mi", ":MoltenInit<cr>", { desc = "Initialize Molten cell", silent = true })
-vim.keymap.set("n", "<localleader>mx", ":MoltenOpenInBrowser<cr>", { desc = "open output in browser", silent = true })
+-- Aerial 
+-- require("aerial").setup({
+--   -- optionally use on_attach to set keymaps when aerial has attached to a buffer
+--   on_attach = function(bufnr)
+--     -- Jump forwards/backwards with '{' and '}'
+--     vim.keymap.set("n", "{", ":AerialPrev<cr>", { buffer = bufnr })
+--     vim.keymap.set("n", "}", ":AerialNext<cr>", { buffer = bufnr })
+--   end,
+-- })
+vim.keymap.set("n", "<leader>a", ":AerialToggle!<cr>")
 
 -- External Commands
 wk.add({ "<leader>e", desc = "External commands" })

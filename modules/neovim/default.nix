@@ -107,7 +107,7 @@
         directory = "~/.config/nvf/sessions"; 
       };
       starter.enable = true;
-      tabline.enable = true;
+      # tabline.enable = true;
     };
     fzf-lua.enable = true;
     # notify.nvim-notify.enable = true;
@@ -168,10 +168,8 @@
     startPlugins = with pkgs.vimPlugins; [
       # render-markdown-nvim  # good markdown rendering
       neogit                # magit alternative
+      vim-repeat
       jupytext-nvim         # convert ipynb to markdown
-      quarto-nvim           # empowered markdown
-      molten-nvim           # run ipynb from vim
-      everforest            # green based colorscheme
       bullets-vim           # markdown insert bulleted lists ...
       img-clip-nvim         # drag n drop images
       vim-floaterm          # terminal
@@ -180,11 +178,12 @@
       nabla-nvim            # display math expression
       leetcode-nvim         # enable to solve leetcode problems
       markview-nvim         # good markdown rendering
-      cyberdream-nvim       # good light transparent colorscheme
+
+      # Colorschemes
+      cyberdream-nvim       # good transparent colorscheme
       modus-themes-nvim     # has good light colorscheme
       # bamboo-nvim         # has good dark colorscheme
-      nvim-treesitter-parsers.latex
-      nvim-treesitter-parsers.html
+      everforest            # green based colorscheme
     ];
     extraPlugins = with pkgs.vimPlugins; {
       lazydev = {  # neovim library for lua lsp
@@ -197,6 +196,8 @@
       imagemagick 
       ueberzugpp
       basedpyright
+      tree-sitter
+      texlab
     ];
     luaPackages = [ "magick" ];
     python3Packages = [

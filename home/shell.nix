@@ -44,7 +44,7 @@
           hash = "sha256-0A5UVbrP9+GRvX14VQm4Yxw+P9Ca5gtlk9qkLCVf5+Q=";
         };
       in {
-        chmod = "${yazi-plugins}/chmod.yazi";
+        # chmod = "${yazi-plugins}/chmod.yazi";
         # smart-enter = "${yazi-plugins}/smart-enter.yazi";
       };
       keymap = {
@@ -55,11 +55,6 @@
             shell '${pkgs.ripdrag}/bin/ripdrag "$@" -x 2>/dev/null &' --confirm
             '';
             desc = "Drag and drop";
-          }
-          { 
-            on = ["c" "m"];
-            run = "plugin chmod";
-            desc = "Chmod on seletected files";
           }
           # { 
           #   on = ["l"];

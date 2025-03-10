@@ -132,9 +132,9 @@
 
   environment.systemPackages = with pkgs; [
     # gui applications
-    google-chrome onlyoffice-bin okular 
+    google-chrome onlyoffice-bin
     tikzit motrix zotero
-    kdenlive inkscape krita
+    inkscape krita
     code-cursor
     
 
