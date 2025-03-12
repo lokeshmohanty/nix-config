@@ -1,8 +1,13 @@
+-- use `<cmd>` for silent `:`
 -- Which-Key
 local wk = require("which-key")
 wk.add({ "<leader>d", desc = "DAP" })
 wk.add({ "<leader>l", desc = "LSP" })
 
+-- Main
+vim.keymap.set("n", "<leader>q", ":bd<cr>")
+
+-- Preview
 wk.add({ "<leader>p", desc = "Preview" })
 vim.keymap.set("n", "<leader>pp", ":lua require('nabla').popup({border = 'rounded'})<cr>")
 vim.keymap.set("n", "<leader>pv", ":lua require('nabla').toggle_virt<cr>")
@@ -91,6 +96,6 @@ vim.keymap.set("n", "<leader>cx", ":!chmod +x %<cr>",
 
 -- Others
 wk.add({ "<leader><leader>", desc = "Others" })
-vim.keymap.set('n', '<leader><leader>i', ':IconPickerYank<cr>')
-vim.keymap.set('n', '<leader><leader>p', ':MarkdownPreviewToggle<cr>')
-vim.keymap.set('n', '<leader><leader>g', ':Neogit<cr>')
+vim.keymap.set('n', '<leader><leader>i', '<cmd>IconPickerYank<cr>')
+vim.keymap.set('n', '<leader><leader>p', '<cmd>MarkdownPreviewToggle<cr>')
+vim.keymap.set('n', '<leader><leader>g', '<cmd>Neogit<cr>')

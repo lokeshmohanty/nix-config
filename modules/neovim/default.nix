@@ -9,8 +9,7 @@
     additionalRuntimePaths = [ ./. ];
     luaConfigRC.myConfig = ''
       require("myConfig")
-      vim.cmd("colorscheme modus_operandi")
-      require("leetcode").setup()
+      require("neovide")
     '';
     options = { 
       tabstop = 2; 
@@ -107,7 +106,7 @@
         directory = "~/.config/nvf/sessions"; 
       };
       starter.enable = true;
-      # tabline.enable = true;
+      tabline.enable = true;
     };
     fzf-lua.enable = true;
     # notify.nvim-notify.enable = true;
@@ -180,10 +179,12 @@
       markview-nvim         # good markdown rendering
 
       # Colorschemes
-      cyberdream-nvim       # good transparent colorscheme
       modus-themes-nvim     # has good light colorscheme
-      # bamboo-nvim         # has good dark colorscheme
+      bamboo-nvim           # has good dark colorscheme
       everforest            # green based colorscheme
+      cyberdream-nvim       # good transparent colorscheme
+      catppuccin-nvim
+      tokyonight-nvim
     ];
     extraPlugins = with pkgs.vimPlugins; {
       lazydev = {  # neovim library for lua lsp

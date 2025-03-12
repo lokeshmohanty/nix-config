@@ -11,5 +11,8 @@
     wineWowPackages.waylandFull
     winetricks
     gamescope
+
+    # Games
+    zeroad
   ];
 }
