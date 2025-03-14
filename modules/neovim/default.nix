@@ -10,6 +10,7 @@
     luaConfigRC.myConfig = ''
       require("myConfig")
       require("neovide")
+      requrie("illustrate")
     '';
     options = { 
       tabstop = 2; 

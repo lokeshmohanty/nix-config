@@ -9,9 +9,10 @@ vim.keymap.set("n", "<leader>q", ":bd<cr>")
 
 -- Preview
 wk.add({ "<leader>p", desc = "Preview" })
-vim.keymap.set("n", "<leader>pp", ":lua require('nabla').popup({border = 'rounded'})<cr>")
-vim.keymap.set("n", "<leader>pv", ":lua require('nabla').toggle_virt<cr>")
-vim.keymap.set("n", "<leader>ps", ":Markview splitToggle<cr>")
+vim.keymap.set("n", "<leader>pp", "<cmd>lua require('nabla').popup({border = 'rounded'})<cr>")
+vim.keymap.set("n", "<leader>pv", "<cmd>lua require('nabla').toggle_virt<cr>")
+vim.keymap.set("n", "<leader>ps", "<cmd>Markview splitToggle<cr>")
+vim.keymap.set('n', '<leader>pm', '<cmd>MarkdownPreviewToggle<cr>')
 
 -- Floaterm
 wk.add({ "<leader>t", desc = "Terminal" })
@@ -37,9 +38,7 @@ vim.keymap.set("t", "<leader>tk", "<C-\\><C-n>:FloatermKill<cr>",
   { desc = "kill term"})
 
 -- Yazi (File manager)
-vim.keymap.set("n", "<leader>.", ":Yazi<cr>")
-vim.keymap.set("n", "<leader>,", ":Yazi cwd<cr>")
-vim.keymap.set("n", "<leader>-", ":Yazi toggle<cr>")
+vim.keymap.set("n", "<leader>y", ":Yazi<cr>")
 
 -- FzfLua
 wk.add({ "<leader>f", desc = "Fuzzy functions" })
@@ -51,7 +50,27 @@ vim.keymap.set('n', '<leader>fh', ':FzfLua helptags<cr>')
 vim.keymap.set('n', '<leader>fB', ':FzfLua builtin<cr>')
 
 -- Mini Files
-vim.keymap.set('n', '<leader>sd', ':lua MiniFiles.open()<cr>')
+vim.keymap.set('n', '<leader>,', '<cmd>lua MiniFiles.open()<cr>')
+vim.keymap.set('n', '<leader>.', '<cmd>lua MiniFiles.open(vim.api.nvim_buf_get_name(0))<cr>')
+
+local show_dotfiles = true
+local filter_show = function(fs_entry) return true end
+local filter_hide = function(fs_entry)
+  return not vim.startswith(fs_entry.name, '.')
+end
+local toggle_dotfiles = function()
+  show_dotfiles = not show_dotfiles
+  local new_filter = show_dotfiles and filter_show or filter_hide
+  MiniFiles.refresh({ content = { filter = new_filter } })
+end
+vim.api.nvim_create_autocmd('User', {
+  pattern = 'MiniFilesBufferCreate',
+  callback = function(args)
+    local buf_id = args.data.buf_id
+    -- Tweak left-hand side of mapping to your liking
+    vim.keymap.set('n', 'g.', toggle_dotfiles, { buffer = buf_id })
+  end,
+})
 
 -- Mini Sessions
 wk.add({ "<leader>ms", desc = "MiniSessions" })
@@ -79,6 +98,27 @@ end)
 -- })
 vim.keymap.set("n", "<leader>a", ":AerialToggle!<cr>")
 
+
+-- Illustrate for handling inkscape
+local illustrate = require('illustrate')
+local illustrate_finder = require('illustrate.finder')
+vim.keymap.set("n", "<leader>is",
+  function() illustrate.create_and_open_svg() end,
+  { desc = "Create and open a new SVG file with provided name." }
+)
+vim.keymap.set("n", "<leader>io",
+  function() illustrate.open_under_cursor() end,
+  { desc = "Open file under cursor (or file within environment under cursor)." }
+)
+vim.keymap.set("n", "<leader>if",
+  function() illustrate_finder.search_and_open() end,
+  { desc = "Use telescope to search and open illustrations in default app." }
+)
+vim.keymap.set("n", "<leader>ic",
+  function() illustrate_finder.search_create_copy_and_open() end,
+  { desc = "Use telescope to search existing file, copy it with new name, and open it in default app." }
+)
+
 -- External Commands
 wk.add({ "<leader>e", desc = "External commands" })
 vim.keymap.set("n", "<leader>ex", ":.w !bash -e<cr>",
@@ -97,5 +137,4 @@ vim.keymap.set("n", "<leader>cx", ":!chmod +x %<cr>",
 -- Others
 wk.add({ "<leader><leader>", desc = "Others" })
 vim.keymap.set('n', '<leader><leader>i', '<cmd>IconPickerYank<cr>')
-vim.keymap.set('n', '<leader><leader>p', '<cmd>MarkdownPreviewToggle<cr>')
 vim.keymap.set('n', '<leader><leader>g', '<cmd>Neogit<cr>')

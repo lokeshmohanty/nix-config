@@ -36,11 +36,7 @@
     # Run 'sudo -E hp-setup' or 'sudo hp-setup -i -a'
     # drivers = with pkgs; [ hplipWithPlugin ]; 
   };
-  services.avahi = {
-    enable = true;
-    nssmdns4 = true;
-    openFirewall = true;
-  };
+  services.tailscale.enable = true;
 
   services.blueman.enable = true;
   services.flatpak.enable = true;
