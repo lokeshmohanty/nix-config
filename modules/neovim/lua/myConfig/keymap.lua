@@ -42,12 +42,16 @@ vim.keymap.set("n", "<leader>y", ":Yazi<cr>")
 
 -- FzfLua
 wk.add({ "<leader>f", desc = "Fuzzy functions" })
-vim.keymap.set('n', '<leader>ff', ':FzfLua files<cr>')
-vim.keymap.set('n', '<leader>fb', ':FzfLua buffers<cr>')
-vim.keymap.set('n', '<leader>fs', ':FzfLua live_grep_native<cr>')
-vim.keymap.set('n', '<leader>fg', ':FzfLua grep<cr>')
-vim.keymap.set('n', '<leader>fh', ':FzfLua helptags<cr>')
-vim.keymap.set('n', '<leader>fB', ':FzfLua builtin<cr>')
+vim.keymap.set('n', '<leader>fb', '<cmd>FzfLua buffers<cr>')
+vim.keymap.set('n', '<leader>fB', '<cmd>FzfLua builtin<cr>')
+vim.keymap.set('n', '<leader>ff', '<cmd>FzfLua files<cr>')
+vim.keymap.set('n', '<leader>fg', '<cmd>FzfLua grep<cr>')
+vim.keymap.set('n', '<leader>fG', '<cmd>FzfLua live_grep_native<cr>')
+vim.keymap.set('n', '<leader>fh', '<cmd>FzfLua helptags<cr>')
+vim.keymap.set('n', '<leader>fm', '<cmd>FzfLua marks<cr>')
+vim.keymap.set('n', '<leader>fr', '<cmd>FzfLua registers<cr>')
+vim.keymap.set('n', '<leader>fs', '<cmd>FzfLua spell_suggest<cr>')
+vim.keymap.set('n', 's', ':FzfLua ')
 
 -- Mini Files
 vim.keymap.set('n', '<leader>,', '<cmd>lua MiniFiles.open()<cr>')
@@ -74,18 +78,25 @@ vim.api.nvim_create_autocmd('User', {
 
 -- Mini Sessions
 wk.add({ "<leader>ms", desc = "MiniSessions" })
+local ms = require('mini.sessions')
 vim.keymap.set('n', '<leader>mss', function()
   local input = vim.fn.input('Save session as: ')
-  MiniSessions.write(input)
+  ms.write(input)
 end)
 vim.keymap.set('n', '<leader>msd', function()
-  local sessions, i = { "Delete session: " }, 1
-  for k, _ in pairs(MiniSessions.detected) do
-    table.insert(sessions, i .. ". " .. k)
+  local sessions = {}
+  for k, _ in pairs(ms.detected) do
+    table.insert(sessions, k)
   end
-  local input = vim.fn.inputlist(sessions)
-  MiniSessions.delete(input)
+
+  vim.ui.select(
+    sessions,
+    { prompt = 'Select session to delete:', },
+    function(choice) ms.delete(choice) end
+  )
 end)
+
+
 
 -- Aerial 
 -- require("aerial").setup({

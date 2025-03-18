@@ -10,68 +10,27 @@
     luaConfigRC.myConfig = ''
       require("myConfig")
       require("neovide")
-      requrie("illustrate")
+      require("illustrate")
     '';
     options = { 
       tabstop = 2; 
       shiftwidth = 0; 
       expandtab = true;
     };
-    # theme = {
-    #   enable = true;
-    #   name = "mini-base16";
-    #   base16-colors = { # style: terracotta
-    #     base00 = "#efeae8";
-    #     base01 = "#dfd6d1";
-    #     base02 = "#d0c1bb";
-    #     base03 = "#c0aca4";
-    #     base04 = "#59453d";
-    #     base05 = "#473731";
-    #     base06 = "#352a25";
-    #     base07 = "#241c19";
-    #     base08 = "#a75045";
-    #     base09 = "#bd6942";
-    #     base0A = "#ce943e";
-    #     base0B = "#7a894a";
-    #     base0C = "#847f9e";
-    #     base0D = "#625574";
-    #     base0E = "#8d5968";
-    #     base0F = "#b07158";
-    #   };
-    # };
     spellcheck.enable = false;
     spellcheck.programmingWordlist.enable = true;
     statusline.lualine = {
       enable = true;
     };
-    autocomplete.blink-cmp = {
+    autocomplete.nvim-cmp = {
       enable = true;
-      setupOpts = {
-        keymap.preset = "super-tab";
-        snippets.preset = "luasnip";
-        sources.providers = {
-          lazydev = {
-            name = "LazyDev";
-            module = "lazydev.integrations.blink";
-          };
-        };
-        sources.default = [ "lazydev" ];
-      };
       mappings = {
+        complete = "<C-l>";
         confirm = "<TAB>";
         next = "<C-n>";
         previous = "<C-p>";
       };
     };
-    snippets.luasnip = {
-      enable = true;
-      loaders = ''
-        require("luasnip.loaders.from_snipmate").lazy_load()
-        require("luasnip.loaders.from_lua").load({ paths = "~/.config/nvf/snippets" })
-      '';
-      providers = with pkgs.vimPlugins; [ vim-snippets ];
-    };
-    treesitter.context.enable = true;
 
     debugger.nvim-dap.enable = true;
     debugger.nvim-dap.ui.enable = true;
@@ -108,6 +67,7 @@
       };
       starter.enable = true;
       tabline.enable = true;
+      snippets.enable = true;
     };
     fzf-lua.enable = true;
     # notify.nvim-notify.enable = true;
@@ -146,19 +106,12 @@
         };
       };
     };
-
     lazy.plugins = {
       vimtex = {
         enabled = true;
         package = pkgs.vimPlugins.vimtex;
         lazy = true;
         ft = "tex";
-        setupOpts = {
-          init = ''
-            vim.g.vimtex_view_general_viewer = "okular"
-            vim.g.vimtex_view_general_options = "--unique file:@pdf\#src:@line@tex"
-          '';
-        };
         after =  ''
           vim.api.nvim_command('unlet b:did_ftplugin')
           vim.api.nvim_command('call vimtex#init()')
