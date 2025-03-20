@@ -38,10 +38,36 @@
   services.printing = {
     enable = true;
     # Run 'sudo -E hp-setup' or 'sudo hp-setup -i -a'
-    # drivers = with pkgs; [ hplipWithPlugin ];
+    drivers = with pkgs; [ hplipWithPlugin ]; 
   };
-  services.tailscale.enable = true;
 
   services.blueman.enable = true;
   services.flatpak.enable = true;
+  services.tailscale.enable = true;
+  services.cloudflare-warp.enable = true;
+  services.cloudflared.enable = true;
+  services.samba = {
+    enable = true;
+    package = pkgs.sambaFull;
+    openFirewall = true;
+    # settings = {
+    #   "load printers" = "yes";
+    #   "printing" = "cups";
+    #   "printcap name" = "cups";
+    # };
+    # "printers" = {
+    #   "comment" = "All Printers";
+    #   "path" = "/var/spool/samba";
+    #   "public" = "yes";
+    #   "browseable" = "yes";
+    #   # to allow user 'guest account' to print.
+    #   "guest ok" = "yes";
+    #   "writable" = "no";
+    #   "printable" = "yes";
+    #   "create mode" = 0700;
+    # };
+  };
+  systemd.tmpfiles.rules = [
+    "d /var/spool/samba 1777 root root -"
+  ];
 }

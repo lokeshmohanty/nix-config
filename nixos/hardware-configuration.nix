@@ -9,38 +9,39 @@
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
 
-  boot.initrd.availableKernelModules = [
-    "nvme"
-    "xhci_pci"
-    "usb_storage"
-    "usbhid"
-    "sd_mod"
-    "sdhci_pci"
-  ];
-  boot.initrd.kernelModules = ["amdgpu"];
-  boot.kernelModules = ["kvm-amd"];
-  boot.extraModulePackages = [];
+  boot.initrd.availableKernelModules = [ "xhci_pci"
+                                         "ahci"
+                                         "nvme"
+                                         "usbhid"
+                                         "usb_storage"
+                                         "sd_mod"
+                                       ];
+  boot.initrd.kernelModules = [ ];
+  boot.kernelModules = [ "kvm-intel" ];
+  boot.extraModulePackages = [ ];
 
-  fileSystems."/" = {
-    device = "/dev/disk/by-uuid/6a590303-f1e4-4870-9259-7d46be5bee63";
-    fsType = "ext4";
-  };
+  fileSystems."/" =
+    { device = "/dev/disk/by-uuid/62595460-1a62-439d-adc5-24621a883c52";
+      fsType = "ext4";
+    };
 
-  fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/53C5-BDA6";
-    fsType = "vfat";
-  };
+  fileSystems."/boot" =
+    { device = "/dev/disk/by-uuid/B98B-B543";
+      fsType = "vfat";
+    };
 
-  swapDevices = [
-    {device = "/dev/disk/by-uuid/feb6cd5f-fcb9-4431-9e1e-0b62744e733a";}
-  ];
+  fileSystems."/mnt/hdd" =
+    { device = "/dev/disk/by-uuid/4d3ced74-d0c1-474a-aca5-b13c7b8d3c0e";
+      fsType = "ext4";
+    };
+
+  swapDevices =
+    [ { device = "/dev/disk/by-uuid/73c6993d-0e93-4ed2-8abf-b031a275f803"; }
+    ];
 
   networking.useDHCP = lib.mkDefault true;
-  # networking.interfaces.enp3s0f0.useDHCP = lib.mkDefault true;
-  # networking.interfaces.wlp6s0.useDHCP = lib.mkDefault true;
 
-  # # Set your system kind (needed for flakes)
-  # nixpkgs.hostPlatform = "x86_64-linux";
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-  hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+  powerManagement.cpuFreqGovernor = lib.mkDefault "performance";
+  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }

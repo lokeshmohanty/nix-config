@@ -1,18 +1,20 @@
 {pkgs, ...}: {
-  programs.steam = {
-    enable = true;
-    remotePlay.openFirewall = true;
-    dedicatedServer.openFirewall = true;
-    extraCompatPackages = [pkgs.proton-ge-bin];
-  };
-  hardware.steam-hardware.enable = true;
+  # programs.steam = {
+  #   enable = true;
+  #   remotePlay.openFirewall = true;
+  #   dedicatedServer.openFirewall = true;
+  #   extraCompatPackages = [pkgs.proton-ge-bin];
+  # };
+  # hardware.steam-hardware.enable = true;
   environment.systemPackages = with pkgs; [
     wineWowPackages.waylandFull
     winetricks
-    gamescope
+    # gamescope
+    bottles
+    lutris
 
     # Games
-    zeroad
+    # zeroad
     luanti
   ];
 }

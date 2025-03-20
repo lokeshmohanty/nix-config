@@ -42,10 +42,9 @@
     );
     formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
     nixosConfigurations = {
-      sudarshan = nixpkgs.lib.nixosSystem {
+      bhaskara = nixpkgs.lib.nixosSystem {
         specialArgs = {inherit inputs;};
         modules = [
-          inputs.nixos-hardware.nixosModules.lenovo-thinkpad-l14-amd
           inputs.lix-module.nixosModules.default
           ./nixos/configuration.nix
           ./nixos/desktop-environment.nix
@@ -53,7 +52,7 @@
       };
     };
     homeConfigurations = {
-      "lokesh@sudarshan" = home-manager.lib.homeManagerConfiguration {
+      "lokesh@bhaskara" = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
         extraSpecialArgs = {inherit inputs;};
         modules = [
