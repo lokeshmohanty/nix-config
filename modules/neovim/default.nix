@@ -50,6 +50,7 @@
       typst.enable = true;
       html.enable = true;
       lua.enable = true;
+      ts.enable = true;
     };
     notes.orgmode.enable = true;
     binds.whichKey.enable = true;
@@ -153,6 +154,7 @@
       basedpyright
       tree-sitter
       texlab
+      typescript-language-server
     ];
     luaPackages = [ "magick" ];
     python3Packages = [
