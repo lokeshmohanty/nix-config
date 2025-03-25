@@ -1,6 +1,8 @@
 { pkgs, ... }: {
   
   vim = {
+    viAlias = true;
+    vimAlias = false;
     searchCase = "smart";
     useSystemClipboard = true;
     enableLuaLoader = true;
