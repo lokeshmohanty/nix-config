@@ -32,22 +32,23 @@
     stylix = {
       enable = true;
       targets = {
-        fuzzel.enable = false;
-        waybar.enable = false;
+        fuzzel.enable = true;
+        waybar.enable = true;
       };
-      polarity = "light";
+      polarity = "dark";
       opacity = {
-        applications = 1.0;
-        desktop = 1.0;
-        popups = 1.0;
-        terminal = 1.0;
+        applications = 0.8;
+        desktop = 0.5;
+        popups = 0.5;
+        terminal = 0.2;
       };
       image = config.wallpaper;
       base16Scheme = "${pkgs.base16-schemes}/share/themes/${config.stylixConfig.theme}.yaml";
       iconTheme = {
         enable = true;
-        package = pkgs.material-design-icons;
-        light = "material-design-icons";
+        package = pkgs.papirus-icon-theme; #material-design-icons;
+        dark = "papirus-icon-theme"; # "material-design-icons";
+        light = "papirus-icon-theme"; # "material-design-icons";
       };
       cursor = {
         package = pkgs.bibata-cursors;

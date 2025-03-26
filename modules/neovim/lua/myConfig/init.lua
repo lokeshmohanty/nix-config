@@ -7,5 +7,6 @@ require('myConfig.treesitter')
 require('myConfig.snippets')
 
 
-vim.cmd("colorscheme modus_operandi")
+vim.cmd("colorscheme everforest")
+-- vim.cmd("colorscheme modus_operandi")
 -- require("leetcode").setup()

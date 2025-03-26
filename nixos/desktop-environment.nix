@@ -10,7 +10,8 @@
     graphviz
     flameshot
 
-    mate.mate-polkit
+    # mate.mate-polkit
+    hyprpolkitagent
     nautilus
     ffmpegthumbnailer
 
