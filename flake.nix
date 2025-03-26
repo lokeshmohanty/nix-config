@@ -51,13 +51,7 @@
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
           extraSpecialArgs = { inherit inputs; };
           modules = [
-            ./home/editor
-            ./home/terminal
             ./home/home.nix
-            ./home/fuzzel.nix
-            ./home/shell.nix
-            ./home/xdg.nix
-            ./home/stylix.nix
           ];
         };
       };

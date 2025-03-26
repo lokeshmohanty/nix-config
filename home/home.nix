@@ -6,7 +6,15 @@
   pkgs,
   ...
 }: {
-  imports = [];
+  imports = [
+    ./editor
+    ./terminal
+    ./browser
+    ./fuzzel.nix
+    ./shell.nix
+    ./xdg.nix
+    ./stylix.nix
+  ];
 
   nixpkgs = {
     overlays = [
@@ -85,7 +93,7 @@
   };
 
   stylixConfig.enable = true;
-  stylixConfig.theme = "terracotta";
+  stylixConfig.theme = "everforest-dark-hard";#"terracotta";
   wallpaper = ./../wallpapers/0016.jpg;
 
   # Hyprland
