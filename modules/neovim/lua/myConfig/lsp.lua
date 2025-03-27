@@ -6,6 +6,15 @@ require("lspconfig").basedpyright.setup({
   },
 })
 require("lspconfig").ts_ls.setup({})
+-- require("lspconfig").lua_ls.setup({
+--   settings = {
+--     Lua = {
+--       diagnostics = {
+--         disable = { "missing-fields", "incomplete-signature-doc" },
+--       },
+--     },
+--   },
+-- })
 -- require("lspconfig").texlab.setup({
 --   settings = {
 --     texlab = {

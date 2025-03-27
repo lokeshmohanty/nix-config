@@ -136,12 +136,17 @@
       markview-nvim         # good markdown rendering
 
       # Colorschemes
-      modus-themes-nvim     # has good light colorscheme
-      bamboo-nvim           # has good dark colorscheme
-      everforest            # green based colorscheme
-      cyberdream-nvim       # good transparent colorscheme
-      catppuccin-nvim
-      tokyonight-nvim
+      (let
+        everforest-nvim = pkgs.vimUtils.buildVimPlugin {
+          name = "everforest-nvim";
+          src = pkgs.fetchFromGitHub {
+            owner = "neanias";
+            repo = "everforest-nvim";
+            rev = "135cc21a45756e688dd1a3cbeb1c80a04b569b46";
+            hash = "sha256-X+GaH76afaWmszGuLYf9VHP134jvmUCVSB7C7aiPSOs=";
+          };
+        };
+      in everforest-nvim)
     ];
     extraPlugins = with pkgs.vimPlugins; {
       lazydev = {  # neovim library for lua lsp
