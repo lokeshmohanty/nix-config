@@ -21,9 +21,6 @@
     };
     spellcheck.enable = false;
     spellcheck.programmingWordlist.enable = true;
-    statusline.lualine = {
-      enable = true;
-    };
     autocomplete.nvim-cmp = {
       enable = true;
       mappings = {
@@ -65,6 +62,7 @@
       notify.enable = true;
       bracketed.enable = true;
       sessions.enable = true;
+      statusline.enable = true;
       sessions.setupOpts = { 
         directory = "~/.config/nvf/sessions"; 
       };
