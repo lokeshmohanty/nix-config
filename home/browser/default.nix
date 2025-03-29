@@ -1,6 +1,7 @@
 {
   programs.qutebrowser = {
     enable = true;
+    loadAutoconfig = true;
     searchEngines = {
       DEFAULT = "https://www.google.com/search?hl=en&q={}";
       g = "https://www.google.com/search?hl=en&q={}";

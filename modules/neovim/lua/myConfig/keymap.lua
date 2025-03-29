@@ -6,6 +6,7 @@ wk.add({ "<leader>l", desc = "LSP" })
 
 -- Main
 vim.keymap.set("n", "<leader>q", ":bd<cr>")
+vim.keymap.set('n', '<leader>g', '<cmd>Neogit<cr>')
 
 -- Preview
 wk.add({ "<leader>p", desc = "Preview" })
@@ -146,6 +147,5 @@ vim.keymap.set("n", "<leader>cx", ":!chmod +x %<cr>",
   { desc = "make current file executable" })
 
 -- Others
-wk.add({ "<leader><leader>", desc = "Others" })
-vim.keymap.set('n', '<leader><leader>i', '<cmd>IconPickerYank<cr>')
-vim.keymap.set('n', '<leader><leader>g', '<cmd>Neogit<cr>')
+wk.add({ "<leader>o", desc = "Others" })
+vim.keymap.set('n', '<leader>oi', '<cmd>IconPickerYank<cr>')
