@@ -21,15 +21,15 @@
     };
     spellcheck.enable = false;
     spellcheck.programmingWordlist.enable = true;
-    autocomplete.nvim-cmp = {
-      enable = true;
-      mappings = {
-        complete = "<C-l>";
-        confirm = "<TAB>";
-        next = "<C-n>";
-        previous = "<C-p>";
-      };
-    };
+    # autocomplete.nvim-cmp = {
+    #   enable = true;
+    #   mappings = {
+    #     complete = "<C-l>";
+    #     confirm = "<TAB>";
+    #     next = "<C-n>";
+    #     previous = "<C-p>";
+    #   };
+    # };
 
     debugger.nvim-dap.enable = true;
     debugger.nvim-dap.ui.enable = true;
@@ -58,20 +58,19 @@
       files.enable = true;
       basics.enable = true;
       pairs.enable = true;
+      indentscope.enable = true;
       comment.enable = true;
       notify.enable = true;
       bracketed.enable = true;
       sessions.enable = true;
       statusline.enable = true;
-      sessions.setupOpts = { 
-        directory = "~/.config/nvf/sessions"; 
-      };
+      sessions.setupOpts = { directory = "~/.config/nvf/sessions"; };
       starter.enable = true;
       tabline.enable = true;
+      completion.enable = true;
       snippets.enable = true;
     };
     fzf-lua.enable = true;
-    # notify.nvim-notify.enable = true;
     utility = {
       ccc.enable = true;
       icon-picker.enable = true;       # :IconPicker
@@ -95,17 +94,6 @@
       noice.enable = true;
       colorizer.enable = true;
       fastaction.enable = true;
-    };
-    assistant.copilot = {
-      enable = true;
-      mappings = {
-        suggestion = {
-          accept = "<C-Enter>";
-          acceptLine = "<C-l>";
-          next = "<M-]>";
-          prev = "<M-[>";
-        };
-      };
     };
     lazy.plugins = {
       vimtex = {
