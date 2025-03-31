@@ -1,6 +1,6 @@
 {
     "item": {
-        "prefix": "item",
+        "prefix": "it",
         "body": "\n\\item ",
         "description": "\\item on a newline"
     },
@@ -166,7 +166,7 @@
         "description": "multline* environment"
     },
     "itemize": {
-        "prefix": "BIT",
+        "prefix": "ite",
         "body": "\\begin{itemize}\n\t\\item ${0:${TM_SELECTED_TEXT}}\n\\end{itemize}",
         "description": "itemize environment"
     },
