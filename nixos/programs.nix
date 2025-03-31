@@ -14,7 +14,7 @@
   programs.dconf.enable = true;
   programs.gnupg.agent = {
     enable = true;
-    pinentryPackage = pkgs.pinentry-qt;
+    pinentryPackage = pkgs.wayprompt;
     enableSSHSupport = true;
   };
   programs.light.enable = true;

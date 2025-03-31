@@ -15,14 +15,14 @@
       url.start_pages = ["qute://bookmarks"];
       content.autoplay = false;
     };
-    keyBindings = {
-      normal = {
-        "H" = "tab-prev";
-        "L" = "tab-next";
-        "J" = "back";    # back in history
-        "K" = "forward"; # forward in history
-      };
-    };
+    # keyBindings = {
+    #   normal = {
+    #     "H" = "tab-prev";
+    #     "L" = "tab-next";
+    #     "J" = "back";    # back in history
+    #     "K" = "forward"; # forward in history
+    #   };
+    # };
   };
 }
 
