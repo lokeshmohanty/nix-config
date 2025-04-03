@@ -75,15 +75,6 @@
       ccc.enable = true;
       icon-picker.enable = true;       # :IconPicker
       diffview-nvim.enable = true;     # :Diffview
-      # images.image-nvim.enable = true;
-      # images.image-nvim.setupOpts = {
-      #   maxWidth = 60;
-      #   maxHeight = 12;
-      #   integrations.markdown = {
-      #     downloadRemoteImages = true;
-      #     onlyRenderAtCursor = true;
-      #   };
-      # };
       surround.enable = true;
       surround.useVendoredKeybindings = false;
       outline.aerial-nvim.enable = true;
@@ -108,7 +99,7 @@
       };
     };
     startPlugins = with pkgs.vimPlugins; [
-      # render-markdown-nvim  # good markdown rendering
+      render-markdown-nvim  # good markdown rendering
       neogit                # magit alternative
       vim-repeat
       jupytext-nvim         # convert ipynb to markdown
@@ -119,7 +110,6 @@
       lsp_signature-nvim    # display lsp function signature
       nabla-nvim            # display math expression
       leetcode-nvim         # enable to solve leetcode problems
-      markview-nvim         # good markdown rendering
 
       # Colorschemes
       (let
