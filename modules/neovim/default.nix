@@ -54,6 +54,7 @@
     notes.orgmode.enable = true;
     binds.whichKey.enable = true;
     mini = {
+      align.enable = true;
       icons.enable = true;
       files.enable = true;
       basics.enable = true;

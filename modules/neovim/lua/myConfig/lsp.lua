@@ -7,6 +7,7 @@ require("lspconfig").basedpyright.setup({
 })
 require("lspconfig").ts_ls.setup({})
 require("lspconfig").texlab.setup({})
+require("tailwind-tools").setup({})
 -- require("lspconfig").lua_ls.setup({
 --   settings = {
 --     Lua = {
