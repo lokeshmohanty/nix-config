@@ -1,12 +1,29 @@
-{ pkgs, inputs, ... }: {
+{
+  pkgs,
+  inputs,
+  ...
+}: {
   environment.systemPackages = with pkgs; [
-    xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
-    pinentry-qt jmtpfs
-    waybar dunst libnotify swaybg waypaper
-    grim slurp swappy wl-clipboard
+    xdg-desktop-portal
+    xdg-desktop-portal-hyprland
+    xdg-desktop-portal-gtk
+    pinentry-qt
+    jmtpfs
+    waybar
+    dunst
+    libnotify
+    swaybg
+    waypaper
+    grim
+    slurp
+    swappy
+    wl-clipboard
     networkmanagerapplet
-    swayidle swaylock-effects wlogout
-    cliphist hyprpicker
+    swayidle
+    swaylock-effects
+    wlogout
+    cliphist
+    hyprpicker
     graphviz
     flameshot
 
@@ -15,13 +32,19 @@
     nautilus
     ffmpegthumbnailer
 
-    qt5.qtwayland qt6.qtwayland
-    kdePackages.okular 
+    qt5.qtwayland
+    qt6.qtwayland
+    kdePackages.okular
     kdePackages.kdenlive
-    kdePackages.gwenview vlc
-    mpv imv gimp
-    pamixer pavucontrol
-    nwg-displays wlr-randr
+    kdePackages.gwenview
+    vlc
+    mpv
+    imv
+    gimp
+    pamixer
+    pavucontrol
+    nwg-displays
+    wlr-randr
     qalculate-qt
     ntfs3g
   ];
@@ -48,9 +71,9 @@
     xdgOpenUsePortal = true;
     config = {
       common = {
-        default = [ "gtk" ];
+        default = ["gtk"];
       };
     };
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+    extraPortals = [pkgs.xdg-desktop-portal-gtk];
   };
 }

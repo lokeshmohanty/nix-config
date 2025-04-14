@@ -19,41 +19,47 @@
     stylix.url = "github:danth/stylix";
   };
 
-  outputs = { self, nixpkgs, home-manager, ... } @ inputs:
-    let
-      systems = [
-        "aarch64-linux"
-        "i686-linux"
-        "x86_64-linux"
-        "aarch64-darwin"
-        "x86_64-darwin"
-      ];
-      forAllSystems = nixpkgs.lib.genAttrs systems;
-    in {
-      packages = forAllSystems (system:
-        let pkgs = nixpkgs.legacyPackages.${system};
-        in import ./pkgs { inherit pkgs inputs; }
-      );
-      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
-      nixosConfigurations = {
-        sudarshan = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs; };
-          modules = [
-            inputs.nixos-hardware.nixosModules.lenovo-thinkpad-l14-amd
-            inputs.lix-module.nixosModules.default
-            ./nixos/configuration.nix
-            ./nixos/desktop-environment.nix
-          ];
-        };
-      };
-      homeConfigurations = {
-        "lokesh@sudarshan" = home-manager.lib.homeManagerConfiguration {
-          pkgs = nixpkgs.legacyPackages.x86_64-linux;
-          extraSpecialArgs = { inherit inputs; };
-          modules = [
-            ./home/home.nix
-          ];
-        };
+  outputs = {
+    self,
+    nixpkgs,
+    home-manager,
+    ...
+  } @ inputs: let
+    systems = [
+      "aarch64-linux"
+      "i686-linux"
+      "x86_64-linux"
+      "aarch64-darwin"
+      "x86_64-darwin"
+    ];
+    forAllSystems = nixpkgs.lib.genAttrs systems;
+  in {
+    packages = forAllSystems (
+      system: let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in
+        import ./pkgs {inherit pkgs inputs;}
+    );
+    formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
+    nixosConfigurations = {
+      sudarshan = nixpkgs.lib.nixosSystem {
+        specialArgs = {inherit inputs;};
+        modules = [
+          inputs.nixos-hardware.nixosModules.lenovo-thinkpad-l14-amd
+          inputs.lix-module.nixosModules.default
+          ./nixos/configuration.nix
+          ./nixos/desktop-environment.nix
+        ];
       };
     };
+    homeConfigurations = {
+      "lokesh@sudarshan" = home-manager.lib.homeManagerConfiguration {
+        pkgs = nixpkgs.legacyPackages.x86_64-linux;
+        extraSpecialArgs = {inherit inputs;};
+        modules = [
+          ./home/home.nix
+        ];
+      };
+    };
+  };
 }

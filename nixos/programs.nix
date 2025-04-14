@@ -1,6 +1,8 @@
-{ config, pkgs, ... }:
-
 {
+  config,
+  pkgs,
+  ...
+}: {
   ## Documentation: https://github.com/viperML/nh
   ## Video: https://www.youtube.com/watch?v=DnA4xNTrrqY
   ## Nix Helper

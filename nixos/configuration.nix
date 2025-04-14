@@ -6,9 +6,7 @@
   config,
   pkgs,
   ...
-}:
-
-{
+}: {
   # You can import other NixOS modules here
   imports = [
     # If you want to use modules from other flakes (such as nixos-hardware):
@@ -58,7 +56,7 @@
     settings = {
       experimental-features = "nix-command flakes";
       auto-optimise-store = true;
-      trusted-users = [ "lokesh" ];
+      trusted-users = ["lokesh"];
 
       # cachix
       substituters = [
@@ -96,7 +94,7 @@
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.supportedFilesystems = [ "ntfs" ];
+  boot.supportedFilesystems = ["ntfs"];
 
   powerManagement.enable = true;
   services.thermald.enable = true;
@@ -124,7 +122,7 @@
       initialPassword = "nixos";
       isNormalUser = true;
       description = "Lokesh Mohanty";
-      extraGroups = [ "wheel" "input" "video" "networkmanager" "libvirtd" "docker"];
+      extraGroups = ["wheel" "input" "video" "networkmanager" "libvirtd" "docker"];
     };
   };
   users.defaultUserShell = pkgs.fish;
@@ -132,11 +130,15 @@
 
   environment.systemPackages = with pkgs; [
     # gui applications
-    google-chrome onlyoffice-bin
-    tikzit motrix zotero
-    inkscape krita
+    google-chrome
+    onlyoffice-bin
+    tikzit
+    motrix
+    zotero
+    inkscape
+    krita
+    vscode-fhs
     code-cursor
-    
 
     # cli applications
     tesseract
@@ -144,10 +146,20 @@
     gh
 
     # system utilities
-    inxi neofetch bat duf
-    libtool zip unzip unrar file
-    powertop htop bottom
-    openconnect networkmanager-openconnect
+    inxi
+    neofetch
+    bat
+    duf
+    libtool
+    zip
+    unzip
+    unrar
+    file
+    powertop
+    htop
+    bottom
+    openconnect
+    networkmanager-openconnect
     bluetuith
 
     # other utilities
@@ -159,20 +171,37 @@
 
     ## programming languages
     uv
-    (pkgs.python3.withPackages (ps: with ps; [
-      pip ipython jupyterlab 
-      jupytext notebook  # required by molten.nvim for ipynb files
-      numpy pandas matplotlib seaborn tqdm
-      pillow pydantic rich tensorboard
-      huggingface-hub
-    ]))
-    gnumake gcc ghc nodejs micromamba
-    cmakeWithGui shellcheck 
+    (pkgs.python3.withPackages (ps:
+      with ps; [
+        pip
+        ipython
+        jupyterlab
+        jupytext
+        notebook # required by molten.nvim for ipynb files
+        numpy
+        pandas
+        matplotlib
+        seaborn
+        tqdm
+        pillow
+        pydantic
+        rich
+        tensorboard
+        huggingface-hub
+      ]))
+    gnumake
+    gcc
+    ghc
+    nodejs
+    micromamba
+    cmakeWithGui
+    shellcheck
     quarto
 
     ## latex
     texlive.combined.scheme-full
-    texlab tectonic
+    texlab
+    tectonic
     typst
   ];
 

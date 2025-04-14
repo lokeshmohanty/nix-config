@@ -1,4 +1,8 @@
-{ pkgs, lib, ... }: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
   services.pipewire = {
@@ -8,14 +12,14 @@
     pulse.enable = true;
     jack.enable = true;
   };
-  services.gvfs.enable = true;  # mount, trash and other functionalities
-  services.tumbler.enable = true;  # thumbnail support for images
+  services.gvfs.enable = true; # mount, trash and other functionalities
+  services.tumbler.enable = true; # thumbnail support for images
   services.locate = {
     enable = true;
     package = pkgs.plocate;
   };
 
-  # Capslock as Control + Escape, Escape as Capslock 
+  # Capslock as Control + Escape, Escape as Capslock
   services.interception-tools = {
     enable = true;
     plugins = lib.mkForce [
@@ -29,12 +33,12 @@
     '';
   };
 
-  # https://nixos.wiki/wiki/Printing  
+  # https://nixos.wiki/wiki/Printing
   # Access CUPS interface at http://localhost:631
   services.printing = {
     enable = true;
     # Run 'sudo -E hp-setup' or 'sudo hp-setup -i -a'
-    # drivers = with pkgs; [ hplipWithPlugin ]; 
+    # drivers = with pkgs; [ hplipWithPlugin ];
   };
   services.tailscale.enable = true;
 

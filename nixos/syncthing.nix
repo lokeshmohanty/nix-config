@@ -1,4 +1,4 @@
-{ ... }: {
+{...}: {
   services.syncthing = {
     enable = true;
     user = "lokesh";
@@ -9,49 +9,49 @@
     overrideFolders = true;
     settings = {
       devices = {
-        "lab" = { id = "BKTCSPE-QCLARTR-5UVN7OB-NRHFAJI-SG36GWR-6NDDDO7-FLQVPV6-MGIU6AT"; }; 
-        "phone" = { id = "KITNSPR-KMBOSUP-RLJS4XX-KILL76P-SR3HAEL-VKQR4U3-JN636OM-FXNZ3AX"; };
+        "lab" = {id = "BKTCSPE-QCLARTR-5UVN7OB-NRHFAJI-SG36GWR-6NDDDO7-FLQVPV6-MGIU6AT";};
+        "phone" = {id = "KITNSPR-KMBOSUP-RLJS4XX-KILL76P-SR3HAEL-VKQR4U3-JN636OM-FXNZ3AX";};
       };
       folders = {
         "Projects" = {
           path = "/home/lokesh/Projects";
-          devices = [ "lab" ];
+          devices = ["lab"];
         };
         "Research" = {
           path = "/home/lokesh/Documents/Research";
-          devices = [ "lab" ];
+          devices = ["lab"];
         };
         "Presentations" = {
           path = "/home/lokesh/Documents/Presentations";
-          devices = [ "lab" ];
+          devices = ["lab"];
         };
         "Books" = {
           path = "/home/lokesh/Documents/Books";
-          devices = [ "lab" ];
+          devices = ["lab"];
         };
         "Courses" = {
           path = "/home/lokesh/Documents/Courses";
-          devices = [ "lab" ];
+          devices = ["lab"];
         };
         "Practice" = {
           path = "/home/lokesh/Desktop/Practice";
-          devices = [ "lab" ];
+          devices = ["lab"];
         };
         "Org" = {
           path = "/home/lokesh/Documents/Org";
-          devices = [ "phone" "lab" ];
+          devices = ["phone" "lab"];
         };
         "Notebook" = {
           path = "/home/lokesh/Documents/Notebook";
-          devices = [ "phone" "lab" ];
+          devices = ["phone" "lab"];
         };
         "Personal" = {
           path = "/home/lokesh/Documents/Personal";
-          devices = [ "phone" ];
+          devices = ["phone"];
         };
         "Camera" = {
           path = "/home/lokesh/Pictures/Phone";
-          devices = [ "phone" ];
+          devices = ["phone"];
         };
       };
     };

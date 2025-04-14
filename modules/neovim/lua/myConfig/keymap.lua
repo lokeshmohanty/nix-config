@@ -5,7 +5,7 @@ wk.add({ "<leader>d", desc = "DAP" })
 wk.add({ "<leader>l", desc = "LSP" })
 
 -- Main
-vim.keymap.set("n", "<leader>q", ":bd<cr>")
+vim.keymap.set("n", "<leader>q", "<cmd>bd<cr>")
 vim.keymap.set('n', '<leader>g', '<cmd>Neogit<cr>')
 
 -- Preview

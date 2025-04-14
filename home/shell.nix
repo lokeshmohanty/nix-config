@@ -1,8 +1,10 @@
-{ pkgs, config, ... }:
-
 {
+  pkgs,
+  config,
+  ...
+}: {
   home.packages = with pkgs; [
-    exiftool                    #  Read and write meta information in files
+    exiftool #  Read and write meta information in files
   ];
   programs = {
     fzf = {
@@ -36,7 +38,7 @@
           sort_reverse = true;
         };
       };
-      plugins = let 
+      plugins = let
         # nix-prefetch-github <owner> <repo>
         yazi-plugins = pkgs.fetchFromGitHub {
           owner = "yazi-rs";
@@ -50,14 +52,14 @@
       };
       keymap = {
         manager.prepend_keymap = [
-          { 
+          {
             on = ["<C-n>"];
             run = ''
-            shell '${pkgs.ripdrag}/bin/ripdrag "$@" -x 2>/dev/null &' --confirm
+              shell '${pkgs.ripdrag}/bin/ripdrag "$@" -x 2>/dev/null &' --confirm
             '';
             desc = "Drag and drop";
           }
-          # { 
+          # {
           #   on = ["l"];
           #   run = "plugin smart-enter";
           #   desc = "Enter the child directory, or open the file";
@@ -124,7 +126,7 @@
 
       pythonEnv = {
         description = "start a nix-shell with the given python packages";
-        argumentNames = [ "pythonVersion" ];
+        argumentNames = ["pythonVersion"];
         body = ''
           if set -q argv[2]
             # set pythonVersion $argv[1]
@@ -141,9 +143,18 @@
       };
     };
     plugins = [
-      { name = "bass"; src = pkgs.fishPlugins.bass; }
-      { name = "colored-man-output"; src = pkgs.fishPlugins.colored-man-pages.src; }
-      { name = "autopair"; src = pkgs.fishPlugins.autopair.src; }
+      {
+        name = "bass";
+        src = pkgs.fishPlugins.bass;
+      }
+      {
+        name = "colored-man-output";
+        src = pkgs.fishPlugins.colored-man-pages.src;
+      }
+      {
+        name = "autopair";
+        src = pkgs.fishPlugins.autopair.src;
+      }
     ];
   };
 }

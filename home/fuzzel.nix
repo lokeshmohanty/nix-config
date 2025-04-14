@@ -1,6 +1,9 @@
-{ pkgs, config, ... }:
-
 {
+  pkgs,
+  config,
+  ...
+}: {
+  home.packages = [pkgs.rofi];
   programs.fuzzel = {
     enable = true;
     # settings.main = {

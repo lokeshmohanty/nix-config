@@ -28,7 +28,7 @@
   home = {
     username = "lokesh";
     homeDirectory = "/home/lokesh";
-    sessionPath = [ "$HOME/.local/bin" ];
+    sessionPath = ["$HOME/.local/bin"];
     sessionVariables = {
       LESSHISTFILE = config.xdg.cacheHome + "/less/history";
       LESSKEY = config.xdg.configHome + "/less/lesskey";
@@ -48,8 +48,11 @@
       gnumake
 
       imagemagick
-      pandoc pass rclone 
-      yt-dlp ffmpeg
+      pandoc
+      pass
+      rclone
+      yt-dlp
+      ffmpeg
 
       # Modern cli tools, replacement of grep/sed/...
 
@@ -87,13 +90,14 @@
       # croc # File transfer between computers securely and easily
 
       # other
-      remmina freerdp # remote desktop client
+      remmina
+      freerdp # remote desktop client
       ventoy # multi-boot USB creator
     ];
   };
 
   stylixConfig.enable = true;
-  stylixConfig.theme = "everforest-dark-hard";#"terracotta";
+  stylixConfig.theme = "everforest-dark-hard"; #"terracotta";
   wallpaper = ./../wallpapers/0016.jpg;
 
   # Hyprland
@@ -123,13 +127,20 @@
   };
   programs.firefox.enable = true;
   # programs.keychain = { enable = true; keys = [ "id_ed25519" ]; };
-  programs.gh = { enable = true; extensions = [ pkgs.gh-dash ]; };
+  programs.gh = {
+    enable = true;
+    extensions = [pkgs.gh-dash];
+  };
   programs.nix-index.enable = true;
 
   services.gammastep = {
     enable = true;
-    temperature = { day = 5000; night = 2500; };
-    latitude = 13.0; longitude = 77.5;
+    temperature = {
+      day = 5000;
+      night = 2500;
+    };
+    latitude = 13.0;
+    longitude = 77.5;
   };
 
   dconf.settings = {

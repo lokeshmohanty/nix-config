@@ -1,21 +1,25 @@
-{ pkgs, inputs, ... }:
-
 {
-  imports = [ 
+  pkgs,
+  inputs,
+  ...
+}: {
+  imports = [
     inputs.nvf.homeManagerModules.default
   ];
 
+  home.packages = with pkgs; [notmuch];
   home.sessionVariables.EDITOR = "nvim";
   programs.vim.enable = true;
   programs.nvf = {
     enable = true;
     enableManpages = true;
-    settings = import ../../modules/neovim { inherit pkgs; };
+    settings = import ../../modules/neovim {inherit pkgs;};
   };
   programs.emacs = {
     enable = true;
-    package = pkgs.emacs30;
+    extraPackages = epkgs: [epkgs.vterm];
   };
+  services.emacs.enable = true;
   programs.neovide = {
     enable = true;
     settings = {

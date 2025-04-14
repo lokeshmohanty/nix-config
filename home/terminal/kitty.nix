@@ -1,9 +1,11 @@
-{ pkgs, config, ... }:
-
 {
+  pkgs,
+  config,
+  ...
+}: {
   programs.kitty = {
     enable = true;
-    environment = { "TERM" = "xterm-256color"; };
+    environment = {"TERM" = "xterm-256color";};
     font = {
       name = "Victor Mono Italic";
       size = 15;
