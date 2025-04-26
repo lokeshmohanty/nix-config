@@ -5,6 +5,7 @@ require("myConfig.markdown")
 require("myConfig.latex")
 require("myConfig.treesitter")
 require("myConfig.snippets")
+require("myConfig.fold")
 
 -- vim.cmd([[ colorscheme retrobox ]])
 require("everforest").load()

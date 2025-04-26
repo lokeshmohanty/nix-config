@@ -1,9 +1,3 @@
-require("nvim-treesitter.configs").setup({
-	-- ensure_installed = { "nix", "lua", "vim", "vimdoc", "markdown", "markdown_inline" },
-	-- auto_install = true,
-	parser_install_dir = "/home/lokesh/.config/nvf/parsers/",
-})
-
 require("lspconfig").basedpyright.setup({
 	settings = {
 		basedpyright = {
