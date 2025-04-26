@@ -1,18 +1,18 @@
 require("nvim-treesitter.configs").setup({
-			ensure_installed = { "nix", "lua", "vim", "vimdoc", "markdown", "markdown_inline" },
-			auto_install = true,
-			parser_install_dir = "/home/lokesh/.config/nvf/parsers/",
+	-- ensure_installed = { "nix", "lua", "vim", "vimdoc", "markdown", "markdown_inline" },
+	-- auto_install = true,
+	parser_install_dir = "/home/lokesh/.config/nvf/parsers/",
 })
+
 require("lspconfig").basedpyright.setup({
-  settings = {
-    basedpyright = {
-      typeCheckingMode = 'off',
-    },
-  },
+	settings = {
+		basedpyright = {
+			typeCheckingMode = "off",
+		},
+	},
 })
 require("lspconfig").ts_ls.setup({})
 require("lspconfig").texlab.setup({})
--- require("tailwind-tools").setup({})
 -- require("lspconfig").lua_ls.setup({
 --   settings = {
 --     Lua = {

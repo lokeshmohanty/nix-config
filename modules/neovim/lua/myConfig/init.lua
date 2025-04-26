@@ -1,16 +1,13 @@
-
-require('myConfig.keymap')
+require("myConfig.keymap")
 -- require('myConfig.lualine')
-require('myConfig.lsp')
-require('myConfig.markdown')
-require('myConfig.latex')
-require('myConfig.treesitter')
-require('myConfig.snippets')
+require("myConfig.lsp")
+require("myConfig.markdown")
+require("myConfig.latex")
+require("myConfig.treesitter")
+require("myConfig.snippets")
 
 -- vim.cmd([[ colorscheme retrobox ]])
 require("everforest").load()
-
-
 
 -- Completion
 -- See: ins-completion

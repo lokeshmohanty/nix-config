@@ -110,6 +110,7 @@
       yazi-nvim # file manager
       lsp_signature-nvim # display lsp function signature
       nvim-treesitter
+      nvim-ufo # foldings
 
       # Colorschemes
       (let
