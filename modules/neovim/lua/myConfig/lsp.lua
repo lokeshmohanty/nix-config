@@ -1,7 +1,10 @@
+-- vim.lsp.enable('basedpyright')
 require("lspconfig").basedpyright.setup({
 	settings = {
 		basedpyright = {
-			typeCheckingMode = "off",
+      analysis = {
+        typeCheckingMode = "basic",
+      },
 		},
 	},
 })

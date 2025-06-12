@@ -11,6 +11,8 @@ require("myConfig.terminal")
 -- vim.cmd([[ colorscheme retrobox ]])
 require("everforest").load()
 
+require("uv").setup({})
+
 vim.cmd([[ let g:tex_flavor = "tex" ]])
 
 -- Completion

@@ -105,12 +105,25 @@
       jupytext-nvim # convert ipynb to markdown
       bullets-vim # markdown insert bulleted lists ...
       img-clip-nvim # drag n drop images
-      vim-floaterm # terminal
+      # vim-floaterm # terminal
       yazi-nvim # file manager
       lsp_signature-nvim # display lsp function signature
       nvim-treesitter
       nvim-ufo # foldings
 
+      # use nix-prefetch-github for rev and hash
+      (let
+        uv-nvim = pkgs.vimUtils.buildVimPlugin {
+          name = "uv-nvim";
+          src = pkgs.fetchFromGitHub {
+            owner = "benomahony";
+            repo = "uv.nvim";
+            rev = "642e45d392a65fe15dbebd63444e45e21a38f883";
+            hash = "sha256-S1Zi22qM1k2NBXt0NurQLqjije6ZrL1DxhCx0QoOyNA=";
+          };
+        };
+      in
+        uv-nvim)
       # Colorschemes
       (let
         everforest-nvim = pkgs.vimUtils.buildVimPlugin {
@@ -141,7 +154,7 @@
       texlab
       typescript-language-server
     ];
-    luaPackages = ["magick"];
-    python3Packages = ["pynvim"];
+    luaPackages = [ "magick" ];
+    python3Packages = [ "pynvim" "pylatexenc" ];
   };
 }
