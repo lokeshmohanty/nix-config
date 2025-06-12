@@ -3,7 +3,6 @@
     viAlias = true;
     vimAlias = false;
     searchCase = "smart";
-    useSystemClipboard = true;
     enableLuaLoader = true;
     withPython3 = true;
     withNodeJs = true;
@@ -11,7 +10,8 @@
     luaConfigRC.myConfig = ''
       require("myConfig")
       require("neovide")
-      require("illustrate")
+      -- require("illustrate")
+      vim.opt.clipboard:append("unnamedplus")
     '';
     options = {
       tabstop = 2;
@@ -35,7 +35,6 @@
     debugger.nvim-dap.ui.enable = true;
     lsp.enable = true;
     languages = {
-      enableLSP = true;
       enableDAP = true;
       enableFormat = true;
       enableExtraDiagnostics = false;

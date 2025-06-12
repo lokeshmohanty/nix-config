@@ -11,6 +11,8 @@ require("myConfig.terminal")
 -- vim.cmd([[ colorscheme retrobox ]])
 require("everforest").load()
 
+vim.cmd([[ let g:tex_flavor = "tex" ]])
+
 -- Completion
 -- See: ins-completion
 -- require('mini.completion').setup({

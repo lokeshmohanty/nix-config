@@ -119,6 +119,7 @@
       # If you do, you can skip setting a root password by
       # passing '--no-root-passwd' to nixos-install.
       # Be sure to change it (using passwd) after rebooting!
+      shell = pkgs.fish;
       initialPassword = "nixos";
       isNormalUser = true;
       description = "Lokesh Mohanty";
@@ -171,7 +172,7 @@
 
     ## programming languages
     uv
-    (pkgs.python3.withPackages (ps:
+    (pkgs.python311.withPackages (ps:
       with ps; [
         pip
         ipython
@@ -188,6 +189,13 @@
         rich
         tensorboard
         huggingface-hub
+        pyqt6-sip
+        pyqtwebengine
+        qtpy
+        qt-material
+        pyqt5-stubs
+        qtawesome
+        pyqtdarktheme
       ]))
     gnumake
     gcc

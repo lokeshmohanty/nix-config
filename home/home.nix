@@ -92,7 +92,7 @@
       # other
       remmina
       freerdp # remote desktop client
-      ventoy # multi-boot USB creator
+      # ventoy # multi-boot USB creator
     ];
   };
 

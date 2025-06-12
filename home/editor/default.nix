@@ -22,11 +22,11 @@
   services.emacs.enable = true;
   programs.neovide = {
     enable = true;
-    settings = {
-      font = {
-        normal = "Cascadia Code";
-        size = 14.0;
-      };
-    };
+    # settings = {
+    #   font = {
+    #     normal = "Cascadia Code";
+    #     size = 14.0;
+    #   };
+    # };
   };
 }

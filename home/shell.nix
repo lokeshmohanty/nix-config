@@ -94,16 +94,27 @@
       s = "sudo -E";
       p = "python";
       x = "env -u WAYLAND_DISPLAY";
+
+      # docker
       di = "docker image";
       dc = "docker container";
       de = "distrobox enter";
       mm = "micromamba";
+
+      # tmux
+      ta = "tmux attach -t";
+      tn = "tmux new-session -t";
+      tl = "tmux list-sessions";
+      tk = "tmux kill-session -t";
+
+      # nix
       nd = "nix develop";
       nl = "nix-locate";
       nr = "nix run nixpkgs#";
       ns = "nix search nixpkgs";
       nq = "nix-env -qaP";
       nsh = "nix-shell --command fish -p";
+
       hypr = "dbus-run-session Hyprland";
     };
     functions = {
