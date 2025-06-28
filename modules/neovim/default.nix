@@ -1,6 +1,6 @@
 {pkgs, ...}: {
   vim = {
-    viAlias = true;
+    viAlias = false;
     vimAlias = false;
     searchCase = "smart";
     enableLuaLoader = true;

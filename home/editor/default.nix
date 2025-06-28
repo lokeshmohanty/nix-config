@@ -8,8 +8,7 @@
   ];
   home.packages = with pkgs; [notmuch];
   home.sessionVariables.EDITOR = "nvim";
-  programs.vim.enable = true;
-  nixCats.enable = true;
+  # nixCats.enable = true;
   programs.emacs = {
     enable = true;
     extraPackages = epkgs: [epkgs.vterm];
