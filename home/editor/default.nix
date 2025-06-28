@@ -4,7 +4,7 @@
   ...
 }: {
   imports = [
-    ./nixCats
+    ../../modules/nixCats
   ];
   home.packages = with pkgs; [notmuch];
   home.sessionVariables.EDITOR = "nvim";

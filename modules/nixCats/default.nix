@@ -27,7 +27,7 @@ in {
         ];
       # see the packageDefinitions below.
       # This says which of those to install.
-      packageNames = ["myHomeModuleNvim"];
+      packageNames = ["nvim"];
 
       luaPath = ./.;
 
@@ -150,7 +150,7 @@ in {
       packageDefinitions.replace = {
         # These are the names of your packages
         # you can include as many as you wish.
-        myHomeModuleNvim = {
+        nvim = {
           pkgs,
           name,
           ...
@@ -161,10 +161,10 @@ in {
             suffix-path = true;
             suffix-LD = true;
             wrapRc = true;
-            unwrappedCfgPath = "~/Documents/nix-config/home/editor/nixCats";
+            unwrappedCfgPath = "~/Documents/nix-config/modules/nixCats";
             # IMPORTANT:
             # your alias may not conflict with your other packages.
-            aliases = ["vi" "nvim" "homeVim"];
+            aliases = ["vi"];
             # neovim-unwrapped = inputs.neovim-nightly-overlay.packages.${pkgs.system}.neovim;
             hosts.python3.enable = true;
             hosts.node.enable = true;
