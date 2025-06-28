@@ -154,7 +154,7 @@
       texlab
       typescript-language-server
     ];
-    luaPackages = [ "magick" ];
-    python3Packages = [ "pynvim" "pylatexenc" ];
+    luaPackages = ["magick"];
+    python3Packages = ["pynvim" "pylatexenc"];
   };
 }
