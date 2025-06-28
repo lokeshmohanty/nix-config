@@ -4,17 +4,12 @@
   ...
 }: {
   imports = [
-    inputs.nvf.homeManagerModules.default
+    ./nixCats
   ];
-
   home.packages = with pkgs; [notmuch];
   home.sessionVariables.EDITOR = "nvim";
   programs.vim.enable = true;
-  programs.nvf = {
-    enable = true;
-    enableManpages = true;
-    settings = import ../../modules/neovim {inherit pkgs;};
-  };
+  nixCats.enable = true;
   programs.emacs = {
     enable = true;
     extraPackages = epkgs: [epkgs.vterm];

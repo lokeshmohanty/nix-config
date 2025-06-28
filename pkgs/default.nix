@@ -1,12 +1,13 @@
 {
   pkgs,
-  inputs,
-  ...
+    inputs,
+    ...
 }: {
-  neovim =
-    (inputs.nvf.lib.neovimConfiguration {
-      pkgs = pkgs;
-      modules = [../modules/neovim];
-    })
-    .neovim;
+neovim =
+  (inputs.nvf.lib.neovimConfiguration {
+   pkgs = pkgs;
+   modules = [../modules/neovim];
+   })
+.neovim;
 }
+
