@@ -1,0 +1,60 @@
+{
+  "nodes": {
+    "nixCats": {
+      "locked": {
+        "lastModified": 1750385661,
+        "narHash": "sha256-JpIEf5IrOzMTjowkxB6kgh4AK3Dp9i/T9G4w2ZiKMgQ=",
+        "owner": "BirdeeHub",
+        "repo": "nixCats-nvim",
+        "rev": "04379fef2fbd4c9d8f4c9a6203cef135ab0b1acd",
+        "type": "github"
+      },
+      "original": {
+        "owner": "BirdeeHub",
+        "repo": "nixCats-nvim",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1751180975,
+        "narHash": "sha256-BKk4yDiXr4LdF80OTVqYJ53Q74rOcA/82EClXug8xsY=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "a48741b083d4f36dd79abd9f760c84da6b4dc0e5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "plugins-everforest": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1746546554,
+        "narHash": "sha256-LMIGPDhKZVqriGuPR9ICVo55QdyByLXOoRK82KfsRxU=",
+        "owner": "neanias",
+        "repo": "everforest-nvim",
+        "rev": "2eb7c348f880ba93de4d98cae049c9441f5d4d49",
+        "type": "github"
+      },
+      "original": {
+        "owner": "neanias",
+        "repo": "everforest-nvim",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "nixCats": "nixCats",
+        "nixpkgs": "nixpkgs",
+        "plugins-everforest": "plugins-everforest"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
