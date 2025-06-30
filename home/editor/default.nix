@@ -4,11 +4,15 @@
   ...
 }: {
   imports = [
-    ../../modules/nixCats
+    inputs.nixCats.homeModule
   ];
   home.packages = with pkgs; [notmuch];
-  home.sessionVariables.EDITOR = "nvim";
+  home.sessionVariables.EDITOR = "vi";
   # nixCats.enable = true;
+  nixCats = {
+    enable = true;
+    packageNames = ["nixCats" "regularCats"];
+  };
   programs.emacs = {
     enable = true;
     extraPackages = epkgs: [epkgs.vterm];

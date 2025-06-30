@@ -17,9 +17,11 @@
     nvf.url = "github:notashelf/nvf";
     nix-alien.url = "github:thiagokokada/nix-alien";
     stylix.url = "github:danth/stylix";
-    nixCats.url = "github:BirdeeHub/nixCats-nvim";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
+
+    nixCats.url = "./modules/nixCats";
+    nixCats.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = inputs @ {

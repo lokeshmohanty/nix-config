@@ -793,6 +793,24 @@
       }
     },
     "nixCats": {
+      "inputs": {
+        "nixCats": "nixCats_2",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1,
+        "narHash": "sha256-bUUUJheswzVRWYQQMFt1guq3LcWwyadg9daXlEunah8=",
+        "path": "/nix/store/r17xsvr3fy1ivjpalyylb5jpq8lk6202-source/modules/nixCats",
+        "type": "path"
+      },
+      "original": {
+        "path": "/nix/store/r17xsvr3fy1ivjpalyylb5jpq8lk6202-source/modules/nixCats",
+        "type": "path"
+      }
+    },
+    "nixCats_2": {
       "locked": {
         "lastModified": 1750385661,
         "narHash": "sha256-JpIEf5IrOzMTjowkxB6kgh4AK3Dp9i/T9G4w2ZiKMgQ=",

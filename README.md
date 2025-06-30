@@ -30,6 +30,14 @@
     nix-copy-closure --to <username>@<ip> $(type -p <package-name>)
     ```
 
+## Neovim
+
+- To run my configuration of neovim
+
+```sh
+    nix run github:lokeshmohanty/nix-config?dir=modules/nixCats#nixCats
+```
+
 # References
 
 - **Template** : [nix-starter-configs](https://github.com/Misterio77/nix-starter-configs)
