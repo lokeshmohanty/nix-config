@@ -91,6 +91,7 @@
             dropbar-nvim
             nvim-ufo
             grug-far-nvim
+            render-markdown-nvim
           ];
         };
         themer = with pkgs.vimPlugins; (
@@ -148,7 +149,6 @@
         };
         markdown = with pkgs.vimPlugins; [
           markdown-preview-nvim
-          render-markdown-nvim
         ];
         debug = with pkgs.vimPlugins; {
           default = [

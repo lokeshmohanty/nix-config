@@ -29,8 +29,6 @@ vim.api.nvim_create_autocmd("User", {
 
 -- Mini Sessions
 require("mini.sessions").setup({})
-local wk = require("which-key")
-wk.add({ "<leader>ms", desc = "MiniSessions" })
 local ms = require("mini.sessions")
 vim.keymap.set("n", "<leader>mss", function()
 	local input = vim.fn.input("Save session as: ")

@@ -19,9 +19,15 @@ end
 
 if nixCats('general.extra') then
   require("myLuaConf.plugins.snacks")
-  -- require("myLuaConf.plugins.mini")
+  require("myLuaConf.plugins.mini")
   require("myLuaConf.plugins.oil")
   -- require("myLuaConf.plugins.ufo")
+
+  require("render-markdown").setup({
+    heading = {
+      icons = { "󰎤 ", "󰎧 ", "󰎪 ", "󰎭 ", "󰎱 ", "󰎳 " },
+    }
+  })
 end
 
 require('lze').load {
@@ -36,8 +42,8 @@ require('lze').load {
     cmd = { "MarkdownPreview", "MarkdownPreviewStop", "MarkdownPreviewToggle", },
     ft = "markdown",
     keys = {
-      {"<leader>mp", "<cmd>MarkdownPreview <CR>", mode = {"n"}, noremap = true, desc = "markdown preview"},
-      {"<leader>ms", "<cmd>MarkdownPreviewStop <CR>", mode = {"n"}, noremap = true, desc = "markdown preview stop"},
+      -- {"<leader>mp", "<cmd>MarkdownPreview <CR>", mode = {"n"}, noremap = true, desc = "markdown preview"},
+      -- {"<leader>ms", "<cmd>MarkdownPreviewStop <CR>", mode = {"n"}, noremap = true, desc = "markdown preview stop"},
       {"<leader>mt", "<cmd>MarkdownPreviewToggle <CR>", mode = {"n"}, noremap = true, desc = "markdown preview toggle"},
     },
     before = function(plugin)
