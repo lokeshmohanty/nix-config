@@ -48,6 +48,7 @@ require('lze').load {
   { import = "myLuaConf.plugins.completion", },
   { import = "myLuaConf.plugins.which-key", },
   { import = "myLuaConf.plugins.gitsigns", },
+  { import = "myLuaConf.plugins.ai", },
   {
     "markdown-preview.nvim",
     for_cat = 'general.markdown',

@@ -802,12 +802,12 @@
       },
       "locked": {
         "lastModified": 1,
-        "narHash": "sha256-Nlx3ri4qOWOto/RomFJ+TtPFxjiRr/RAb1NbcITJ9dw=",
-        "path": "/nix/store/03kv38n48m14nmh80bbsk1i15g2xms73-source/modules/nixCats",
+        "narHash": "sha256-KKpo6Erv2bdosiVhr8bsf382PCm0NE/MdP8F6x5fBzM=",
+        "path": "/nix/store/s8yhq4dq8xyxp833srcaykckc7hl912d-source/modules/nixCats",
         "type": "path"
       },
       "original": {
-        "path": "/nix/store/03kv38n48m14nmh80bbsk1i15g2xms73-source/modules/nixCats",
+        "path": "/nix/store/s8yhq4dq8xyxp833srcaykckc7hl912d-source/modules/nixCats",
         "type": "path"
       }
     },

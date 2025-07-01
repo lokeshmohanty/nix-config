@@ -87,22 +87,18 @@
             mini-nvim
             oil-nvim
             nvim-web-devicons
-            neogit
             gx-nvim
             dropbar-nvim
             nvim-ufo
             grug-far-nvim
             render-markdown-nvim
+            neogit
           ];
         };
         tex = with pkgs.vimPlugins; [vimtex];
         themer = with pkgs.vimPlugins; (
-          builtins.getAttr (categories.colorscheme or "onedark") {
-            "onedark" = onedark-nvim;
+          builtins.getAttr (categories.colorscheme or "catppuccin") {
             "catppuccin" = catppuccin-nvim;
-            "catppuccin-mocha" = catppuccin-nvim;
-            "tokyonight" = tokyonight-nvim;
-            "tokyonight-day" = tokyonight-nvim;
             "everforest" = pkgs.neovimPlugins.everforest;
           }
         );
@@ -120,6 +116,7 @@
             blink-cmp
             blink-compat
             colorful-menu-nvim
+            sqlite-lua
           ];
           treesitter = with pkgs.vimPlugins; [
             nvim-treesitter-textobjects
@@ -133,7 +130,12 @@
           always = with pkgs.vimPlugins; [
             nvim-lspconfig
             lualine-nvim
+
             gitsigns-nvim
+            # diffview-nvim
+            # advanced-git-search-nvim
+            # webify-nvim
+
             vim-sleuth
             vim-fugitive
             vim-rhubarb
@@ -149,6 +151,10 @@
           ];
         };
         markdown = with pkgs.vimPlugins; [markdown-preview-nvim];
+        ai = with pkgs.vimPlugins; [
+          copilot-lua
+          CopilotChat-nvim
+        ];
         debug = with pkgs.vimPlugins; {
           default = [
             nvim-dap
@@ -245,6 +251,7 @@
           markdown = true;
           general = true;
           dev = true;
+          ai = true;
           nix = true;
           lua = true;
           python = true;
@@ -273,6 +280,7 @@
         categories = {
           markdown = true;
           general = true;
+          ai = true;
           nix = true;
           lua = true;
           python = true;
