@@ -11,6 +11,7 @@
         inputs.lix-module.nixosModules.default
         ./configuration.nix
         ./hardware-configuration.nix
+        ./syncthing.nix
       ];
     };
   };

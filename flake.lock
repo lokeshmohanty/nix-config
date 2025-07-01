@@ -803,11 +803,11 @@
       "locked": {
         "lastModified": 1,
         "narHash": "sha256-Nlx3ri4qOWOto/RomFJ+TtPFxjiRr/RAb1NbcITJ9dw=",
-        "path": "/nix/store/58ha5pxniy6x5p9isg2qd1ard74kh1dn-source/modules/nixCats",
+        "path": "/nix/store/03kv38n48m14nmh80bbsk1i15g2xms73-source/modules/nixCats",
         "type": "path"
       },
       "original": {
-        "path": "/nix/store/58ha5pxniy6x5p9isg2qd1ard74kh1dn-source/modules/nixCats",
+        "path": "/nix/store/03kv38n48m14nmh80bbsk1i15g2xms73-source/modules/nixCats",
         "type": "path"
       }
     },

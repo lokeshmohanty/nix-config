@@ -16,7 +16,6 @@
     # You can also split up your configuration and import pieces of it here:
     ./security.nix
     ./gaming.nix
-    ./syncthing.nix
     ./services.nix
     ./programs.nix
     ./desktop-environment.nix
@@ -38,7 +37,7 @@
     # Configure your nixpkgs instance
     config = {
       allowUnfree = true;
-      allowInsecure = true;
+      allowInsecure = false;
     };
   };
 
