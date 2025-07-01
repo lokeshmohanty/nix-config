@@ -1,5 +1,3 @@
-# This is your system's configuration file.
-# Use this to configure your system environment (it replaces /etc/nixos/configuration.nix)
 {
   inputs,
   lib,
@@ -9,7 +7,18 @@
 }: {
   imports = [
     ../../nixos
+    ../../nixos/ssh.nix
   ];
+
+  hardware.graphics.enable = true;
+  hardware.nvidia = {
+    modesetting.enable = true;
+    powerManagement.enable = false;
+    powerManagement.finegrained = false;
+    open = false;
+    nvidiaSettings = true;
+  };
+  nixpkgs.config.nvidia.acceptLicense = true;
 
   networking.hostName = "bhaskara";
 }
