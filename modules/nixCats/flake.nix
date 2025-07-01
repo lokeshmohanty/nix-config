@@ -58,6 +58,7 @@
         ];
         debug = with pkgs; {go = [delve];};
         python = with pkgs; [python3Packages.python-lsp-server];
+        tex = with pkgs; [texlab];
         go = with pkgs; [
           gopls
           gotools
@@ -94,6 +95,7 @@
             render-markdown-nvim
           ];
         };
+        tex = with pkgs.vimPlugins; [vimtex];
         themer = with pkgs.vimPlugins; (
           builtins.getAttr (categories.colorscheme or "onedark") {
             "onedark" = onedark-nvim;
@@ -114,7 +116,6 @@
       optionalPlugins = {
         general = {
           blink = with pkgs.vimPlugins; [
-            luasnip
             cmp-cmdline
             blink-cmp
             blink-compat
@@ -147,13 +148,12 @@
             vim-startuptime
           ];
         };
-        markdown = with pkgs.vimPlugins; [
-          markdown-preview-nvim
-        ];
+        markdown = with pkgs.vimPlugins; [markdown-preview-nvim];
         debug = with pkgs.vimPlugins; {
           default = [
             nvim-dap
-            nvim-dap-view
+            nvim-dap-ui
+            # nvim-dap-view
             nvim-dap-virtual-text
           ];
           go = [nvim-dap-go];
@@ -248,6 +248,7 @@
           nix = true;
           lua = true;
           python = true;
+          tex = true;
           themer = true;
           colorscheme = "everforest";
           extra = {
@@ -275,6 +276,7 @@
           nix = true;
           lua = true;
           python = true;
+          tex = true;
           dev = true;
           themer = true;
           colorscheme = "everforest";

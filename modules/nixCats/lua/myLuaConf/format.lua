@@ -1,7 +1,7 @@
 require('lze').load {
   {
     "conform.nvim",
-    for_cat = 'format',
+    for_cat = 'dev',
     -- cmd = { "" },
     -- event = "",
     -- ft = "",

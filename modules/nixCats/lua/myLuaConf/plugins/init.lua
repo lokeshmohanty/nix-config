@@ -19,15 +19,27 @@ end
 
 if nixCats('general.extra') then
   require("myLuaConf.plugins.snacks")
-  require("myLuaConf.plugins.mini")
-  require("myLuaConf.plugins.oil")
-  -- require("myLuaConf.plugins.ufo")
+  require("myLuaConf.plugins.snippet")
+  require("myLuaConf.plugins.session")
+  require("myLuaConf.plugins.file-manager")
+  require("myLuaConf.plugins.fold")
 
+  require("mini.pairs").setup({})
+  require("mini.starter").setup({})
+  -- require("mini.tabline").setup({})
+  -- require("mini.icons").setup()
   require("render-markdown").setup({
     heading = {
       icons = { "󰎤 ", "󰎧 ", "󰎪 ", "󰎭 ", "󰎱 ", "󰎳 " },
     }
   })
+end
+
+if nixCats('tex') then
+  -- vim.g.vimtex_view_method = 'zathura'
+
+  vim.g.vimtex_view_general_viewer = 'okular'
+  vim.g.vimtex_view_general_options = '--unique file:@pdf\\#src:@line@tex'
 end
 
 require('lze').load {

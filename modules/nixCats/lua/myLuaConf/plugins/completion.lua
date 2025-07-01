@@ -16,24 +16,6 @@ return {
     dep_of = { "cmp-cmdline" },
   },
   {
-    "luasnip",
-    for_cat = "general.blink",
-    dep_of = { "blink.cmp" },
-    after = function (_)
-      local luasnip = require 'luasnip'
-      require('luasnip.loaders.from_vscode').lazy_load()
-      luasnip.config.setup {}
-
-      local ls = require('luasnip')
-
-      vim.keymap.set({ "i", "s" }, "<M-n>", function()
-          if ls.choice_active() then
-              ls.change_choice(1)
-          end
-      end)
-    end,
-  },
-  {
     "colorful-menu.nvim",
     for_cat = "general.blink",
     on_plugin = { "blink.cmp" },
@@ -44,9 +26,7 @@ return {
     event = "DeferredUIEnter",
     after = function (_)
       require("blink.cmp").setup({
-        -- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
-        -- See :h blink-cmp-config-keymap for configuring keymaps
-        keymap =  {
+        keymap = {
           preset = 'default',
         },
         cmdline = {
@@ -100,7 +80,7 @@ return {
           },
         },
         snippets = {
-          preset = 'luasnip',
+          preset = 'mini_snippets',
         },
         sources = {
           default = { 'lsp', 'path', 'snippets', 'buffer', 'omni' },

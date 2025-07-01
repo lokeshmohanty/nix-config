@@ -1,7 +1,7 @@
 require('lze').load {
   {
     "nvim-lint",
-    for_cat = 'lint',
+    for_cat = 'dev',
     -- cmd = { "" },
     event = "FileType",
     -- ft = "",

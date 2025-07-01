@@ -91,6 +91,11 @@ require('lze').load {
     for_cat = "python",
     lsp = {},
   },
+  -- {
+  --   "texlab",
+  --   for_cat = "tex",
+  --   lsp = {},
+  -- },
   {
     "gopls",
     for_cat = "go",
