@@ -6,18 +6,32 @@
   imports = [
     inputs.nixCats.homeModule
   ];
-  home.packages = with pkgs; [notmuch];
+  home.packages = with pkgs; [
+    mu
+    isync
+    maim
+    nixfmt
+    nim
+    sqlite
+    isort
+    python3Packages.pytest
+    python3Packages.setuptools
+  ];
   home.sessionVariables.EDITOR = "vi";
-  # nixCats.enable = true;
   nixCats = {
     enable = true;
     packageNames = ["nixCats" "regularCats"];
   };
   programs.emacs = {
     enable = true;
-    extraPackages = epkgs: [epkgs.vterm];
+    extraPackages = epkgs:
+      with epkgs; [
+        treesit-grammars.with-all-grammars
+        vterm
+        mu4e
+      ];
   };
-  services.emacs.enable = true;
+  # services.emacs.enable = true;
   programs.neovide = {
     enable = true;
     # settings = {
