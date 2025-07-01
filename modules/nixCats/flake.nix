@@ -66,7 +66,7 @@
           gccgo
         ];
         lua = with pkgs; [lua-language-server];
-        nix = { inherit (pkgs) nix-doc nixd alejandra; };
+        nix = {inherit (pkgs) nix-doc nixd alejandra;};
       };
 
       # This is for plugins that will load at startup without using packadd:
@@ -164,7 +164,7 @@
           python = [neotest-python];
         };
         dev = with pkgs.vimPlugins; [
-          nvim-lint 
+          nvim-lint
           conform-nvim
           lazydev-nvim
         ];

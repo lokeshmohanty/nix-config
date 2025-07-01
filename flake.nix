@@ -24,37 +24,10 @@
     nixCats.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs @ {
-    flake-parts,
-    nixpkgs,
-    home-manager,
-    ...
-  }:
+  outputs = {flake-parts, ...} @ inputs:
     flake-parts.lib.mkFlake {inherit inputs;} {
       systems = ["x86_64-linux"];
-      imports = [];
-      flake = {
-        nixosConfigurations = {
-          sudarshan = nixpkgs.lib.nixosSystem {
-            specialArgs = {inherit inputs;};
-            modules = [
-              inputs.nixos-hardware.nixosModules.lenovo-thinkpad-l14-amd
-              inputs.lix-module.nixosModules.default
-              ./nixos/configuration.nix
-              ./nixos/desktop-environment.nix
-            ];
-          };
-        };
-        homeConfigurations = {
-          "lokesh@sudarshan" = home-manager.lib.homeManagerConfiguration {
-            pkgs = nixpkgs.legacyPackages.x86_64-linux;
-            extraSpecialArgs = {inherit inputs;};
-            modules = [
-              ./home/home.nix
-            ];
-          };
-        };
-      };
+      imports = [./hosts ./home];
       perSystem = {
         config,
         pkgs,

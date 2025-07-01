@@ -19,10 +19,8 @@
     ./syncthing.nix
     ./services.nix
     ./programs.nix
+    ./desktop-environment.nix
     # ./ssh.nix
-
-    # Import your generated (nixos-generate-config) hardware configuration
-    ./hardware-configuration.nix
   ];
 
   nixpkgs = {
@@ -78,27 +76,12 @@
     # };
   };
 
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
-    extraPackages = [
-      pkgs.rocmPackages.clr.icd
-      pkgs.amdvlk
-    ];
-  };
-  services.xserver.videoDrivers = ["amdgpu"];
-
-  networking.hostName = "sudarshan";
   networking.networkmanager.enable = true;
   networking.firewall.enable = false;
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.supportedFilesystems = ["ntfs"];
-
-  powerManagement.enable = true;
-  services.thermald.enable = true;
-  # services.tlp.enable = true;
 
   time.timeZone = "Asia/Kolkata";
   i18n.defaultLocale = "en_US.UTF-8";
@@ -201,15 +184,12 @@
     gcc
     ghc
     nodejs
-    micromamba
     cmakeWithGui
     shellcheck
     quarto
 
     ## latex
     texlive.combined.scheme-full
-    texlab
-    tectonic
     typst
   ];
 
@@ -227,7 +207,6 @@
     ];
   };
 
-  hardware.bluetooth.enable = true;
   virtualisation = {
     docker = {
       enable = true;
@@ -244,5 +223,5 @@
   };
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-  system.stateVersion = "23.05";
+  system.stateVersion = "25.05";
 }
