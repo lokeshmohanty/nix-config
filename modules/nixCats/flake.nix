@@ -58,6 +58,7 @@
         ];
         debug = with pkgs; {go = [delve];};
         python = with pkgs; [python3Packages.python-lsp-server];
+        elixir = with pkgs; [beam28Packages.elixir-ls];
         tex = with pkgs; [texlab];
         go = with pkgs; [
           gopls
@@ -168,6 +169,7 @@
         test = with pkgs.vimPlugins; {
           default = [neotest];
           python = [neotest-python];
+          elixir = [neotest-elixir];
         };
         dev = with pkgs.vimPlugins; [
           nvim-lint
@@ -229,6 +231,7 @@
         debug = [["debug" "default"]];
         go = [["debug" "go"]];
         python = [["python" "debug" "test"]];
+        elixir = [["elixir" "test"]];
       };
     };
 
@@ -255,6 +258,7 @@
           nix = true;
           lua = true;
           python = true;
+          elixir = true;
           tex = true;
           themer = true;
           colorscheme = "everforest";
@@ -284,6 +288,7 @@
           nix = true;
           lua = true;
           python = true;
+          elixir = true;
           tex = true;
           dev = true;
           themer = true;

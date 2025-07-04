@@ -91,6 +91,11 @@ require('lze').load {
     for_cat = "python",
     lsp = {},
   },
+  {
+    "elixirls",
+    for_cat = "elixir",
+    lsp = { cmd = { 'elixir-ls' } },
+  },
   -- {
   --   "texlab",
   --   for_cat = "tex",
