@@ -10,6 +10,7 @@
     settings = {
       devices = {
         "laptop".id = "ZUAVAEV-LA24HLW-EIXNXCB-O7DEVOB-CJWPE22-SH5JKJY-MYCOLMN-EUK5LAS";
+        "phone" = {id = "KITNSPR-KMBOSUP-RLJS4XX-KILL76P-SR3HAEL-VKQR4U3-JN636OM-FXNZ3AX";};
       };
       folders = {
         "Projects" = {
@@ -38,11 +39,11 @@
         };
         "Org" = {
           path = "/home/lokesh/Documents/Org";
-          devices = ["laptop"];
+          devices = ["laptop" "phone"];
         };
         "Notebook" = {
           path = "/home/lokesh/Documents/Notebook";
-          devices = ["laptop"];
+          devices = ["laptop" "phone"];
         };
       };
     };
