@@ -113,6 +113,9 @@
 (setq org-directory "~/Documents/Org/"
       org-roam-directory "~/Documents/Org/Roam")
 
+(setq org-appear-delay "0.3"
+      org-appear-autolinks t)
+
 ;;; :ui doom-dashboard
 (setq fancy-splash-image (file-name-concat doom-user-dir "splash.png"))
 ;; Hide the menu for as minimalistic a startup screen as possible.
