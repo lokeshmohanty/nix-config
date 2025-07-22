@@ -31,7 +31,7 @@
       enableFishIntegration = true;
       enableNushellIntegration = true;
       settings = {
-        manager = {
+        mgr = {
           show_hidden = false;
           sort_by = "mtime";
           sort_dir_first = true;
@@ -51,7 +51,7 @@
         # smart-enter = "${yazi-plugins}/smart-enter.yazi";
       };
       keymap = {
-        manager.prepend_keymap = [
+        mgr.prepend_keymap = [
           {
             on = ["<C-n>"];
             run = ''
