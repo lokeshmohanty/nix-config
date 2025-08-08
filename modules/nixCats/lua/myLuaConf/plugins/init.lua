@@ -42,12 +42,6 @@ if nixCats('tex') then
   vim.g.vimtex_view_general_options = '--unique file:@pdf\\#src:@line@tex'
 end
 
-if nixCats('typst') then
-  require('typst-preview').setup({
-    dependencies_bin = { ['tinymist'] = 'tinymist' }
-  })
-end
-
 require('lze').load {
   { import = "myLuaConf.plugins.telescope", },
   { import = "myLuaConf.plugins.treesitter", },
@@ -56,15 +50,20 @@ require('lze').load {
   { import = "myLuaConf.plugins.gitsigns", },
   { import = "myLuaConf.plugins.ai", },
   {
+    "typst-preview.vim",
+    for_cat = 'typst',
+    cmd = { 'TypstPreview', 'TypstPreviewToggle' },
+    after = function(plugin)
+      require('typst-preview').setup({ 
+        dependencies_bin = { ['tinymist'] = 'tinymist' }
+      })
+    end,
+  },
+  {
     "markdown-preview.nvim",
     for_cat = 'general.markdown',
-    cmd = { "MarkdownPreview", "MarkdownPreviewStop", "MarkdownPreviewToggle", },
+    cmd = { "MarkdownPreview", "MarkdownPreviewToggle" },
     ft = "markdown",
-    keys = {
-      -- {"<leader>mp", "<cmd>MarkdownPreview <CR>", mode = {"n"}, noremap = true, desc = "markdown preview"},
-      -- {"<leader>ms", "<cmd>MarkdownPreviewStop <CR>", mode = {"n"}, noremap = true, desc = "markdown preview stop"},
-      {"<leader>mt", "<cmd>MarkdownPreviewToggle <CR>", mode = {"n"}, noremap = true, desc = "markdown preview toggle"},
-    },
     before = function(plugin)
       vim.g.mkdp_auto_close = 0
     end,
