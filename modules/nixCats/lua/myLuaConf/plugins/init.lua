@@ -42,6 +42,12 @@ if nixCats('tex') then
   vim.g.vimtex_view_general_options = '--unique file:@pdf\\#src:@line@tex'
 end
 
+if nixCats('typst') then
+  require('typst-preview').setup({
+    dependencies_bin = { ['tinymist'] = 'tinymist' }
+  })
+end
+
 require('lze').load {
   { import = "myLuaConf.plugins.telescope", },
   { import = "myLuaConf.plugins.treesitter", },

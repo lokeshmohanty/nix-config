@@ -102,6 +102,11 @@ require('lze').load {
   --   lsp = {},
   -- },
   {
+    "tinymist",
+    for_cat = "typst",
+    lsp = {},
+  },
+  {
     "gopls",
     for_cat = "go",
     lsp = {

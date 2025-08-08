@@ -60,6 +60,7 @@
         python = with pkgs; [python3Packages.python-lsp-server];
         elixir = with pkgs; [beam28Packages.elixir-ls];
         tex = with pkgs; [texlab];
+        typst = with pkgs; [tinymist];
         go = with pkgs; [
           gopls
           gotools
@@ -97,6 +98,7 @@
           ];
         };
         tex = with pkgs.vimPlugins; [vimtex];
+        typst = with pkgs.vimPlugins; [ typst-preview-nvim ];
         themer = with pkgs.vimPlugins; (
           builtins.getAttr (categories.colorscheme or "catppuccin") {
             "catppuccin" = catppuccin-nvim;
@@ -260,6 +262,7 @@
           python = true;
           elixir = true;
           tex = true;
+          typst = true;
           themer = true;
           colorscheme = "everforest";
           extra = {
@@ -290,6 +293,7 @@
           python = true;
           elixir = true;
           tex = true;
+          typst = true;
           dev = true;
           themer = true;
           colorscheme = "everforest";
