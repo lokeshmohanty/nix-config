@@ -42,6 +42,16 @@ if nixCats('tex') then
   vim.g.vimtex_view_general_options = '--unique file:@pdf\\#src:@line@tex'
 end
 
+if nixCats('orgmode') then
+  require("orgmode").setup({
+    org_agenda_files = "~/Documents/Org/*",
+    org_default_notes_file = "~/Documents/Org/notes.org",
+  })
+  require("org-roam").setup({
+    directory = "~/Documents/Org/Roam",
+  })
+end
+
 require('lze').load {
   { import = "myLuaConf.plugins.telescope", },
   { import = "myLuaConf.plugins.treesitter", },

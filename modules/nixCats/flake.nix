@@ -97,6 +97,7 @@
             neogit
           ];
         };
+        orgmode = with pkgs.vimPlugins; [orgmode org-roam-nvim];
         tex = with pkgs.vimPlugins; [vimtex];
         typst = with pkgs.vimPlugins; [ typst-preview-nvim ];
         themer = with pkgs.vimPlugins; (
@@ -263,6 +264,7 @@
           elixir = true;
           tex = true;
           typst = true;
+          orgmode = true;
           themer = true;
           colorscheme = "everforest";
           extra = {
@@ -295,6 +297,7 @@
           tex = true;
           typst = true;
           dev = true;
+          orgmode = true;
           themer = true;
           colorscheme = "everforest";
           extra = {
