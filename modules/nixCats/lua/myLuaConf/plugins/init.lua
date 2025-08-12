@@ -50,6 +50,7 @@ if nixCats('orgmode') then
   require("org-roam").setup({
     directory = "~/Documents/Org/Roam",
   })
+  require("org-bullets").setup()
 end
 
 require('lze').load {

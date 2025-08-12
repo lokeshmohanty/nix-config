@@ -5,6 +5,10 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     nixCats.url = "github:BirdeeHub/nixCats-nvim";
 
+    "plugins-org-bullets" = {
+      url = "github:nvim-orgmode/org-bullets.nvim";
+      flake = false;
+    };
     "plugins-everforest" = {
       url = "github:neanias/everforest-nvim";
       flake = false;
@@ -91,13 +95,18 @@
             nvim-web-devicons
             gx-nvim
             dropbar-nvim
-            nvim-ufo
+            # nvim-ufo
             grug-far-nvim
             render-markdown-nvim
             neogit
           ];
         };
-        orgmode = with pkgs.vimPlugins; [orgmode org-roam-nvim];
+        orgmode = with pkgs.vimPlugins; [
+          orgmode 
+          org-roam-nvim 
+          sniprun
+          pkgs.neovimPlugins.org-bullets 
+        ];
         tex = with pkgs.vimPlugins; [vimtex];
         typst = with pkgs.vimPlugins; [ typst-preview-nvim ];
         themer = with pkgs.vimPlugins; (

@@ -798,16 +798,17 @@
         "nixpkgs": [
           "nixpkgs"
         ],
-        "plugins-everforest": "plugins-everforest"
+        "plugins-everforest": "plugins-everforest",
+        "plugins-org-bullets": "plugins-org-bullets"
       },
       "locked": {
         "lastModified": 1,
-        "narHash": "sha256-gCLncWcKmDtTbBsFQ9oaJAsRxj8e4vn1GqdAH4E+jEs=",
-        "path": "/nix/store/gpinphxx07w0ick7ma7bdasam7a2csh7-source/modules/nixCats",
+        "narHash": "sha256-XoHWCnnylCFGkTfMxr5Z0u/30tkIqQiifDfLjWu+6ik=",
+        "path": "/nix/store/ffkfcvnn25j389wpjs845w6q7sa2anb2-source/modules/nixCats",
         "type": "path"
       },
       "original": {
-        "path": "/nix/store/gpinphxx07w0ick7ma7bdasam7a2csh7-source/modules/nixCats",
+        "path": "/nix/store/ffkfcvnn25j389wpjs845w6q7sa2anb2-source/modules/nixCats",
         "type": "path"
       }
     },
@@ -998,6 +999,22 @@
       "original": {
         "owner": "neanias",
         "repo": "everforest-nvim",
+        "type": "github"
+      }
+    },
+    "plugins-org-bullets": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1737617809,
+        "narHash": "sha256-/l8IfvVSPK7pt3Or39+uenryTM5aBvyJZX5trKNh0X0=",
+        "owner": "nvim-orgmode",
+        "repo": "org-bullets.nvim",
+        "rev": "21437cfa99c70f2c18977bffd423f912a7b832ea",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nvim-orgmode",
+        "repo": "org-bullets.nvim",
         "type": "github"
       }
     },

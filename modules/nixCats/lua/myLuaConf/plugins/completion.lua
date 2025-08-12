@@ -84,16 +84,11 @@ return {
         },
         sources = {
           default = { 'lsp', 'path', 'snippets', 'buffer', 'omni' },
+          per_filetype = { org = {'orgmode'} },
           providers = {
-            path = {
-              score_offset = 50,
-            },
-            lsp = {
-              score_offset = 40,
-            },
-            snippets = {
-              score_offset = 40,
-            },
+            path = { score_offset = 50, },
+            lsp = { score_offset = 40, },
+            snippets = { score_offset = 40, },
             cmp_cmdline = {
               name = 'cmp_cmdline',
               module = 'blink.compat.source',
@@ -101,6 +96,11 @@ return {
               opts = {
                 cmp_name = 'cmdline',
               },
+            },
+            orgmode = {
+              name = 'Orgmode',
+              module = 'orgmode.org.autocompletion.blink',
+              fallbacks = { 'buffer' },
             },
           },
         },
