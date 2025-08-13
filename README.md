@@ -35,7 +35,7 @@
 - To run my configuration of neovim
 
 ```sh
-    nix run github:lokeshmohanty/nix-config?dir=modules/nixCats#nixCats
+    nix run github:lokeshmohanty/nix-config?dir=modules/neovim#nixCats
 ```
 
 # References

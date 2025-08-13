@@ -4,7 +4,7 @@
   ...
 }: {
   imports = [
-    inputs.nixCats.homeModule
+    inputs.nvim.homeModule
   ];
   home.packages = with pkgs; [
     mu
@@ -18,9 +18,9 @@
     python3Packages.setuptools
   ];
   home.sessionVariables.EDITOR = "vi";
-  nixCats = {
+  nvim = {
     enable = true;
-    packageNames = ["nixCats" "regularCats"];
+    packageNames = ["nvim" "vi"];
   };
   programs.emacs = {
     enable = true;

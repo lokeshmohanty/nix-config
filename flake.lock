@@ -793,26 +793,6 @@
       }
     },
     "nixCats": {
-      "inputs": {
-        "nixCats": "nixCats_2",
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "plugins-everforest": "plugins-everforest",
-        "plugins-org-bullets": "plugins-org-bullets"
-      },
-      "locked": {
-        "lastModified": 1,
-        "narHash": "sha256-XoHWCnnylCFGkTfMxr5Z0u/30tkIqQiifDfLjWu+6ik=",
-        "path": "/nix/store/ffkfcvnn25j389wpjs845w6q7sa2anb2-source/modules/nixCats",
-        "type": "path"
-      },
-      "original": {
-        "path": "/nix/store/ffkfcvnn25j389wpjs845w6q7sa2anb2-source/modules/nixCats",
-        "type": "path"
-      }
-    },
-    "nixCats_2": {
       "locked": {
         "lastModified": 1750385661,
         "narHash": "sha256-JpIEf5IrOzMTjowkxB6kgh4AK3Dp9i/T9G4w2ZiKMgQ=",
@@ -986,6 +966,26 @@
         "type": "github"
       }
     },
+    "nvim": {
+      "inputs": {
+        "nixCats": "nixCats",
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "plugins-everforest": "plugins-everforest",
+        "plugins-org-bullets": "plugins-org-bullets"
+      },
+      "locked": {
+        "lastModified": 1,
+        "narHash": "sha256-+3TsmPqzh1LJST9KKZONM6w7XWo86GwkeG4YT8CEg0k=",
+        "path": "/nix/store/hs90adc16bn4dvd9xwrvy5v4gqkm0n4g-source/modules/nvim",
+        "type": "path"
+      },
+      "original": {
+        "path": "/nix/store/hs90adc16bn4dvd9xwrvy5v4gqkm0n4g-source/modules/nvim",
+        "type": "path"
+      }
+    },
     "plugins-everforest": {
       "flake": false,
       "locked": {
@@ -1048,10 +1048,10 @@
         "hyprland": "hyprland",
         "lix-module": "lix-module",
         "nix-alien": "nix-alien",
-        "nixCats": "nixCats",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_3",
         "nvf": "nvf",
+        "nvim": "nvim",
         "stylix": "stylix"
       }
     },

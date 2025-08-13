@@ -247,8 +247,8 @@
       };
     };
 
-    packageDefinitions = {
-      nixCats = {
+    packageDefinitions = rec {
+      nvim = {
         pkgs,
         name,
         ...
@@ -256,9 +256,9 @@
         settings = {
           suffix-path = true;
           suffix-LD = true;
-          aliases = ["nvim"];
           wrapRc = true;
           configDirName = "nvim";
+          aliases = ["nixCats"];
           hosts.python3.enable = true;
           hosts.node.enable = true;
         };
@@ -277,6 +277,12 @@
           themer = true;
           colorscheme = "everforest";
           extra = {
+            # nixCats.extra("path.to.val") will perform vim.tbl_get(nixCats.extra, "path" "to" "val")
+            # this is different from the main nixCats("path.to.cat") in that
+            # the main nixCats("path.to.cat") will report true if `path.to = true`
+            # even though path.to.cat would be an indexing error in that case.
+            # this is to mimic the concept of "subcategories" but may get in the way of just fetching values.
+            
             # to keep the categories table from being filled with non category things that you want to pass
             # there is also an extra table you can use to pass extra stuff.
             # but you can pass all the same stuff in any of these sets and access it in lua
@@ -287,43 +293,13 @@
           };
         };
       };
-      regularCats = {pkgs, ...} @ misc: {
-        settings = {
-          suffix-path = true;
-          suffix-LD = true;
-          wrapRc = false;
-          configDirName = "nvim";
-          aliases = ["vi"];
-        };
-        categories = {
-          markdown = true;
-          general = true;
-          ai = true;
-          nix = true;
-          lua = true;
-          python = true;
-          elixir = true;
-          tex = true;
-          typst = true;
-          dev = true;
-          orgmode = true;
-          themer = true;
-          colorscheme = "everforest";
-          extra = {
-            # nixCats.extra("path.to.val") will perform vim.tbl_get(nixCats.extra, "path" "to" "val")
-            # this is different from the main nixCats("path.to.cat") in that
-            # the main nixCats("path.to.cat") will report true if `path.to = true`
-            # even though path.to.cat would be an indexing error in that case.
-            # this is to mimic the concept of "subcategories" but may get in the way of just fetching values.
-            nixdExtras = {
-              nixpkgs = ''import ${pkgs.path} {}'';
-            };
-          };
-        };
+      vi = pkgs: (nvim pkgs) // { 
+        settings.wrapRc = false;
+        settings.aliases = ["regularCats"];
       };
     };
 
-    defaultPackageName = "nixCats";
+    defaultPackageName = "nvim";
   in
     # see :help nixCats.flake.outputs.exports
     forEachSystem (system: let

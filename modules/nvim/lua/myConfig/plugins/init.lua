@@ -1,8 +1,4 @@
-local colorschemeName = nixCats('colorscheme')
-if not require('nixCatsUtils').isNixCats then
-  colorschemeName = 'onedark'
-end
-vim.cmd.colorscheme(colorschemeName)
+vim.cmd.colorscheme(nixCats('colorscheme'))
 
 local ok, notify = pcall(require, "notify")
 if ok then
@@ -18,22 +14,18 @@ if ok then
 end
 
 if nixCats('general.extra') then
-  require("myLuaConf.plugins.snacks")
-  require("myLuaConf.plugins.snippet")
-  require("myLuaConf.plugins.session")
-  require("myLuaConf.plugins.file-manager")
-  require("myLuaConf.plugins.fold")
+  require("myConfig.plugins.snacks")
+  require("myConfig.plugins.snippet")
+  require("myConfig.plugins.session")
+  require("myConfig.plugins.file-manager")
+  require("myConfig.plugins.fold")
 
   require("mini.pairs").setup({})
   require("mini.starter").setup({})
   -- require("mini.tabline").setup({})
   -- require("mini.icons").setup()
-  require("render-markdown").setup({
-    heading = {
-      icons = { "󰎤 ", "󰎧 ", "󰎪 ", "󰎭 ", "󰎱 ", "󰎳 " },
-    }
-  })
 end
+
 
 if nixCats('tex') then
   -- vim.g.vimtex_view_method = 'zathura'
@@ -53,13 +45,16 @@ if nixCats('orgmode') then
   require("org-bullets").setup()
 end
 
+require('myConfig.plugins.debug')
 require('lze').load {
-  { import = "myLuaConf.plugins.telescope", },
-  { import = "myLuaConf.plugins.treesitter", },
-  { import = "myLuaConf.plugins.completion", },
-  { import = "myLuaConf.plugins.which-key", },
-  { import = "myLuaConf.plugins.gitsigns", },
-  { import = "myLuaConf.plugins.ai", },
+  { import = "myConfig.plugins.lint", },
+  { import = "myConfig.plugins.format", },
+  { import = "myConfig.plugins.telescope", },
+  { import = "myConfig.plugins.treesitter", },
+  { import = "myConfig.plugins.completion", },
+  { import = "myConfig.plugins.which-key", },
+  { import = "myConfig.plugins.gitsigns", },
+  { import = "myConfig.plugins.ai", },
   {
     "typst-preview.vim",
     for_cat = 'typst',

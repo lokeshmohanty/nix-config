@@ -1,6 +1,4 @@
--- NOTE: These 2 need to be set up before any plugins are loaded.
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ','
+-- [[ Settings ]]
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -38,7 +36,8 @@ vim.o.tabstop = 2
 vim.o.softtabstop = 2
 vim.o.shiftwidth = 2
 
--- stops line wrapping from being confusing
+-- Line break
+vim.o.linebreak = true
 vim.o.breakindent = true
 
 -- Save undo history
@@ -84,6 +83,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 
 vim.g.netrw_liststyle=0
 vim.g.netrw_banner=0
+
 -- [[ Basic Keymaps ]]
 
 -- Keymaps for better default experience
@@ -135,5 +135,9 @@ vim.keymap.set({"n", "v", "x"}, '<C-a>', 'gg0vG$', { noremap = true, silent = tr
 vim.keymap.set({'n', 'v', 'x'}, '<leader>p', '"+p', { noremap = true, silent = true, desc = 'Paste from clipboard' })
 vim.keymap.set('i', '<C-p>', '<C-r><C-p>+', { noremap = true, silent = true, desc = 'Paste from clipboard from within insert mode' })
 vim.keymap.set("x", "<leader>P", '"_dP', { noremap = true, silent = true, desc = 'Paste over selection without erasing unnamed register' })
+
+-- [[ Custom Keymaps ]]
+
+-- vim.keymap.set("n", "s", ":FzfLua ")
 
 

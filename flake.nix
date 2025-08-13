@@ -20,8 +20,8 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
 
-    nixCats.url = "./modules/nixCats";
-    nixCats.inputs.nixpkgs.follows = "nixpkgs";
+    nvim.url = "./modules/nvim";
+    nvim.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = {flake-parts, ...} @ inputs:
