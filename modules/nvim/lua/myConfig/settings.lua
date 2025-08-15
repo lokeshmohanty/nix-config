@@ -138,6 +138,6 @@ vim.keymap.set("x", "<leader>P", '"_dP', { noremap = true, silent = true, desc =
 
 -- [[ Custom Keymaps ]]
 
--- vim.keymap.set("n", "s", ":FzfLua ")
+vim.keymap.set("n", "s", ":FzfLua ")
 
 

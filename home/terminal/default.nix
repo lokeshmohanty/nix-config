@@ -1,7 +1,7 @@
 {
   imports = [
     ./foot.nix
-    # ./kitty.nix
+    ./kitty.nix
     # ./alacritty.nix
     # ./wezterm.nix
     ./tmux.nix

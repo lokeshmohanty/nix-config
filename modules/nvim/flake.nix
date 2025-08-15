@@ -23,9 +23,7 @@
     inherit (inputs.nixCats) utils;
     luaPath = ./.;
     forEachSystem = utils.eachSystem nixpkgs.lib.platforms.all;
-    extra_pkg_config = {
-      # allowUnfree = true;
-    };
+    extra_pkg_config = { allowUnfree = true; };
     dependencyOverlays =
       /*
       (import ./overlays inputs) ++
@@ -59,6 +57,8 @@
           universal-ctags
           ripgrep
           fd
+          mermaid-cli
+          ghostscript
         ];
         debug = with pkgs; {go = [delve];};
         python = with pkgs; [python3Packages.python-lsp-server];
@@ -89,15 +89,11 @@
             nvim-notify
           ];
           extra = [
+            fzf-lua
             snacks-nvim
             mini-nvim
             oil-nvim
             nvim-web-devicons
-            gx-nvim
-            dropbar-nvim
-            # nvim-ufo
-            grug-far-nvim
-            render-markdown-nvim
             neogit
           ];
         };
@@ -107,6 +103,7 @@
           sniprun
           pkgs.neovimPlugins.org-bullets 
         ];
+        markdown = with pkgs.vimPlugins; [ render-markdown-nvim ];
         tex = with pkgs.vimPlugins; [vimtex];
         typst = with pkgs.vimPlugins; [ typst-preview-nvim ];
         themer = with pkgs.vimPlugins; (
@@ -135,35 +132,28 @@
             nvim-treesitter-textobjects
             nvim-treesitter.withAllGrammars
           ];
-          telescope = with pkgs.vimPlugins; [
-            telescope-fzf-native-nvim
-            telescope-ui-select-nvim
-            telescope-nvim
-          ];
           always = with pkgs.vimPlugins; [
             nvim-lspconfig
-            lualine-nvim
-
             gitsigns-nvim
             # diffview-nvim
             # advanced-git-search-nvim
             # webify-nvim
-
-            vim-sleuth
-            vim-fugitive
-            vim-rhubarb
             nvim-surround
           ];
           extra = with pkgs.vimPlugins; [
-            fidget-nvim
+            fidget-nvim # notifications
             which-key-nvim
             comment-nvim
             undotree
             indent-blankline-nvim
             vim-startuptime
+            gx-nvim
+            grug-far-nvim
           ];
         };
-        markdown = with pkgs.vimPlugins; [markdown-preview-nvim];
+        markdown = with pkgs.vimPlugins; [
+          markdown-preview-nvim
+        ];
         ai = with pkgs.vimPlugins; [
           copilot-lua
           CopilotChat-nvim

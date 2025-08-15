@@ -22,7 +22,7 @@ if nixCats('general.extra') then
 
   require("mini.pairs").setup({})
   require("mini.starter").setup({})
-  -- require("mini.tabline").setup({})
+  require("mini.statusline").setup({})
   -- require("mini.icons").setup()
 end
 
@@ -49,7 +49,6 @@ require('myConfig.plugins.debug')
 require('lze').load {
   { import = "myConfig.plugins.lint", },
   { import = "myConfig.plugins.format", },
-  { import = "myConfig.plugins.telescope", },
   { import = "myConfig.plugins.treesitter", },
   { import = "myConfig.plugins.completion", },
   { import = "myConfig.plugins.which-key", },
@@ -129,44 +128,31 @@ require('lze').load {
     end,
   },
   {
-    "lualine.nvim",
-    for_cat = 'general.always',
-    -- cmd = { "" },
-    event = "DeferredUIEnter",
-    -- ft = "",
-    -- keys = "",
-    -- colorscheme = "",
-    after = function (plugin)
-
-      require('lualine').setup({
-        options = {
-          icons_enabled = false,
-          theme = colorschemeName,
-          component_separators = '|',
-          section_separators = '',
-        },
-        sections = {
-          lualine_c = {
-            {
-              'filename', path = 1, status = true,
-            },
-          },
-        },
-        inactive_sections = {
-          lualine_b = {
-            {
-              'filename', path = 3, status = true,
-            },
-          },
-          lualine_x = {'filetype'},
-        },
-        tabline = {
-          lualine_a = { 'buffers' },
-          -- if you use lualine-lsp-progress, I have mine here instead of fidget
-          -- lualine_b = { 'lsp_progress', },
-          lualine_z = { 'tabs' }
-        },
-      })
+    "gx",
+    for_cat = 'general.extra',
+    cmd = { "Browse" },
+    keys = { { "gx", "<cmd>Browse<cr>", mode = { "n", "x" } }, },
+    init = function()
+      vim.g.netrw_nogx = 1
+    end,
+    after = function(_)
+      require("gx").setup({})
     end,
   },
+  {
+    "grug-far",
+    for_cat = 'general.extra',
+    cmd = { "GrugFar" },
+    after = function(_)
+      require("grug-far").setup({})
+    end,
+  },
+  -- {
+  --   "lualine.nvim",
+  --   for_cat = 'general.always',
+  --   event = "DeferredUIEnter",
+  --   after = function (plugin)
+  --     require('myConfig.plugins.lualine')
+  --   end,
+  -- },
 }

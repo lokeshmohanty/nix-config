@@ -20,5 +20,6 @@ vim.keymap.set("n", "<localleader>p", "<cmd>MarkdownPreviewToggle<CR>", { desc =
 require("render-markdown").setup({
   heading = {
     icons = { "󰎤 ", "󰎧 ", "󰎪 ", "󰎭 ", "󰎱 ", "󰎳 " },
-  }
+  },
+  completions = { blink = { enabled = true } },
 })
