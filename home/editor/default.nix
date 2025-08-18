@@ -20,7 +20,8 @@
   home.sessionVariables.EDITOR = "vi";
   nvim = {
     enable = true;
-    packageNames = ["nvim" "vi"];
+    packageNames = ["nvim"];
+    # packageNames = ["nvim" "vi"];
   };
   programs.emacs = {
     enable = true;
