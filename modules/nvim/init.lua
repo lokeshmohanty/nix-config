@@ -113,8 +113,8 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', function() vim.diagnostic.jump({count=1, float=true}) end, { desc = 'Go to previous diagnostic message' })
 vim.keymap.set('n', ']d', function() vim.diagnostic.jump({count=-1, float=true}) end, { desc = 'Go to next diagnostic message' })
-vim.keymap.set('n', '<leader>de', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
-vim.keymap.set('n', '<leader>dq', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
+vim.keymap.set('n', '<leader>cdo', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
+vim.keymap.set('n', '<leader>cdl', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
 -- Sync clipboard between OS and Neovim.
 -- But it constantly clobbers your system clipboard whenever you delete anything.
@@ -129,5 +129,5 @@ vim.keymap.set("x", "<leader>P", '"_dP', { noremap = true, silent = true, desc =
 
 -- [[ Other Keymaps ]]
 
-vim.keymap.set("n", "s", ":FzfLua ")
+vim.keymap.set("n", "S", ":FzfLua ")
 vim.keymap.set("n", "<leader>gg", "<cmd>Neogit<cr>")

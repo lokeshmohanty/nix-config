@@ -26,13 +26,8 @@
 
         snacks-nvim
         mini-nvim
-        # mini-ai
-        # mini-icons
-        # mini-pairs
         fzf-lua
-        oil-nvim
         neogit
-        nvim-surround
 
         nvim-lspconfig
         blink-cmp
@@ -44,21 +39,19 @@
         gitsigns-nvim
         which-key-nvim
         render-markdown-nvim
+        markdown-preview-nvim
 
         vimtex
 
-        # orgmode
         orgmode
         org-roam-nvim
         sniprun
-        pkgs.neovimPlugins.org-bullets
 
         nvim-lint
         conform-nvim
         nvim-dap
-        nvim-dap-ui
+        nvim-dap-view
         nvim-dap-virtual-text
-        # nvim-dap-view
         # nvim-nio
 
         pkgs.neovimPlugins.everforest
@@ -74,11 +67,13 @@
         typst-preview-nvim
         copilot-lua
         CopilotChat-nvim
-        markdown-preview-nvim
+
         nvim-dap-python
+        pkgs.neovimPlugins.org-bullets
 
         grug-far-nvim
         gx-nvim
+        oil-nvim
 
         undotree
       ];

@@ -4,6 +4,7 @@ require('mini.icons').setup()
 require('mini.surround').setup()
 
 require('mini.ai').setup()
+--
 -- -- Module mappings. Use `''` (empty string) to disable one.
 --   mappings = {
 --     -- Main textobject prefixes

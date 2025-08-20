@@ -13,6 +13,8 @@ vim.cmd([[
 --   end
 -- })
 --
+
+vim.g.mkdp_auto_close = 0
 require("render-markdown").setup({
   heading = {
     icons = { "󰎤 ", "󰎧 ", "󰎪 ", "󰎭 ", "󰎱 ", "󰎳 " },
