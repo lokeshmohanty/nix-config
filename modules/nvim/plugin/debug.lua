@@ -28,7 +28,7 @@ require('dap-view').setup({
     show = true,
     sections = { "watches", "scopes", "exceptions", "breakpoints", "threads", "repl", "console" },
     -- sections = { "repl", "console" },
-    default_section = "console",
+    default_section = "breakpoints",
     controls = {
       enabled = true,
       position = "right",

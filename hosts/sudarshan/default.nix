@@ -8,7 +8,6 @@
       specialArgs = {inherit inputs self;};
       modules = [
         inputs.nixos-hardware.nixosModules.lenovo-thinkpad-l14-amd
-        inputs.lix-module.nixosModules.default
         ./configuration.nix
         ./hardware-configuration.nix
         ./syncthing.nix

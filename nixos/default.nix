@@ -52,7 +52,7 @@
     nixPath = lib.mapAttrsToList (key: value: "${key}=${value.to.path}") config.nix.registry;
 
     settings = {
-      experimental-features = "nix-command flakes repl-flake";
+      experimental-features = "nix-command flakes";
       auto-optimise-store = true;
       trusted-users = ["lokesh"];
 
@@ -155,31 +155,31 @@
 
     ## programming languages
     uv
-    (pkgs.python311.withPackages (ps:
-      with ps; [
-        pip
-        ipython
-        jupyterlab
-        jupytext
-        notebook # required by molten.nvim for ipynb files
-        numpy
-        pandas
-        matplotlib
-        seaborn
-        tqdm
-        pillow
-        pydantic
-        rich
-        tensorboard
-        huggingface-hub
-        pyqt6-sip
-        pyqtwebengine
-        qtpy
-        qt-material
-        pyqt5-stubs
-        qtawesome
-        pyqtdarktheme
-      ]))
+    # (pkgs.python311.withPackages (ps:
+    #   with ps; [
+    #     pip
+    #     ipython
+    #     jupyterlab
+    #     jupytext
+    #     notebook # required by molten.nvim for ipynb files
+    #     numpy
+    #     pandas
+    #     matplotlib
+    #     seaborn
+    #     tqdm
+    #     pillow
+    #     pydantic
+    #     rich
+    #     tensorboard
+    #     huggingface-hub
+    #     pyqt6-sip
+    #     pyqtwebengine
+    #     qtpy
+    #     qt-material
+    #     pyqt5-stubs
+    #     qtawesome
+    #     pyqtdarktheme
+    #   ]))
     gnumake
     gcc
     ghc
