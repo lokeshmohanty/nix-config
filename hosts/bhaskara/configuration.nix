@@ -5,10 +5,7 @@
   pkgs,
   ...
 }: {
-  imports = [
-    ../../nixos
-    ../../nixos/ssh.nix
-  ];
+  imports = [ ../../system ];
 
   hardware.graphics.enable = true;
   hardware.nvidia = {
@@ -25,6 +22,22 @@
     openFirewall = true;
   };
   # services.cloudflared.enable = true;
+
+  # Printing
+  # https://nixos.wiki/wiki/Printing
+  # Access CUPS interface at http://localhost:631
+  services.printing = {
+    enable = true;
+    # NIXPKGS_ALLOW_UNFREE=1 nix-shell -p hplipWithPlugin --run 'sudo -E hp-setup'
+    drivers = with pkgs; [ hplipWithPlugin ];
+  };
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
+  };
+
+  sshServer.enable = true;
 
   networking.hostName = "bhaskara";
 }

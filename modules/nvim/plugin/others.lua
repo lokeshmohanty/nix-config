@@ -6,7 +6,7 @@ require('lze').load({
     before = function() vim.g.netrw_nogx = 1 end,
     after = function(_) 
       vim.cmd.packadd("gx")
-      require("gx").setup({}) 
+      require("gx").setup({})
     end,
   },
   {
@@ -14,7 +14,7 @@ require('lze').load({
     cmd = { "GrugFar" },
     after = function(_) 
       vim.cmd.packadd("grug-far")
-      require("grug-far").setup({}) 
+      require("grug-far").setup({})
     end,
   },
   {
@@ -74,6 +74,15 @@ require('lze').load({
           ["g\\"] = "actions.toggle_trash",
         },
       })
+    end,
+  },
+  {
+    "himalaya-ui",
+    cmd = { "HimalayaUI" },
+    keys = { { "<leader>H", "<cmd>HimalayaUI<CR>", mode = { "n" }, desc = "HimalayaUI" }, },
+    after = function(_)
+      vim.packadd("vim-himalaya-ui")
+      require("himalaya-ui").setup({})
     end,
   },
   {

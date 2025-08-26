@@ -15,6 +15,10 @@
         python3Packages.python-lsp-server
         # texlab
         tinymist
+
+
+        # others
+        himalaya # email
       ];
     };
 
@@ -70,12 +74,14 @@
 
         nvim-dap-python
         pkgs.neovimPlugins.org-bullets
+        # pkgs.neovimPlugins.bruno
 
         grug-far-nvim
         gx-nvim
         oil-nvim
 
         undotree
+        pkgs.neovimPlugins.himalaya-ui
       ];
     };
   };

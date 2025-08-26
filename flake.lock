@@ -779,6 +779,7 @@
           "nixpkgs"
         ],
         "plugins-everforest": "plugins-everforest",
+        "plugins-himalaya-ui": "plugins-himalaya-ui",
         "plugins-org-bullets": "plugins-org-bullets"
       },
       "locked": {
@@ -804,6 +805,22 @@
       "original": {
         "owner": "neanias",
         "repo": "everforest-nvim",
+        "type": "github"
+      }
+    },
+    "plugins-himalaya-ui": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1755989238,
+        "narHash": "sha256-BIF4okxeTzL8Tx4PHNc9Ks+ARJs3IQLImc4BpMoCer4=",
+        "owner": "aliyss",
+        "repo": "vim-himalaya-ui",
+        "rev": "f49f73541b95dba6fd11f2c4bc7cd05ab9dcdc9e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "aliyss",
+        "repo": "vim-himalaya-ui",
         "type": "github"
       }
     },

@@ -20,7 +20,7 @@
     ./programs.nix
     ./desktop-environment.nix
     ./fonts.nix
-    # ./ssh.nix
+    ./ssh.nix
   ];
 
   nixpkgs = {
@@ -122,7 +122,6 @@
     (inkscape-with-extensions.override {inkscapeExtensions = [inkscape-extensions.textext];})
     krita
     vscode-fhs
-    code-cursor
 
     # cli applications
     tesseract

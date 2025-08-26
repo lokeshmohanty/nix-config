@@ -32,14 +32,6 @@
             EV_KEY: [[KEY_CAPSLOCK, KEY_ESC]]
     '';
   };
-
-  # https://nixos.wiki/wiki/Printing
-  # Access CUPS interface at http://localhost:631
-  services.printing = {
-    enable = true;
-    # Run 'sudo -E hp-setup' or 'sudo hp-setup -i -a'
-    # drivers = with pkgs; [ hplipWithPlugin ];
-  };
   services.tailscale.enable = true;
 
   services.blueman.enable = true;
