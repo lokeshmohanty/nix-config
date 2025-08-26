@@ -1,10 +1,7 @@
-{
-  pkgs,
-  config,
-  ...
-}: {
+{ pkgs, ... }: {
   home.packages = with pkgs; [
     exiftool #  Read and write meta information in files
+    nix-your-shell # use fish in nix develop / nix shell ...
   ];
   programs = {
     fzf = {
@@ -85,7 +82,10 @@
     interactiveShellInit = ''
       set fish_greeting
       fish_vi_key_bindings
-      eval "$(${pkgs.micromamba}/bin/micromamba shell hook -s fish)"
+
+      if command -q nix-your-shell
+        nix-your-shell fish | source
+      end
     '';
     shellAbbrs = {
       e = "emacsclient -c -a 'nvim'";
@@ -99,7 +99,6 @@
       di = "docker image";
       dc = "docker container";
       de = "distrobox enter";
-      mm = "micromamba";
 
       # tmux
       ta = "tmux attach -t";
@@ -113,7 +112,7 @@
       nr = "nix run nixpkgs#";
       ns = "nix search nixpkgs";
       nq = "nix-env -qaP";
-      nsh = "nix-shell --command fish -p";
+      nsh = "nix-shell -p";
 
       hypr = "dbus-run-session Hyprland";
     };
