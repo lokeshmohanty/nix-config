@@ -7,15 +7,15 @@
     inputs.nvim.homeModule
   ];
   home.packages = with pkgs; [
-    mu
-    isync
-    maim
-    nixfmt
+    isync   # sync emails
+    maim    # screenshots
+    nixfmt  # nix formatter
     nim
     sqlite
     isort
     python3Packages.pytest
     python3Packages.setuptools
+    logseq
   ];
   home.sessionVariables.EDITOR = "vi";
   nvim = {
@@ -23,15 +23,15 @@
     packageNames = ["nvim"];
     # packageNames = ["nvim" "vi"];
   };
-  programs.emacs = {
-    enable = true;
-    extraPackages = epkgs:
-      with epkgs; [
-        treesit-grammars.with-all-grammars
-        vterm
-        mu4e
-      ];
-  };
+  # programs.emacs = {
+  #   enable = true;
+  #   extraPackages = epkgs:
+  #     with epkgs; [
+  #       treesit-grammars.with-all-grammars
+  #       vterm
+  #       mu4e
+  #     ];
+  # };
   # services.emacs.enable = true;
   programs.neovide = {
     enable = true;
