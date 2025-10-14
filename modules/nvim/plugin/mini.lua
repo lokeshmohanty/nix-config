@@ -1,7 +1,10 @@
-require('mini.pairs').setup()
 require('mini.starter').setup()
 require('mini.icons').setup()
 require('mini.surround').setup()
+
+require('mini.pairs').setup()
+local map_math = function() MiniPairs.map_buf(0, 'i', '$', { action = 'closeopen', pair = '$$' }) end
+vim.api.nvim_create_autocmd('FileType', { pattern = {'typst', 'tex'}, callback = map_math })
 
 require('mini.ai').setup()
 --

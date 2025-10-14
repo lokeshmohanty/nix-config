@@ -5,15 +5,15 @@ require('lze').load({
     keys = { { "gx", "<cmd>Browse<cr>", mode = { "n", "x" } }, },
     before = function() vim.g.netrw_nogx = 1 end,
     after = function(_) 
-      vim.cmd.packadd("gx")
+      vim.cmd.packadd("gx.nvim")
       require("gx").setup({})
     end,
   },
   {
     "grug-far",
     cmd = { "GrugFar" },
-    after = function(_) 
-      vim.cmd.packadd("grug-far")
+    after = function(_)
+      vim.cmd.packadd("grug-far.nvim")
       require("grug-far").setup({})
     end,
   },

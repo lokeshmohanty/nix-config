@@ -8,7 +8,7 @@ vim.g.maplocalleader = ','
 if vim.g.neovide then
   vim.o.guifont = "Cascadia Code:h14"
   vim.g.neovide_opacity = 0.90
-  vim.g.neovide_cursor_vfx_mode = "railgun"
+  vim.g.neovide_cursor_vfx_mode = "pixiedust"
 end
 
 -- [[ Setting options ]]

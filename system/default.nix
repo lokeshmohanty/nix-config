@@ -153,7 +153,7 @@
     hledger
 
     ## programming languages
-    uv
+    uv swig
     # (pkgs.python311.withPackages (ps:
     #   with ps; [
     #     pip
