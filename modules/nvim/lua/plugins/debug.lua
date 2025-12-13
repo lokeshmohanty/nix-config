@@ -6,6 +6,13 @@ require('lze').load({{
   after = function (_)
     vim.cmd.packadd("nvim-dap-python")
     require("dap-python").setup("uv")
+    -- table.insert(require('dap').configurations.python, {
+    --   type = 'python',
+    --   request = 'launch',
+    --   name = 'Launch a file',
+    --   program = '${file}',
+    --   console = 'integratedTerminal',
+    -- })
   end,
 }})
 

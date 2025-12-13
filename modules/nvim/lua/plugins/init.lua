@@ -1,0 +1,12 @@
+require("plugins.debug")
+require("plugins.format")
+require("plugins.lsp")
+require("plugins.completion")
+require("plugins.general_ui")
+require("plugins.gitsigns")
+require("plugins.lint")
+require("plugins.treesitter")
+
+require("plugins.mini")
+require("plugins.snacks")
+require("plugins.others")
