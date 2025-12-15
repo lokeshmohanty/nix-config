@@ -34,12 +34,13 @@ require('lualine').setup({
     },
     lualine_x = {'filetype'},
   },
-  tabline = {
-    lualine_a = { 'buffers' },
-    lualine_b = { 'lsp_progress', },
-    lualine_z = { 'tabs' }
-  },
+  -- tabline = {
+  --   -- lualine_a = { 'buffers' },
+  --   lualine_a = { 'lsp_progress', },
+  --   lualine_z = { 'tabs' }
+  -- },
 })
+-- Command line ui: ./noice.lua:1
 
 require('which-key').setup({})
 require('which-key').add {

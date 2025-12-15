@@ -32,6 +32,7 @@
         mini-nvim
         fzf-lua
         neogit
+        noice-nvim
 
         nvim-lspconfig
         blink-cmp
@@ -74,7 +75,6 @@
 
         nvim-dap-python
         pkgs.neovimPlugins.org-bullets
-        # pkgs.neovimPlugins.bruno
 
         grug-far-nvim
         gx-nvim
@@ -94,8 +94,8 @@
         suffix-LD = true;
         aliases = [ "vi" ];
         configDirName = "nvim";
-        hosts.python3.enable = false;
-        hosts.node.enable = false;
+        hosts.python3.enable = true;
+        hosts.node.enable = true;
         hosts.ruby.enable = false;
         hosts.perl.enable = false;
       };

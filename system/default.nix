@@ -154,31 +154,8 @@
 
     ## programming languages
     uv swig
-    # (pkgs.python311.withPackages (ps:
-    #   with ps; [
-    #     pip
-    #     ipython
-    #     jupyterlab
-    #     jupytext
-    #     notebook # required by molten.nvim for ipynb files
-    #     numpy
-    #     pandas
-    #     matplotlib
-    #     seaborn
-    #     tqdm
-    #     pillow
-    #     pydantic
-    #     rich
-    #     tensorboard
-    #     huggingface-hub
-    #     pyqt6-sip
-    #     pyqtwebengine
-    #     qtpy
-    #     qt-material
-    #     pyqt5-stubs
-    #     qtawesome
-    #     pyqtdarktheme
-    #   ]))
+    (pkgs.python3.withPackages (ps:
+      with ps; [ pip ipython matplotlib jupyterlab ]))
     gnumake
     gcc
     ghc

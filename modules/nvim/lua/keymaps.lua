@@ -23,6 +23,10 @@ vim.keymap.set('n', ']d', function() vim.diagnostic.jump({count=-1, float=true})
 vim.keymap.set('n', '<leader>cdo', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
 vim.keymap.set('n', '<leader>cdl', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
+-- [[ ./plugins/noice.lua:20 ]]
+-- Lsp Hover doc Scorlling
+-- Redirect CmdLine
+
 -- [[ Other Keymaps ]]
 
 vim.keymap.set("n", "S", ":FzfLua ")
