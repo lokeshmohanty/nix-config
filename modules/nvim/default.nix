@@ -27,6 +27,7 @@
       general = with pkgs.vimPlugins; [
         lze
         vim-sleuth
+        vim-slime
 
         snacks-nvim
         mini-nvim
