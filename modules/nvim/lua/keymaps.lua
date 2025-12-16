@@ -29,5 +29,4 @@ vim.keymap.set('n', '<leader>cdl', vim.diagnostic.setloclist, { desc = 'Open dia
 
 -- [[ Other Keymaps ]]
 
-vim.keymap.set("n", "S", ":FzfLua ")
 vim.keymap.set("n", "<leader>gg", "<cmd>Neogit<cr>")

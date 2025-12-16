@@ -17,8 +17,7 @@ vim.keymap.set('n', "<leader>/", function() Snacks.picker.grep() end, { desc = "
 vim.keymap.set('n', "<leader>e", function() Snacks.explorer() end, { desc = "File Explorer" })
 -- find
 vim.keymap.set('n', "<leader>fc", function() Snacks.picker.files({ cwd = vim.fn.stdpath("config") }) end, { desc = "Find Config File" })
-vim.keymap.set('n', "<leader>ff", "<cmd>FzfLua files<cr>", { desc = "Find Files" })
--- vim.keymap.set('n', "<leader>ff", function() Snacks.picker.files() end, { desc = "Find Files" })
+vim.keymap.set('n', "<leader>ff", function() Snacks.picker.files() end, { desc = "Find Files" })
 vim.keymap.set('n', "<leader>fg", function() Snacks.picker.git_files() end, { desc = "Find Git Files" })
 vim.keymap.set('n', "<leader>fp", function() Snacks.picker.projects() end, { desc = "projects" })
 vim.keymap.set('n', "<leader>fr", function() Snacks.picker.recent() end, { desc = "Recent" })

@@ -31,7 +31,6 @@
 
         snacks-nvim
         mini-nvim
-        fzf-lua
         neogit
         noice-nvim
 
