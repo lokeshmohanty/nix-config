@@ -115,7 +115,7 @@
   environment.systemPackages = with pkgs; [
     # gui applications
     google-chrome
-    onlyoffice-bin
+    onlyoffice-desktopeditors
     tikzit
     motrix
     zotero
