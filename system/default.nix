@@ -154,8 +154,14 @@
 
     ## programming languages
     uv swig
-    (pkgs.python3.withPackages (ps:
-      with ps; [ pip ipython matplotlib jupyterlab ]))
+    (pkgs.python3.withPackages (ps: with ps; [ 
+      pip 
+      ipython 
+      matplotlib 
+      jupyterlab 
+      setuptools
+      pytest
+    ]))
     gnumake
     gcc
     ghc
@@ -182,6 +188,7 @@
     };
     libvirtd.enable = true;
     # waydroid.enable = true;
+    # waydroid.package = pkgs.waydroid-nftables;
   };
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion

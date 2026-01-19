@@ -14,6 +14,7 @@
   };
   services.gvfs.enable = true; # mount, trash and other functionalities
   services.tumbler.enable = true; # thumbnail support for images
+  services.transmission.openRPCPort = true; # required for motrix
   services.locate = {
     enable = true;
     package = pkgs.plocate;

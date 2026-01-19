@@ -3,8 +3,8 @@
     enable = true;
     user = "lokesh";
     openDefaultPorts = true;
-    overrideDevices = true;
-    overrideFolders = true;
+    # overrideDevices = true;
+    # overrideFolders = true;
     settings = {
       devices = {
         "lab" = {
