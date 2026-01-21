@@ -106,7 +106,7 @@
       initialPassword = "nixos";
       isNormalUser = true;
       description = "Lokesh Mohanty";
-      extraGroups = ["wheel" "input" "video" "networkmanager" "libvirtd" "docker"];
+      extraGroups = ["wheel" "input" "audio" "video" "networkmanager" "libvirtd"];
     };
   };
   users.defaultUserShell = pkgs.fish;

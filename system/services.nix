@@ -4,13 +4,29 @@
   ...
 }: {
   # Enable sound with pipewire.
-  services.pulseaudio.enable = false;
+  musnix.enable = true;
   services.pipewire = {
     enable = true;
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
     jack.enable = true;
+    wireplumber.enable = true;
+    wireplumber.configPackages = [
+      (pkgs.writeTextDir "share/wireplumber/main.lua.d/51-hdmi-fix.lua" ''
+        rule = {
+          matches = {
+            {
+              { "device.name", "matches", "alsa_card.*" },
+            },
+          },
+          apply_properties = {
+            ["api.alsa.use-acp"] = true,
+          },
+        }
+        table.insert(alsa_monitor.rules, rule)
+      '')
+    ];
   };
   services.gvfs.enable = true; # mount, trash and other functionalities
   services.tumbler.enable = true; # thumbnail support for images

@@ -10,6 +10,9 @@
     hyprland.url = "github:hyprwm/Hyprland";
 
     nixos-hardware.url = "github:NixOS/nixos-hardware";
+    musnix.url = "github:musnix/musnix";
+
+
     nvf.url = "github:notashelf/nvf";
     nix-alien.url = "github:thiagokokada/nix-alien";
     stylix.url = "github:danth/stylix";
