@@ -1,10 +1,9 @@
-{...}: {
+{ ... }: {
   services.syncthing = {
     enable = true;
     user = "lokesh";
     openDefaultPorts = true;
-    # overrideDevices = true;
-    # overrideFolders = true;
+    dataDir = "/home/lokesh/.local/syncthing";
     settings = {
       devices = {
         "laptop" = {
