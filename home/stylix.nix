@@ -47,7 +47,7 @@
       # };
       image = config.wallpaper;
       base16Scheme = "${pkgs.base16-schemes}/share/themes/${config.stylixConfig.theme}.yaml";
-      iconTheme = {
+      icons = {
         enable = true;
         package = pkgs.papirus-icon-theme; #material-design-icons;
         dark = "papirus-icon-theme"; # "material-design-icons";

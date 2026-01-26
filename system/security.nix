@@ -1,8 +1,9 @@
 {...}: {
   security = {
     rtkit.enable = true;
+    # polkit.enable = true;
     pam.services.swaylock = {};
     pam.services.greetd.enableGnomeKeyring = true;
-    # polkit.enable = true;
+    pam.howdy.enable = true;
   };
 }

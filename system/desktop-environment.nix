@@ -28,6 +28,7 @@
     flameshot
 
     # mate.mate-polkit
+    howdy
     hyprpolkitagent
     nautilus
     ffmpegthumbnailer
@@ -35,7 +36,7 @@
     qt5.qtwayland
     qt6.qtwayland
     kdePackages.okular
-    kdePackages.kdenlive
+    # kdePackages.kdenlive
     kdePackages.gwenview
     vlc
     mpv

@@ -4,38 +4,43 @@
 
 - Apply system configuration (`nixos-install --flake .#hostname` on live installation media)
 
-    ```sh
-    sudo nixos-rebuild switch --flake .#sudarshan
-    ````
+```sh
+sudo nixos-rebuild switch --flake .#sudarshan
+````
 
 - Apply home configuration
 
-    ```sh
-    nix shell nixpkgs#home-manager
-    home-manager switch --flake .#lokesh@sudarshan
-    ```
+```sh
+nix shell nixpkgs#home-manager
+home-manager switch --flake .#lokesh@sudarshan
+```
+
+- Update flake
+```sh
+nix flake update
+```
 
 
 ## Nix
 
 - Install `nix` ([DeterminateSystems](https://github.com/DeterminateSystems/nix-installer), [Official](https://nixos.org/download.html))
 
-    ```sh
-    curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
-    ```
+```sh
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+```
 
 - Copy packages across systems over ssh ([package management](https://nixos.org/manual/nix/stable/package-management/copy-closure))
 
-    ```sh
-    nix-copy-closure --to <username>@<ip> $(type -p <package-name>)
-    ```
+```sh
+nix-copy-closure --to <username>@<ip> $(type -p <package-name>)
+```
 
 ## Neovim
 
 - To run my configuration of neovim
 
 ```sh
-    nix run github:lokeshmohanty/nix-config?dir=modules/neovim#nixCats
+nix run github:lokeshmohanty/nix-config?dir=modules/nvim#nvim
 ```
 
 # References
