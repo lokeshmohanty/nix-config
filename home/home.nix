@@ -38,6 +38,8 @@
 
       # enable scrolling in git diff
       DELTA_PAGER = "less -R";
+
+      TERM = "xterm-256color";
     };
     packages = with pkgs; [
       # Misc

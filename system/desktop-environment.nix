@@ -27,14 +27,14 @@
     graphviz
     flameshot
 
+    qt5.qtwayland
+    qt6.qtwayland
+
     # mate.mate-polkit
     howdy
     hyprpolkitagent
     nautilus
     ffmpegthumbnailer
-
-    qt5.qtwayland
-    qt6.qtwayland
     kdePackages.okular
     # kdePackages.kdenlive
     kdePackages.gwenview
@@ -54,7 +54,7 @@
     enable = true;
     settings = {
       default_session = {
-        command = "${pkgs.hyprland}/bin/Hyprland";
+        command = "${pkgs.hyprland}/bin/start-hyprland";
         user = "lokesh";
       };
     };
@@ -62,7 +62,8 @@
 
   programs.hyprland = {
     enable = true;
-    # package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+    portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
   };
   programs.nautilus-open-any-terminal.enable = true;
   programs.nautilus-open-any-terminal.terminal = "${pkgs.foot}/bin/footclient";

@@ -3,30 +3,16 @@
     exiftool #  Read and write meta information in files
     nix-your-shell # use fish in nix develop / nix shell ...
   ];
+  home.shell.enableShellIntegration = true;
   programs = {
     fzf = {
       enable = true;
-      enableBashIntegration = true;
-      enableFishIntegration = true;
       tmux.enableShellIntegration = true;
     };
-    zoxide = {
-      enable = true;
-      enableBashIntegration = true;
-      enableFishIntegration = true;
-      enableNushellIntegration = true;
-    };
-    starship = {
-      enable = true;
-      enableBashIntegration = true;
-      enableFishIntegration = true;
-      enableNushellIntegration = true;
-    };
+    zoxide.enable = true;
+    starship.enable = true;
     yazi = {
       enable = true;
-      enableBashIntegration = true;
-      enableFishIntegration = true;
-      enableNushellIntegration = true;
       settings = {
         mgr = {
           show_hidden = false;
@@ -114,7 +100,7 @@
       nq = "nix-env -qaP";
       nsh = "nix-shell -p";
 
-      hypr = "dbus-run-session Hyprland";
+      # hypr = "dbus-run-session Hyprland";
     };
     functions = {
       gitignore = "curl -sL https://www.gitignore.io/api/$argv";
