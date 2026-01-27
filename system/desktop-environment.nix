@@ -54,19 +54,21 @@
     enable = true;
     settings = {
       default_session = {
-        command = "${pkgs.hyprland}/bin/start-hyprland";
+        command = "start-hyprland";
         user = "lokesh";
       };
     };
   };
 
-  programs.hyprland = {
+  programs.hyprland = let
+    hypr = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system};
+  in {
     enable = true;
-    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-    portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+    package = hypr.hyprland;
+    portalPackage = hypr.xdg-desktop-portal-hyprland;
   };
   programs.nautilus-open-any-terminal.enable = true;
-  programs.nautilus-open-any-terminal.terminal = "${pkgs.foot}/bin/footclient";
+  programs.nautilus-open-any-terminal.terminal = "${pkgs.kitty}/bin/kitty";
   services.gnome.sushi.enable = true;
   xdg.portal = {
     enable = true;

@@ -15,6 +15,10 @@
         python3Packages.python-lsp-server
         # texlab
         tinymist
+        tree-sitter # for treesitter
+        trashy # for Snacks.Explorer
+        mermaid-cli ghostscript # for Snacks.Image
+        # rustup # for sniprun
 
 
         # others
@@ -36,7 +40,6 @@
 
         nvim-lspconfig
         blink-cmp
-        # nvim-treesitter-textobjects
         nvim-treesitter.withAllGrammars
 
         lualine-nvim

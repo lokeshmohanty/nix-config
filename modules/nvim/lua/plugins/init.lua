@@ -5,7 +5,6 @@ require("plugins.completion")
 require("plugins.general_ui")
 require("plugins.gitsigns")
 require("plugins.lint")
-require("plugins.treesitter")
 require("plugins.noice")
 
 require("plugins.mini")

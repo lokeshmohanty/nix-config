@@ -31,7 +31,7 @@ If you are unfamiliar with the above, refer to the [Neovim runtime path document
 ## Usage
 
 ```sh
-    nix run github:lokeshmohanty/nix-config?dir=modules/nixCats#nixCats
+    nix run github:lokeshmohanty/nix-config?dir=modules/nvim#nvim
 ```
 
 - Make a symlink of `snippets` at `~/.config/nvim/snippets`

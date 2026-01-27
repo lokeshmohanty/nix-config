@@ -5,5 +5,4 @@
     enable = true;
     packageNames = ["nvim"];
   };
-  programs.neovide.enable = true;
 }
