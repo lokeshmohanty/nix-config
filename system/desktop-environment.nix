@@ -25,20 +25,18 @@
     cliphist
     hyprpicker
     graphviz
-    flameshot
 
     qt5.qtwayland
     qt6.qtwayland
 
     # mate.mate-polkit
-    howdy
+    # howdy
     hyprpolkitagent
     nautilus
     ffmpegthumbnailer
     kdePackages.okular
     # kdePackages.kdenlive
     kdePackages.gwenview
-    vlc
     mpv
     imv
     gimp

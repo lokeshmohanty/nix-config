@@ -44,24 +44,27 @@
     packages = with pkgs; [
       # Misc
       tlrc # rust client for tldr
-      cowsay
+      # cowsay
       gnupg
       gnumake
 
+      # tui applications
+      # lazygit lazysql lazydocker
+
       imagemagick
-      pandoc
+      # pandoc
       pass
       rclone
       yt-dlp
       ffmpeg
 
 
-      isync   # sync emails
-      maim    # screenshots
-      nixfmt  # nix formatter
-      nim
+      # isync   # sync emails
+      # maim    # screenshots
+      # nixfmt  # nix formatter
+      # nim
       sqlite
-      isort
+      # isort
 
       fzf
       fd # search for files by name, faster than find
@@ -82,7 +85,7 @@
       # it provides the command `nom` works just like `nix
       # with more details log output
       nix-output-monitor
-      nix-index # A small utility to index nix store paths
+      # nix-index # A small utility to index nix store paths
       nix-init # generate nix derivation from url
       # https://github.com/nix-community/nix-melt
       # https://github.com/utdemir/nix-tree
@@ -92,8 +95,8 @@
       # croc # File transfer between computers securely and easily
 
       # other
-      remmina
-      freerdp # remote desktop client
+      # remmina
+      # freerdp # remote desktop client
     ];
   };
 
@@ -111,14 +114,14 @@
       set synctex-editor-command "nvim --headless -c \"VimtexInverseSearch %{line} '%{input}'\""
     '';
   };
-  programs.obs-studio = {
-    enable = true;
-    # plugins = with pkgs.obs-studio-plugins; [
-    #   obs-backgroundremoval
-    #   obs-move-transition
-    #   advanced-scene-switcher
-    # ];
-  };
+  # programs.obs-studio = {
+  #   enable = true;
+  #   # plugins = with pkgs.obs-studio-plugins; [
+  #   #   obs-backgroundremoval
+  #   #   obs-move-transition
+  #   #   advanced-scene-switcher
+  #   # ];
+  # };
   programs.firefox.enable = true;
   # programs.keychain = { enable = true; keys = [ "id_ed25519" ]; };
   programs.gh = {

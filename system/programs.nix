@@ -12,10 +12,6 @@
     clean.extraArgs = "--keep-since 4d --keep 3";
     flake = "/home/lokesh/Documents/nix-config";
   };
-  programs.nix-ld = {
-    enable = true;
-    libraries = [(pkgs.runCommand "steamrun-lib" {} "mkdir $out; ln -s ${pkgs.steam-run.fhsenv}/usr/lib64 $out/lib")];
-  };
   programs.dconf.enable = true;
   programs.gnupg.agent = {
     enable = true;

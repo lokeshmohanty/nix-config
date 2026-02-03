@@ -4,13 +4,12 @@
     enableDefaultPackages = true;
     packages = with pkgs; [
       iosevka-comfy.comfy-duo
-      iosevka-comfy.comfy-fixed
       nerd-fonts.inconsolata-go
+      nerd-fonts.fira-code
       cascadia-code
       victor-mono
       google-fonts
       font-awesome
-      source-sans-pro
     ];
   };
 }

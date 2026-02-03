@@ -57,17 +57,11 @@
       trusted-users = ["lokesh"];
 
       # cachix
-      substituters = [
-        "https://hyprland.cachix.org"
-        # "https://nix-community.cachix.org"
-        # "https://nix-gaming.cachix.org"
-      ];
+      substituters = [ "https://hyprland.cachix.org" ];
       trusted-substituters = ["https://hyprland.cachix.org"];
-      trusted-public-keys = [
-        "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
-        # "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-        # "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4="
-      ];
+      trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
+      extra-substituters = [ "https://yazi.cachix.org" ];
+      extra-trusted-public-keys = [ "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k=" ];
     };
     # Garbage collection is being handled by "nix-helper (nh)"
     # gc = {
@@ -117,15 +111,14 @@
     # gui applications
     google-chrome
     onlyoffice-desktopeditors
-    tikzit
     motrix
     zotero
     (inkscape-with-extensions.override {inkscapeExtensions = [inkscape-extensions.textext];})
-    krita
+    # krita
     vscode-fhs
 
     # cli applications
-    tesseract
+    # tesseract
     aria2
     gh
 
@@ -151,7 +144,7 @@
     waypipe
     distrobox
     docker-compose
-    hledger
+    # hledger
 
     ## programming languages
     uv swig
@@ -167,9 +160,9 @@
     gcc
     ghc
     nodejs
-    cmakeWithGui
-    shellcheck
-    quarto
+    # cmakeWithGui
+    # shellcheck
+    # quarto
 
     ## latex
     texlive.combined.scheme-full

@@ -87,6 +87,7 @@
       de = "distrobox enter";
 
       # tmux
+      t = "tmux";
       ta = "tmux attach -t";
       tn = "tmux new-session -t";
       tl = "tmux list-sessions";

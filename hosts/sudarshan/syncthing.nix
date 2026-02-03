@@ -3,16 +3,18 @@
     enable = true;
     user = "lokesh";
     openDefaultPorts = true;
+    overrideDevices = true;
+    overrideFolders = true;
     dataDir = "/home/lokesh/.local/syncthing";
     settings = {
       devices = {
         "lab" = {
           id = "BKTCSPE-QCLARTR-5UVN7OB-NRHFAJI-SG36GWR-6NDDDO7-FLQVPV6-MGIU6AT";
-          autoAcceptFolders = true;
+          # autoAcceptFolders = true;
         };
         "phone" = {
           id = "KITNSPR-KMBOSUP-RLJS4XX-KILL76P-SR3HAEL-VKQR4U3-JN636OM-FXNZ3AX";
-          autoAcceptFolders = true;
+          # autoAcceptFolders = true;
         };
       };
       folders = {

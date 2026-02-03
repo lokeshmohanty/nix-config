@@ -18,8 +18,6 @@
         tree-sitter # for treesitter
         trashy # for Snacks.Explorer
         mermaid-cli ghostscript # for Snacks.Image
-        # rustup # for sniprun
-
 
         # others
         himalaya # email
@@ -29,9 +27,10 @@
     # This is for plugins that will load at startup without using packadd:
     startupPlugins = {
       general = with pkgs.vimPlugins; [
-        lze
-        vim-sleuth
-        vim-slime
+        lze            # lazy-load plugins
+        vim-sleuth     # heuristically set buffer options
+        vim-slime      # send text to live repl
+        Recover-vim    # add compare action for swap files
 
         snacks-nvim
         mini-nvim
@@ -53,7 +52,6 @@
 
         orgmode
         org-roam-nvim
-        sniprun
 
         nvim-lint
         conform-nvim
