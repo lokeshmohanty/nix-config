@@ -25,7 +25,10 @@ nix flake update
 
 ## Nix
 
-- Install `nix` ([DeterminateSystems](https://github.com/DeterminateSystems/nix-installer), [Official](https://nixos.org/download.html))
+- Install `nix` 
+  - [DeterminateSystems](https://github.com/DeterminateSystems/nix-installer)
+  - [Official](https://nixos.org/download.html)
+  - [Nix Portable (no root)](https://github.com/DavHau/nix-portable)
 
 ```sh
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
@@ -54,7 +57,8 @@ nix run github:lokeshmohanty/nix?dir=modules/nvim#nvim
 
 # TODO 
 
-- Modularize (<https://www.youtube.com/watch?v=vYc6IzKvAJQ>)
+- Using [secrets](https://lgug2z.com/articles/handling-secrets-in-nixos-an-overview/#sops-nix)
+- Modularize (<https://www.youtube.com/watch?v=-TRbzkw6Hjs>)
 - Enable secure boot (<https://github.com/nix-community/lanzaboote/blob/master/docs/QUICK_START.md>)
 - Use <https://github.com/fufexan/nix-gaming>
 
