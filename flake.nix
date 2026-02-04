@@ -27,13 +27,10 @@
   outputs = {flake-parts, ...} @ inputs:
     flake-parts.lib.mkFlake {inherit inputs;} {
       systems = ["x86_64-linux"];
-      imports = [./hosts ./home];
-      perSystem = {
-        config,
-        pkgs,
-        ...
-      }: {
-        packages = import ./pkgs {inherit pkgs inputs;};
+      # home-manager(hm) flakeModules required for nh to detect hm configurations
+      imports = [ ./hosts  inputs.home-manager.flakeModules.home-manager ];
+      perSystem = { pkgs, ... }: {
+        # packages = import ./pkgs {inherit pkgs inputs;};
         formatter = pkgs.alejandra;
       };
     };

@@ -2,5 +2,6 @@
   imports = [
     ./sudarshan
     ./bhaskara
+    ./server
   ];
 }

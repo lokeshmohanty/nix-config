@@ -903,14 +903,15 @@
         "plugins-org-bullets": "plugins-org-bullets"
       },
       "locked": {
-        "path": "./modules/nvim",
+        "lastModified": 1,
+        "narHash": "sha256-ZluOsobT/GAna/wg0GMpuF6jpisUlQyr1jvWdWDS+6o=",
+        "path": "/nix/store/60ybrzqy1iji4j4vs49yw9saixd1npc2-source/modules/nvim",
         "type": "path"
       },
       "original": {
-        "path": "./modules/nvim",
+        "path": "/nix/store/60ybrzqy1iji4j4vs49yw9saixd1npc2-source/modules/nvim",
         "type": "path"
-      },
-      "parent": []
+      }
     },
     "plugins-everforest": {
       "flake": false,

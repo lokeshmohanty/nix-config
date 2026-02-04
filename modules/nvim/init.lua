@@ -38,5 +38,5 @@ vim.cmd([[
   let g:slime_bracketed_paste = 1
   let g:slime_dont_ask_default = 1
 ]])
-vim.keymap.set("n", "<leader>s", "<Plug>SlimeParagraphSend")
-vim.keymap.set("v", "<leader>s", "<Plug>SlimeRegionSend")
+vim.keymap.set("n", "<leader>ss", "<Plug>SlimeParagraphSend")
+vim.keymap.set("v", "<leader>ss", "<Plug>SlimeRegionSend")
