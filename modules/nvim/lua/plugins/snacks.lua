@@ -67,7 +67,7 @@ vim.keymap.set('n', "<leader>lS", function() Snacks.picker.lsp_workspace_symbols
 vim.keymap.set('n', "<c-.>",  function() Snacks.scratch() end, { desc = "Toggle Scratch Buffer" })
 vim.keymap.set("n", "<c-/>", function() Snacks.terminal() end, { desc = 'Toggle Terminal' })
 vim.keymap.set('n', "<leader>q", function() Snacks.bufdelete() end, { desc = "Delete Buffer" })
-vim.keymap.set('n', "<leader>S",  function() Snacks.scratch.select() end, { desc = "Select Scratch Buffer" })
+vim.keymap.set('n', "<leader>ns",  function() Snacks.scratch.select() end, { desc = "Select Scratch Buffer" })
 vim.keymap.set('n', "<leader>nn",  function() Snacks.notifier.show_history() end, { desc = "Notification History" })
 -- vim.keymap.set('n', "<leader>nn", function() Snacks.picker.notifications() end, { desc = "Notification History" })
 vim.keymap.set('n', "<leader>:", function() Snacks.picker.command_history() end, { desc = "Command History" })

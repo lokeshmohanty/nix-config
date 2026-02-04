@@ -6,6 +6,11 @@ require('noice').setup({
       ["vim.lsp.util.stylize_markdown"] = true,
       ["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
     },
+    signature = {
+      auto_open = {
+        enabled = false,
+      },
+    },
   },
   -- you can enable a preset for easier configuration
   presets = {
@@ -16,6 +21,9 @@ require('noice').setup({
     lsp_doc_border = false, -- add a border to hover docs and signature help
   },
 })
+
+vim.keymap.set("i", "C-k", vim.lsp.buf.signature_help)
+
 
 vim.keymap.set("c", "<S-Enter>", function()
   require("noice").redirect(vim.fn.getcmdline())

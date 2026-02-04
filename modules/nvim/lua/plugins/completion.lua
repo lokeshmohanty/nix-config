@@ -49,7 +49,11 @@ vim.keymap.set("i", "<C-g><C-j>", function() ms.expand({ match = false }) end)
 -- Run :copilot auth
 require("lze").load({{
   "copilot",
-  cmd = { "Copilot" },
+  ft = { "python" },
+  keys = {
+    { "<leader>ae", "<cmd>Copilot toggle<cr>", desc = "Toggle Copilot" },
+    { "<leader>ac", "<cmd>CopilotChatToggle<cr>", desc = "Toggle Copilot Chat" },
+  },
   after = function (_)
     vim.cmd.packadd("copilot.lua")
     require("copilot").setup({})
@@ -59,6 +63,5 @@ require("lze").load({{
 
     vim.cmd.packadd("CopilotChat.nvim")
     require("CopilotChat").setup({})
-    vim.keymap.set("n", "<leader>ac", "<cmd>CopilotChatToggle<cr>", { desc = "Toggle Copilot Chat" })
   end,
 }})
