@@ -107,6 +107,16 @@
   # Hyprland
   home.sessionVariables.NIXOS_OZONE_WL = "1";
 
+  ## Documentation: https://github.com/viperML/nh
+  ## Video: https://www.youtube.com/watch?v=DnA4xNTrrqY
+  ## Nix Helper
+  programs.nh = {
+    enable = true;
+    clean.enable = true;
+    clean.extraArgs = "--keep-since 4d --keep 3";
+    flake = "${config.home.homeDirectory}/.nix";
+  };
+
   programs.zathura = {
     enable = true;
     extraConfig = ''

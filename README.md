@@ -6,6 +6,8 @@
 
 ```sh
 sudo nixos-rebuild switch --flake .#sudarshan
+# nh variant (path isn't required if programs.nh.flake is defined)
+nh os switch . -c sudarshan
 ````
 
 - Apply home configuration
@@ -40,7 +42,7 @@ nix-copy-closure --to <username>@<ip> $(type -p <package-name>)
 - To run my configuration of neovim
 
 ```sh
-nix run github:lokeshmohanty/nix-config?dir=modules/nvim#nvim
+nix run github:lokeshmohanty/nix?dir=modules/nvim#nvim
 ```
 
 # References

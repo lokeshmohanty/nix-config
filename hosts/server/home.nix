@@ -45,13 +45,14 @@
     shell.enableShellIntegration = true;
   };
 
+  programs.nh = {
+    enable = true;
+    clean.enable = true;
+    clean.extraArgs = "--keep-since 4d --keep 3";
+    flake = "${config.home.homeDirectory}/.nix";
+  };
+
   programs = {
-    nh = {
-      enable = true;
-      clean.enable = true;
-      clean.extraArgs = "--keep-since 4d --keep 3";
-      # flake = "/home/lokesh/nix-config";
-    };
     fzf = {
       enable = true;
       tmux.enableShellIntegration = true;
