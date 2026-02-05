@@ -13,7 +13,7 @@ servers.lua_ls = {
   settings = {
     Lua = {
       formatters = {
-        ignoreComments = true,
+        ignoreComments = false,
       },
       signatureHelp = { enabled = true },
       diagnostics = {
