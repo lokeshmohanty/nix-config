@@ -1,6 +1,7 @@
 require('mini.starter').setup()
 require('mini.icons').setup()
 require('mini.surround').setup()
+require('mini.align').setup()
 
 require('mini.pairs').setup()
 local map_math = function() MiniPairs.map_buf(0, 'i', '$', { action = 'closeopen', pair = '$$' }) end
