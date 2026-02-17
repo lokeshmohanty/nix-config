@@ -33,43 +33,17 @@ require('lze').load({
       require("org-bullets").setup()
     end,
   }, {
-    "oil.nvim",
+    "flash.nvim",
     keys = {
-      {"<leader>-", "<cmd>Oil --float<CR>", desc = 'Open Parent Directory' },
+      { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+      { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+      { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
+      { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+      { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
     },
     after = function(_)
-      vim.g.loaded_netrwPlugin = 1
-
-      require("oil").setup({
-        default_file_explorer = true,
-        view_options = {
-          show_hidden = true
-        },
-        columns = {
-          "icon",
-          "permissions",
-          "size",
-          -- "mtime",
-        },
-        keymaps = {
-          ["g?"] = "actions.show_help",
-          ["<CR>"] = "actions.select",
-          ["<C-s>"] = "actions.select_vsplit",
-          ["<C-h>"] = "actions.select_split",
-          ["<C-t>"] = "actions.select_tab",
-          ["<C-p>"] = "actions.preview",
-          ["<C-c>"] = "actions.close",
-          ["<C-l>"] = "actions.refresh",
-          ["-"] = "actions.parent",
-          ["_"] = "actions.open_cwd",
-          ["`"] = "actions.cd",
-          ["~"] = "actions.tcd",
-          ["gs"] = "actions.change_sort",
-          ["gx"] = "actions.open_external",
-          ["g."] = "actions.toggle_hidden",
-          ["g\\"] = "actions.toggle_trash",
-        },
-      })
+      vim.packadd("flash.nvim")
+      require("flash.nvim").setup()
     end,
   }, {
     "himalaya-ui",

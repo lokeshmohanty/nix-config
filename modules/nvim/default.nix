@@ -79,7 +79,7 @@
 
         grug-far-nvim
         gx-nvim
-        oil-nvim
+        flash-nvim # jump
 
         undotree
         pkgs.neovimPlugins.himalaya-ui
