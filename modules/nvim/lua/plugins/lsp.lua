@@ -7,6 +7,7 @@ local servers = {}
 -- servers.html = {}
 servers.pylsp = {}
 servers.tinymist = {}
+servers.rust_analyzer = {}
 
 -- but you can provide some if you want to!
 servers.lua_ls = {

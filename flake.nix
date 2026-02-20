@@ -13,7 +13,6 @@
     musnix.url = "github:musnix/musnix";
 
 
-    nvf.url = "github:notashelf/nvf";
     nix-alien.url = "github:thiagokokada/nix-alien";
     stylix.url = "github:danth/stylix";
     flake-parts.url = "github:hercules-ci/flake-parts";

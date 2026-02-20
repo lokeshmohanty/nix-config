@@ -35,6 +35,7 @@
     enable = true;
     package = pkgs.plocate;
   };
+  services.fwupd.enable = true; # firmware update manager
 
   # Capslock as Control + Escape, Escape as Capslock
   services.interception-tools = {

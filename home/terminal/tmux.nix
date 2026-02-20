@@ -13,6 +13,7 @@
       # general
       set -g renumber-windows on
       set-option -g status-position top
+      set-option -sg escape-time 0
 
       # keybindings
       bind "\`" switch-client -t "{marked}"
