@@ -6,7 +6,8 @@
   config,
   pkgs,
   ...
-}: {
+}:
+{
   # You can import other NixOS modules here
   imports = [
     # If you want to use modules from other flakes (such as nixos-hardware):
@@ -45,7 +46,7 @@
   nix = {
     # This will add each flake input as a registry
     # To make nix3 commands consistent with your flake
-    registry = lib.mapAttrs (_: value: {flake = value;}) inputs;
+    registry = lib.mapAttrs (_: value: { flake = value; }) inputs;
 
     # This will additionally add your inputs to the system's legacy channels
     # Making legacy nix commands consistent as well, awesome!
@@ -54,7 +55,7 @@
     settings = {
       experimental-features = "nix-command flakes";
       auto-optimise-store = true;
-      trusted-users = ["lokesh"];
+      trusted-users = [ "lokesh" ];
 
       # cachix
       substituters = [
@@ -65,8 +66,8 @@
         "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
         "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       ];
-      extra-substituters = ["https://yazi.cachix.org"];
-      extra-trusted-public-keys = ["yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="];
+      extra-substituters = [ "https://yazi.cachix.org" ];
+      extra-trusted-public-keys = [ "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k=" ];
     };
     # Garbage collection is being handled by "nix-helper (nh)"
     # gc = {
@@ -81,7 +82,7 @@
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.supportedFilesystems = ["ntfs"];
+  boot.supportedFilesystems = [ "ntfs" ];
 
   time.timeZone = "Asia/Kolkata";
   i18n.defaultLocale = "en_US.UTF-8";
@@ -106,7 +107,14 @@
       initialPassword = "nixos";
       isNormalUser = true;
       description = "Lokesh Mohanty";
-      extraGroups = ["wheel" "input" "audio" "video" "networkmanager" "libvirtd"];
+      extraGroups = [
+        "wheel"
+        "input"
+        "audio"
+        "video"
+        "networkmanager"
+        "libvirtd"
+      ];
     };
   };
   users.defaultUserShell = pkgs.fish;
@@ -118,7 +126,7 @@
     onlyoffice-desktopeditors
     motrix
     zotero
-    (inkscape-with-extensions.override {inkscapeExtensions = [inkscape-extensions.textext];})
+    (inkscape-with-extensions.override { inkscapeExtensions = [ inkscape-extensions.textext ]; })
     # krita
     vscode-fhs
 
@@ -152,16 +160,18 @@
     # hledger
 
     ## programming languages
-    uv swig
-    (pkgs.python3.withPackages (ps:
-      with ps; [
+    uv
+    swig
+    (pkgs.python3.withPackages (
+      ps: with ps; [
         pip
         ipython
         matplotlib
         jupyterlab
         setuptools
         pytest
-      ]))
+      ]
+    ))
     gnumake
     gcc
     nodejs
@@ -170,12 +180,14 @@
     # quarto
 
     ## latex
-    texlive.combined.scheme-full texlab
+    texlive.combined.scheme-full
+    texlab
     typst
 
     ## nix
     nix-your-shell # use fish in nix develop / nix shell ...
-    nixd nixfmt # language server and formatter
+    nixd
+    nixfmt # language server and formatter
   ];
 
   virtualisation = {

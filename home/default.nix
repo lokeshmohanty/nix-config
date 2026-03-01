@@ -52,7 +52,7 @@
       # lazygit lazysql lazydocker
 
       imagemagick
-      # pandoc
+      pandoc
       pass
       rclone
       yt-dlp
@@ -61,17 +61,18 @@
       sqlite
 
       fzf
-      fd # search for files by name, faster than find
-      ripgrep
+      fd      # fd alternative
+      sd      # sed alternative
+      ripgrep # grep alternative
 
-      yq-go # yaml processor https://github.com/mikefarah/yq
-      just # a command runner like make, but simpler
-      delta # A viewer for git and diff output
+      yq-go     # yaml processor https://github.com/mikefarah/yq
+      just      # a command runner like make, but simpler
+      delta     # A viewer for git and diff output
       hyperfine # command-line benchmarking tool
-      gping # ping, but with a graph(TUI)
-      doggo # DNS client for humans
-      duf # Disk Usage/Free Utility - a better 'df' alternative
-      gdu # disk usage analyzer(replacement of `du`)
+      gping     # ping, but with a graph(TUI)
+      doggo     # DNS client for humans
+      duf       # Disk Usage/Free Utility - a better 'df' alternative
+      gdu       # disk usage analyzer(replacement of `du`)
 
       # nix related
       nix-alien # run unpatched binaries

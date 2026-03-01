@@ -47,6 +47,7 @@
         vim-sleuth # heuristically set buffer options
         vim-slime # send text to live repl
         Recover-vim # add compare action for swap files
+        plenary-nvim # for async lua
 
         snacks-nvim
         mini-nvim
@@ -63,6 +64,9 @@
         which-key-nvim
         render-markdown-nvim
         markdown-preview-nvim
+        img-clip-nvim
+        copilot-lua
+        codecompanion-nvim
 
         vimtex
 
@@ -88,8 +92,6 @@
         lazydev-nvim
         vim-startuptime
         typst-preview-nvim
-        copilot-lua
-        CopilotChat-nvim
 
         nvim-dap-python
         pkgs.neovimPlugins.org-bullets
