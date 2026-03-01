@@ -29,7 +29,7 @@
       imports = [./hosts inputs.home-manager.flakeModules.home-manager];
       perSystem = {pkgs, ...}: {
         # packages = import ./pkgs {inherit pkgs inputs;};
-        formatter = pkgs.alejandra;
+        formatter = pkgs.nixfmt;
       };
     };
 }

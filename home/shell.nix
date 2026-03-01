@@ -105,39 +105,6 @@
     };
     functions = {
       gitignore = "curl -sL https://www.gitignore.io/api/$argv";
-      y = ''
-        set tmp (mktemp -t "yazi-cwd.XXXXXX")
-        yazi $argv --cwd-file="$tmp"
-        if set cwd (command cat -- "$tmp"); and [ -n "$cwd" ]; and [ "$cwd" != "$PWD" ]
-          builtin cd -- "$cwd"
-        end
-        rm -f -- "$tmp"
-      '';
-
-      haskellEnv = ''
-        for el in $argv
-          set hpkgs $hpkgs "haskellPackages.ghcWithPackages.$el"
-        end
-        nix-shell --command fish -p $hpkgs
-      '';
-
-      pythonEnv = {
-        description = "start a nix-shell with the given python packages";
-        argumentNames = ["pythonVersion"];
-        body = ''
-          if set -q argv[2]
-            # set pythonVersion $argv[1]
-            set argv $argv[2..-1]
-          end
-          echo "Python Version: $pythonVersion"
-
-          for el in $argv
-            set ppkgs $ppkgs "python"$pythonVersion"Packages.$el"
-          end
-
-          nix-shell --command fish -p $ppkgs
-        '';
-      };
     };
     plugins = [
       {

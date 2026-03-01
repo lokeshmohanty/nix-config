@@ -152,8 +152,7 @@
     # hledger
 
     ## programming languages
-    uv
-    swig
+    uv swig
     (pkgs.python3.withPackages (ps:
       with ps; [
         pip
@@ -165,15 +164,18 @@
       ]))
     gnumake
     gcc
-    ghc
     nodejs
     # cmakeWithGui
     # shellcheck
     # quarto
 
     ## latex
-    texlive.combined.scheme-full
+    texlive.combined.scheme-full texlab
     typst
+
+    ## nix
+    nix-your-shell # use fish in nix develop / nix shell ...
+    nixd nixfmt # language server and formatter
   ];
 
   virtualisation = {

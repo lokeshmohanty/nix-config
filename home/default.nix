@@ -58,12 +58,7 @@
       yt-dlp
       ffmpeg
 
-      # isync   # sync emails
-      # maim    # screenshots
-      # nixfmt  # nix formatter
-      # nim
       sqlite
-      # isort
 
       fzf
       fd # search for files by name, faster than find
@@ -84,11 +79,7 @@
       # it provides the command `nom` works just like `nix
       # with more details log output
       nix-output-monitor
-      # nix-index # A small utility to index nix store paths
-      nix-init # generate nix derivation from url
-      # https://github.com/nix-community/nix-melt
-      # https://github.com/utdemir/nix-tree
-      nix-tree # A TUI to visualize the dependency graph of a nix derivation
+      nix-index # A small utility to index nix store paths
 
       # productivity
       # croc # File transfer between computers securely and easily

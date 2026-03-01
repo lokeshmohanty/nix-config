@@ -18,15 +18,21 @@
   } @ packageDef: {
     lspsAndRuntimeDeps = {
       general = with pkgs; [
-        lua-language-server
-        stylua
+        lua-language-server stylua # lua
+        nixd nixfmt # nix
+        zuban # python
+        tinymist # typst
+        rust-analyzer rustfmt # rust
 
-        nixd
-        alejandra
+        # haskell
+        haskell-language-server
+        haskellPackages.cabal-fmt 
+        ormolu
 
-        python3Packages.python-lsp-server
-        tinymist
-        rust-analyzer
+        yaml-language-server
+        tailwindcss-language-server
+        nginx-language-server
+
         tree-sitter # for treesitter
         trashy # for Snacks.Explorer
         mermaid-cli

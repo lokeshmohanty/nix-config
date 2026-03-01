@@ -40,10 +40,8 @@
       gdu # disk usage analyzer(replacement of `du`)
 
       exiftool #  Read and write meta information in files
-      nix-your-shell # use fish in nix develop / nix shell ...
 
       cascadia-code # font
-      pyright # python language server
     ];
     shell.enableShellIntegration = true;
   };
