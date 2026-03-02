@@ -48,6 +48,22 @@ nix-copy-closure --to <username>@<ip> $(type -p <package-name>)
 nix run github:lokeshmohanty/nix?dir=modules/nvim#nvim
 ```
 
+## Dotfiles Setup
+
+- Make git ignore machine specific configuration while keeping the default config in repository
+
+```sh
+git update-index --skip-worktree ./config/hypr/monitors.conf
+git update-index --skip-worktree ./config/hypr/workspaces.conf
+```
+
+- You can get list of files that are marked to be skipped with
+
+```sh
+git ls-files -v . | grep ^S
+```
+
+
 # References
 
 - **Template** : [nix-starter-configs](https://github.com/Misterio77/nix-starter-configs)
