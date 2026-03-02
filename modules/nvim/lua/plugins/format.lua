@@ -13,11 +13,16 @@ conform.setup({
 		-- Use a sub-list to run only the first available formatter
 		-- javascript = { { "prettierd", "prettier" } },
 	},
+	-- format_on_save = {
+	-- 	timeout_ms = 500,
+	-- 	lsp_format = "fallback",
+	-- },
 })
 vim.keymap.set({ "n", "v" }, "<leader>FF", function()
 	conform.format({
-		lsp_fallback = true,
+		lsp_format = "fallback",
 		async = false,
 		timeout_ms = 1000,
 	})
 end, { desc = "[F]ormat [F]ile" })
+

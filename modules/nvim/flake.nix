@@ -5,6 +5,10 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     nixCats.url = "github:BirdeeHub/nixCats-nvim";
 
+    "plugins-slimline" = {
+      url = "github:sschleemilch/slimline.nvim";
+      flake = false;
+    };
     "plugins-org-bullets" = {
       url = "github:nvim-orgmode/org-bullets.nvim";
       flake = false;

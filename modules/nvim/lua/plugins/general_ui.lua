@@ -12,34 +12,56 @@ require('lze').load({
   },
 })
 
-require('lualine').setup({
-  options = {
-    icons_enabled = false,
-    theme = 'onedark',
-    component_separators = '|',
-    section_separators = '',
-  },
-  sections = {
-    lualine_c = {
-      {
-        'filename', path = 1, status = true,
+-- require('slimline').setup({})
+require('slimline').setup({
+  style = 'fg',
+  bold = true,
+  configs = {
+    path = {
+      hl = {
+        primary = 'Label',
+      },
+    },
+    git = {
+      hl = {
+        primary = 'Function',
+      },
+    },
+    filetype_lsp = {
+      hl = {
+        primary = 'String',
       },
     },
   },
-  inactive_sections = {
-    lualine_b = {
-      {
-        'filename', path = 3, status = true,
-      },
-    },
-    lualine_x = {'filetype'},
-  },
-  -- tabline = {
-  --   -- lualine_a = { 'buffers' },
-  --   lualine_a = { 'lsp_progress', },
-  --   lualine_z = { 'tabs' }
-  -- },
 })
+-- require('lualine').setup({
+--   options = {
+--     icons_enabled = false,
+--     theme = 'onedark',
+--     component_separators = '|',
+--     section_separators = '',
+--   },
+--   sections = {
+--     lualine_c = {
+--       {
+--         'filename', path = 1, status = true,
+--       },
+--     },
+--   },
+--   inactive_sections = {
+--     lualine_b = {
+--       {
+--         'filename', path = 3, status = true,
+--       },
+--     },
+--     lualine_x = {'filetype'},
+--   },
+--   -- tabline = {
+--   --   -- lualine_a = { 'buffers' },
+--   --   lualine_a = { 'lsp_progress', },
+--   --   lualine_z = { 'tabs' }
+--   -- },
+-- })
 -- Command line ui: ./noice.lua:1
 
 require('which-key').setup({})

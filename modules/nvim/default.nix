@@ -58,8 +58,9 @@
         blink-cmp
         nvim-treesitter.withAllGrammars
 
-        lualine-nvim
-        lualine-lsp-progress
+        # lualine-nvim
+        # lualine-lsp-progress
+        pkgs.neovimPlugins.slimline
         gitsigns-nvim
         which-key-nvim
         render-markdown-nvim

@@ -787,7 +787,8 @@
         ],
         "plugins-everforest": "plugins-everforest",
         "plugins-himalaya-ui": "plugins-himalaya-ui",
-        "plugins-org-bullets": "plugins-org-bullets"
+        "plugins-org-bullets": "plugins-org-bullets",
+        "plugins-slimline": "plugins-slimline"
       },
       "locked": {
         "path": "./modules/nvim",
@@ -844,6 +845,22 @@
       "original": {
         "owner": "nvim-orgmode",
         "repo": "org-bullets.nvim",
+        "type": "github"
+      }
+    },
+    "plugins-slimline": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1772309106,
+        "narHash": "sha256-Z/C5I9NHNdP8QmMONen1sIZqqZfwLMn09bzVs+u2lho=",
+        "owner": "sschleemilch",
+        "repo": "slimline.nvim",
+        "rev": "2ca5a979698fd0af0406770fa5dc81899fb53106",
+        "type": "github"
+      },
+      "original": {
+        "owner": "sschleemilch",
+        "repo": "slimline.nvim",
         "type": "github"
       }
     },
