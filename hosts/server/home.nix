@@ -3,7 +3,7 @@
   pkgs,
   ...
 }: {
-  imports = [../../home/terminal/tmux.nix ../../home/editor];
+  imports = [../../home/terminal/tmux.nix ../../home/editor.nix];
 
   nixpkgs = {
     config = {
