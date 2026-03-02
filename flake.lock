@@ -646,11 +646,11 @@
     },
     "nixCats": {
       "locked": {
-        "lastModified": 1769085828,
-        "narHash": "sha256-TjhFIAtS628+/r3IuYWPcNa++mUMMDDG8PbSfFHXBiA=",
+        "lastModified": 1770584904,
+        "narHash": "sha256-9Zaz8lbKF2W9pwXZEnbiGsicHdBoU+dHt3Wv3mCJoZ8=",
         "owner": "BirdeeHub",
         "repo": "nixCats-nvim",
-        "rev": "43fbf4d12b0a613f1a792503da4bb2bf270173c7",
+        "rev": "538fdde784d2909700d97a8ef307783b33a86fb1",
         "type": "github"
       },
       "original": {
@@ -779,27 +779,6 @@
         "type": "github"
       }
     },
-    "nvim": {
-      "inputs": {
-        "nixCats": "nixCats",
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "plugins-everforest": "plugins-everforest",
-        "plugins-himalaya-ui": "plugins-himalaya-ui",
-        "plugins-org-bullets": "plugins-org-bullets",
-        "plugins-slimline": "plugins-slimline"
-      },
-      "locked": {
-        "path": "./modules/nvim",
-        "type": "path"
-      },
-      "original": {
-        "path": "./modules/nvim",
-        "type": "path"
-      },
-      "parent": []
-    },
     "plugins-everforest": {
       "flake": false,
       "locked": {
@@ -894,9 +873,13 @@
         "hyprland": "hyprland",
         "musnix": "musnix",
         "nix-alien": "nix-alien",
+        "nixCats": "nixCats",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_4",
-        "nvim": "nvim",
+        "plugins-everforest": "plugins-everforest",
+        "plugins-himalaya-ui": "plugins-himalaya-ui",
+        "plugins-org-bullets": "plugins-org-bullets",
+        "plugins-slimline": "plugins-slimline",
         "stylix": "stylix"
       }
     },

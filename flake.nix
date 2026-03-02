@@ -17,18 +17,41 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
 
-    # nvim.url = "github:lokeshmohanty/nix-config?dir=modules/nvim";
-    nvim.url = "./modules/nvim";
-    nvim.inputs.nixpkgs.follows = "nixpkgs";
+    nixCats.url = "github:BirdeeHub/nixCats-nvim";
+
+    "plugins-slimline" = {
+      url = "github:sschleemilch/slimline.nvim";
+      flake = false;
+    };
+    "plugins-org-bullets" = {
+      url = "github:nvim-orgmode/org-bullets.nvim";
+      flake = false;
+    };
+    # "plugins-bruno" = {
+    #   url = "github:romek-codes/brun.nvim";
+    #   flake = false;
+    # };
+    "plugins-himalaya-ui" = {
+      url = "github:aliyss/vim-himalaya-ui";
+      flake = false;
+    };
+    "plugins-everforest" = {
+      url = "github:neanias/everforest-nvim";
+      flake = false;
+    };
   };
 
-  outputs = {flake-parts, ...} @ inputs:
+  outputs = inputs@{flake-parts, ...}:
     flake-parts.lib.mkFlake {inherit inputs;} {
       systems = ["x86_64-linux"];
       # import home-manager to export flake.homeConfigurations and flake.homeModules
       imports = [./hosts inputs.home-manager.flakeModules.home-manager];
-      perSystem = {pkgs, ...}: {
-        # packages = import ./pkgs {inherit pkgs inputs;};
+      perSystem = {pkgs, ...}: 
+      let
+        packages = import ./pkgs { inherit pkgs inputs; };
+        apps = builtins.mapAttrs (name: drv: { type = "app"; program = let main = drv.meta.mainProgram or name; in "${drv}/bin/${main}"; }) packages;
+      in {
+        inherit packages apps;
         formatter = pkgs.nixfmt;
       };
     };

@@ -5,19 +5,23 @@
   inputs,
   ...
 }: {
-  imports = [inputs.nvim.homeModule];
+  # imports = [inputs.nvim.homeModule];
 
-  home.packages = with pkgs; [pre-commit slides];
+  home.packages = with pkgs; [
+    pre-commit 
+    slides
+    inputs.self.packages.${pkgs.system}.nvim
+  ];
   home.activation.zk = lib.mkAfter ''
     ln -sf /home/lokesh/.nix/config/zk ${config.xdg.configHome}
   '';
 
   home.sessionVariables.EDITOR = "vi";
   home.sessionVariables.ZK_NOTEBOOK_DIR = "/home/lokesh/Documents/Notebook";
-  nvim = {
-    enable = true;
-    packageNames = ["nvim"];
-  };
+  # nvim = {
+  #   enable = true;
+  #   packageNames = ["nvim"];
+  # };
 
   programs.zk = {
     enable = true;
