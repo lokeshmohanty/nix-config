@@ -4,7 +4,8 @@
   config,
   pkgs,
   ...
-}: {
+}:
+{
   imports = [
     ./terminal
     ./browser
@@ -27,18 +28,13 @@
   home = {
     username = "lokesh";
     homeDirectory = "/home/lokesh";
-    sessionPath = ["$HOME/.local/bin"];
+    sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables = {
       LESSHISTFILE = config.xdg.cacheHome + "/less/history";
       LESSKEY = config.xdg.configHome + "/less/lesskey";
       WINEPREFIX = config.xdg.dataHome + "/wine";
-
-      # set default applications
-      BROWSER = "firefox";
-
       # enable scrolling in git diff
       DELTA_PAGER = "less -R";
-
       TERM = "xterm-256color";
     };
     packages = with pkgs; [
@@ -61,18 +57,18 @@
       sqlite
 
       fzf
-      fd      # fd alternative
-      sd      # sed alternative
+      fd # fd alternative
+      sd # sed alternative
       ripgrep # grep alternative
 
-      yq-go     # yaml processor https://github.com/mikefarah/yq
-      just      # a command runner like make, but simpler
-      delta     # A viewer for git and diff output
+      yq-go # yaml processor https://github.com/mikefarah/yq
+      just # a command runner like make, but simpler
+      delta # A viewer for git and diff output
       hyperfine # command-line benchmarking tool
-      gping     # ping, but with a graph(TUI)
-      doggo     # DNS client for humans
-      duf       # Disk Usage/Free Utility - a better 'df' alternative
-      gdu       # disk usage analyzer(replacement of `du`)
+      gping # ping, but with a graph(TUI)
+      doggo # DNS client for humans
+      duf # Disk Usage/Free Utility - a better 'df' alternative
+      gdu # disk usage analyzer(replacement of `du`)
 
       # nix related
       nix-alien # run unpatched binaries
@@ -100,14 +96,9 @@
   };
 
   stylixConfig.enable = true;
-  stylixConfig.theme = "everforest-dark-hard"; #"terracotta";
+  stylixConfig.theme = "everforest-dark-hard"; # "terracotta";
   wallpaper = ./../wallpapers/0016.jpg;
 
-  # Hyprland
-  home.sessionVariables.NIXOS_OZONE_WL = "1";
-
-  ## Documentation: https://github.com/viperML/nh
-  ## Video: https://www.youtube.com/watch?v=DnA4xNTrrqY
   ## Nix Helper
   programs.nh = {
     enable = true;
@@ -123,19 +114,10 @@
       set synctex-editor-command "nvim --headless -c \"VimtexInverseSearch %{line} '%{input}'\""
     '';
   };
-  # programs.obs-studio = {
-  #   enable = true;
-  #   # plugins = with pkgs.obs-studio-plugins; [
-  #   #   obs-backgroundremoval
-  #   #   obs-move-transition
-  #   #   advanced-scene-switcher
-  #   # ];
-  # };
-  programs.firefox.enable = true;
   # programs.keychain = { enable = true; keys = [ "id_ed25519" ]; };
   programs.gh = {
     enable = true;
-    extensions = [pkgs.gh-dash];
+    extensions = [ pkgs.gh-dash ];
   };
   programs.nix-index.enable = true;
 
@@ -151,8 +133,8 @@
 
   dconf.settings = {
     "org/virt-manager/virt-manager/connections" = {
-      autoconnect = ["qemu:///system"];
-      uris = ["qemu:///system"];
+      autoconnect = [ "qemu:///system" ];
+      uris = [ "qemu:///system" ];
     };
   };
 

@@ -1,4 +1,5 @@
-{pkgs, ...}: {
+{ pkgs, ... }:
+{
   programs.tmux = {
     enable = true;
     baseIndex = 1;
@@ -37,6 +38,6 @@
       set -ga update-environment TERM
       set -ga update-environment TERM_PROGRAM
     '';
-    plugins = with pkgs.tmuxPlugins; [gruvbox];
+    plugins = with pkgs.tmuxPlugins; [ gruvbox ];
   };
 }

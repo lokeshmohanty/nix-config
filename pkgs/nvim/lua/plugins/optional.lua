@@ -46,6 +46,17 @@ require('lze').load({
       require("flash.nvim").setup()
     end,
   }, {
+    "bruno.nvim",
+    ft = "bruno",
+    after = function(_)
+      vim.packadd("bruno.nvim")
+      require("bruno").setup({
+        picker = "snacks",
+        show_formatted_output = true,
+        suppress_formatting_errors = false,
+      })
+    end,
+  }, {
     "himalaya-ui",
     cmd = { "HimalayaUI" },
     keys = { { "<leader>H", "<cmd>HimalayaUI<CR>", mode = { "n" }, desc = "HimalayaUI" }, },

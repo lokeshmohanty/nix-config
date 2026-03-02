@@ -27,10 +27,6 @@
       url = "github:nvim-orgmode/org-bullets.nvim";
       flake = false;
     };
-    # "plugins-bruno" = {
-    #   url = "github:romek-codes/brun.nvim";
-    #   flake = false;
-    # };
     "plugins-himalaya-ui" = {
       url = "github:aliyss/vim-himalaya-ui";
       flake = false;
@@ -41,18 +37,33 @@
     };
   };
 
-  outputs = inputs@{flake-parts, ...}:
-    flake-parts.lib.mkFlake {inherit inputs;} {
-      systems = ["x86_64-linux"];
-      # import home-manager to export flake.homeConfigurations and flake.homeModules
-      imports = [./hosts inputs.home-manager.flakeModules.home-manager];
-      perSystem = {pkgs, ...}: 
-      let
-        packages = import ./pkgs { inherit pkgs inputs; };
-        apps = builtins.mapAttrs (name: drv: { type = "app"; program = let main = drv.meta.mainProgram or name; in "${drv}/bin/${main}"; }) packages;
-      in {
-        inherit packages apps;
-        formatter = pkgs.nixfmt;
-      };
+  outputs =
+    inputs@{ flake-parts, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [ "x86_64-linux" ];
+
+      imports = [
+        ./hosts
+        # required to export flake.homeConfigurations and flake.homeModules
+        inputs.home-manager.flakeModules.home-manager
+      ];
+
+      perSystem =
+        { pkgs, ... }:
+        let
+          packages = import ./pkgs { inherit pkgs inputs; };
+          apps = builtins.mapAttrs (name: drv: {
+            type = "app";
+            program =
+              let
+                main = drv.meta.mainProgram or name;
+              in
+              "${drv}/bin/${main}";
+          }) packages;
+        in
+        {
+          inherit packages apps;
+          formatter = pkgs.nixfmt;
+        };
     };
 }

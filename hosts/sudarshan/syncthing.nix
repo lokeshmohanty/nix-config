@@ -1,4 +1,5 @@
-{...}: {
+{ ... }:
+{
   services.syncthing = {
     enable = true;
     user = "lokesh";
@@ -20,46 +21,52 @@
       folders = {
         "Projects" = {
           path = "/home/lokesh/Projects";
-          devices = ["lab"];
-          ignorePatterns = [".venv/*"];
+          devices = [ "lab" ];
+          ignorePatterns = [ ".venv/*" ];
         };
         "Research" = {
           path = "/home/lokesh/Documents/Research";
-          devices = ["lab"];
-          ignorePatterns = [".venv/*"];
+          devices = [ "lab" ];
+          ignorePatterns = [ ".venv/*" ];
         };
         "Presentations" = {
           path = "/home/lokesh/Documents/Presentations";
-          devices = ["lab"];
-          ignorePatterns = [".venv/*"];
+          devices = [ "lab" ];
+          ignorePatterns = [ ".venv/*" ];
         };
         "Books" = {
           path = "/home/lokesh/Documents/Books";
-          devices = ["lab"];
-          ignorePatterns = [".venv/*"];
+          devices = [ "lab" ];
+          ignorePatterns = [ ".venv/*" ];
         };
         "Practice" = {
           path = "/home/lokesh/Desktop/Practice";
-          devices = ["lab"];
-          ignorePatterns = [".venv/*"];
+          devices = [ "lab" ];
+          ignorePatterns = [ ".venv/*" ];
         };
         "Org" = {
           path = "/home/lokesh/Documents/Org";
-          devices = ["phone" "lab"];
-          ignorePatterns = [".venv/*"];
+          devices = [
+            "phone"
+            "lab"
+          ];
+          ignorePatterns = [ ".venv/*" ];
         };
         "Notebook" = {
           path = "/home/lokesh/Documents/Notebook";
-          devices = ["phone" "lab"];
-          ignorePatterns = [".venv/*"];
+          devices = [
+            "phone"
+            "lab"
+          ];
+          ignorePatterns = [ ".venv/*" ];
         };
         "Personal" = {
           path = "/home/lokesh/Documents/Personal";
-          devices = ["phone"];
+          devices = [ "phone" ];
         };
         "Camera" = {
           path = "/home/lokesh/Pictures/Phone";
-          devices = ["phone"];
+          devices = [ "phone" ];
         };
       };
     };

@@ -4,21 +4,21 @@ local servers = {}
 
 -- most don't need much configuration
 -- servers.gopls = {}
--- servers.html = {}
--- servers.pylsp = {}
+servers.clangd = {}
+servers.bashls = {}
 servers.zuban = {} -- python
 servers.tinymist = {}
 servers.rust_analyzer = {}
-servers.hls = {
-  filetypes = { 'haskell', 'lhaskell', 'cabal' },
-}
+servers.hls = { filetypes = { 'haskell', 'lhaskell', 'cabal' }, }
 servers.texlab = {}
 servers.ts_ls = {}
 servers.yamlls = {}
+servers.hydra_lsp = {}
 servers.tailwindcss = {}
 servers.zk = {}
 servers.nushell = {}
 servers.nginx_language_server = {}
+servers.gh_actions_ls = {}
 
 -- but you can provide some if you want to!
 servers.lua_ls = {

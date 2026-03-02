@@ -1,4 +1,5 @@
-{...}: {
+{ ... }:
+{
   services.syncthing = {
     enable = true;
     user = "lokesh";
@@ -18,38 +19,44 @@
       folders = {
         "Projects" = {
           path = "/home/lokesh/Projects";
-          devices = ["laptop"];
-          ignorePatterns = [".venv/*"];
+          devices = [ "laptop" ];
+          ignorePatterns = [ ".venv/*" ];
         };
         "Research" = {
           path = "/home/lokesh/Documents/Research";
-          devices = ["laptop"];
-          ignorePatterns = [".venv/*"];
+          devices = [ "laptop" ];
+          ignorePatterns = [ ".venv/*" ];
         };
         "Presentations" = {
           path = "/home/lokesh/Documents/Presentations";
-          devices = ["laptop"];
-          ignorePatterns = [".venv/*"];
+          devices = [ "laptop" ];
+          ignorePatterns = [ ".venv/*" ];
         };
         "Books" = {
           path = "/home/lokesh/Documents/Books";
-          devices = ["laptop"];
-          ignorePatterns = [".venv/*"];
+          devices = [ "laptop" ];
+          ignorePatterns = [ ".venv/*" ];
         };
         "Practice" = {
           path = "/home/lokesh/Desktop/Practice";
-          devices = ["laptop"];
-          ignorePatterns = [".venv/*"];
+          devices = [ "laptop" ];
+          ignorePatterns = [ ".venv/*" ];
         };
         "Org" = {
           path = "/home/lokesh/Documents/Org";
-          devices = ["laptop" "phone"];
-          ignorePatterns = [".venv/*"];
+          devices = [
+            "laptop"
+            "phone"
+          ];
+          ignorePatterns = [ ".venv/*" ];
         };
         "Notebook" = {
           path = "/home/lokesh/Documents/Notebook";
-          devices = ["laptop" "phone"];
-          ignorePatterns = [".venv/*"];
+          devices = [
+            "laptop"
+            "phone"
+          ];
+          ignorePatterns = [ ".venv/*" ];
         };
       };
     };

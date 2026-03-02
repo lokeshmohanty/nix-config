@@ -3,6 +3,7 @@ require("snacks").setup({
   picker = {},
   terminal = {},
   gitbrowse = {},
+  bigfile = {},   -- disables lsp in large files
   quickfile = {}, -- renders file before loading the plugins
   notifier = {},  -- notifications and history
   input = {},

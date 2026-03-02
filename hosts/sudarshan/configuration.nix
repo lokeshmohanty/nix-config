@@ -1,16 +1,19 @@
-{pkgs, ...}: {
-  imports = [../../system];
+{ pkgs, ... }:
+{
+  imports = [ ../../system ];
 
   hardware.bluetooth.enable = true;
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
   };
-  services.xserver.videoDrivers = ["amdgpu"];
+  services.xserver.videoDrivers = [ "amdgpu" ];
 
   programs.nix-ld = {
     enable = true;
-    libraries = [(pkgs.runCommand "steamrun-lib" {} "mkdir $out; ln -s ${pkgs.steam-run.fhsenv}/usr/lib64 $out/lib")];
+    libraries = [
+      (pkgs.runCommand "steamrun-lib" { } "mkdir $out; ln -s ${pkgs.steam-run.fhsenv}/usr/lib64 $out/lib")
+    ];
   };
 
   networking.hostName = "sudarshan";

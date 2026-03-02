@@ -2,7 +2,8 @@
   pkgs,
   inputs,
   ...
-}: {
+}:
+{
   environment.systemPackages = with pkgs; [
     xdg-desktop-portal
     xdg-desktop-portal-hyprland
@@ -58,13 +59,15 @@
     };
   };
 
-  programs.hyprland = let
-    hypr = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system};
-  in {
-    enable = true;
-    package = hypr.hyprland;
-    portalPackage = hypr.xdg-desktop-portal-hyprland;
-  };
+  programs.hyprland =
+    let
+      hypr = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system};
+    in
+    {
+      enable = true;
+      package = hypr.hyprland;
+      portalPackage = hypr.xdg-desktop-portal-hyprland;
+    };
   programs.nautilus-open-any-terminal.enable = true;
   programs.nautilus-open-any-terminal.terminal = "${pkgs.kitty}/bin/kitty";
   services.gnome.sushi.enable = true;
@@ -73,9 +76,9 @@
     xdgOpenUsePortal = true;
     config = {
       common = {
-        default = ["gtk"];
+        default = [ "gtk" ];
       };
     };
-    extraPortals = [pkgs.xdg-desktop-portal-gtk];
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
 }

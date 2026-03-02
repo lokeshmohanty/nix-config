@@ -2,8 +2,12 @@
   config,
   pkgs,
   ...
-}: {
-  imports = [../../home/terminal/tmux.nix ../../home/editor.nix];
+}:
+{
+  imports = [
+    ../../home/terminal/tmux.nix
+    ../../home/editor.nix
+  ];
 
   nixpkgs = {
     config = {
@@ -14,7 +18,7 @@
   home = {
     username = "lokesh";
     homeDirectory = "/home/lokesh";
-    sessionPath = ["$HOME/.local/bin"];
+    sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables = {
       LESSHISTFILE = config.xdg.cacheHome + "/less/history";
       LESSKEY = config.xdg.configHome + "/less/lesskey";
@@ -39,7 +43,7 @@
       duf # Disk Usage/Free Utility - a better 'df' alternative
       gdu # disk usage analyzer(replacement of `du`)
 
-      exiftool #  Read and write meta information in files
+      exiftool # Read and write meta information in files
 
       cascadia-code # font
     ];

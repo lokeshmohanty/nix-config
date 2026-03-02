@@ -4,7 +4,8 @@
   lib,
   inputs,
   ...
-}: {
+}:
+{
   imports = [
     inputs.stylix.homeModules.stylix
   ];
@@ -12,9 +13,17 @@
   options = {
     stylixConfig = {
       enable = lib.mkEnableOption "enable stylix";
-      theme = lib.mkOption {type = lib.types.str;};
+      theme = lib.mkOption { type = lib.types.str; };
     };
-    wallpaper = lib.mkOption {type = with lib.types; oneOf [str path package];};
+    wallpaper = lib.mkOption {
+      type =
+        with lib.types;
+        oneOf [
+          str
+          path
+          package
+        ];
+    };
   };
   config = lib.mkIf config.stylixConfig.enable {
     # wallpaper = with config.lib.stylix.colors.withHashtag;
@@ -49,7 +58,7 @@
       base16Scheme = "${pkgs.base16-schemes}/share/themes/${config.stylixConfig.theme}.yaml";
       icons = {
         enable = true;
-        package = pkgs.papirus-icon-theme; #material-design-icons;
+        package = pkgs.papirus-icon-theme; # material-design-icons;
         dark = "papirus-icon-theme"; # "material-design-icons";
         light = "papirus-icon-theme"; # "material-design-icons";
       };

@@ -2,7 +2,8 @@
   pkgs,
   lib,
   ...
-}: {
+}:
+{
   # Enable sound with pipewire.
   musnix.enable = true;
   services.pipewire = {

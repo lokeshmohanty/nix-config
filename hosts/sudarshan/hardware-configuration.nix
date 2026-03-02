@@ -4,7 +4,8 @@
   pkgs,
   modulesPath,
   ...
-}: {
+}:
+{
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
@@ -17,9 +18,9 @@
     "sd_mod"
     "sdhci_pci"
   ];
-  boot.initrd.kernelModules = ["amdgpu"];
-  boot.kernelModules = ["kvm-amd"];
-  boot.extraModulePackages = [];
+  boot.initrd.kernelModules = [ "amdgpu" ];
+  boot.kernelModules = [ "kvm-amd" ];
+  boot.extraModulePackages = [ ];
 
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/6a590303-f1e4-4870-9259-7d46be5bee63";
@@ -32,7 +33,7 @@
   };
 
   swapDevices = [
-    {device = "/dev/disk/by-uuid/feb6cd5f-fcb9-4431-9e1e-0b62744e733a";}
+    { device = "/dev/disk/by-uuid/feb6cd5f-fcb9-4431-9e1e-0b62744e733a"; }
   ];
 
   networking.useDHCP = lib.mkDefault true;

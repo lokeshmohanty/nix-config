@@ -1,4 +1,6 @@
 {
+  home.sessionVariables.BROWSER = "firefox";
+  programs.firefox.enable = true;
   programs.qutebrowser = {
     enable = true;
     loadAutoconfig = true;
@@ -12,7 +14,7 @@
     settings = {
       auto_save.session = true;
       url.default_page = "qute://bookmarks";
-      url.start_pages = ["qute://bookmarks"];
+      url.start_pages = [ "qute://bookmarks" ];
       content.autoplay = false;
     };
     # keyBindings = {

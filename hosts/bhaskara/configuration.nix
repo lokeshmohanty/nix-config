@@ -4,8 +4,9 @@
   config,
   pkgs,
   ...
-}: {
-  imports = [../../system];
+}:
+{
+  imports = [ ../../system ];
 
   hardware.graphics.enable = true;
   hardware.nvidia = {
@@ -20,7 +21,13 @@
 
   programs.nix-ld = {
     enable = true;
-    libraries = with pkgs; [ expat libz coreutils binutils libgcc ];
+    libraries = with pkgs; [
+      expat
+      libz
+      coreutils
+      binutils
+      libgcc
+    ];
     # libraries = [(pkgs.runCommand "steamrun-lib" {} "mkdir $out; ln -s ${pkgs.steam-run.fhsenv}/usr/lib64 $out/lib")];
   };
 
@@ -36,7 +43,7 @@
   services.printing = {
     enable = true;
     # NIXPKGS_ALLOW_UNFREE=1 nix-shell -p hplipWithPlugin --run 'sudo -E hp-setup'
-    drivers = with pkgs; [hplipWithPlugin];
+    drivers = with pkgs; [ hplipWithPlugin ];
   };
   services.avahi = {
     enable = true;
