@@ -10,11 +10,7 @@
     settings = {
       devices = {
         "lab" = {
-          id = "BKTCSPE-QCLARTR-5UVN7OB-NRHFAJI-SG36GWR-6NDDDO7-FLQVPV6-MGIU6AT";
-          # autoAcceptFolders = true;
-        };
-        "phone" = {
-          id = "KITNSPR-KMBOSUP-RLJS4XX-KILL76P-SR3HAEL-VKQR4U3-JN636OM-FXNZ3AX";
+          id = "HQ6HDW5-X6C3VWS-CYRV44J-CCYOENZ-BVYZLYN-VSCFQFU-MYXBB56-AC36ZAG";
           # autoAcceptFolders = true;
         };
       };
@@ -44,30 +40,15 @@
           devices = [ "lab" ];
           ignorePatterns = [ ".venv/*" ];
         };
-        "Org" = {
-          path = "/home/lokesh/Documents/Org";
-          devices = [
-            "phone"
-            "lab"
-          ];
-          ignorePatterns = [ ".venv/*" ];
-        };
         "Notebook" = {
           path = "/home/lokesh/Documents/Notebook";
-          devices = [
-            "phone"
-            "lab"
-          ];
+          devices = [ "lab" ];
           ignorePatterns = [ ".venv/*" ];
         };
-        "Personal" = {
-          path = "/home/lokesh/Documents/Personal";
-          devices = [ "phone" ];
-        };
-        "Camera" = {
-          path = "/home/lokesh/Pictures/Phone";
-          devices = [ "phone" ];
-        };
+        # "Personal" = {
+        #   path = "/home/lokesh/Documents/Personal";
+        #   devices = [ "phone" ];
+        # };
       };
     };
   };

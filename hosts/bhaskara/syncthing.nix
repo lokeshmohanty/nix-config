@@ -4,18 +4,11 @@
     enable = true;
     user = "lokesh";
     openDefaultPorts = true;
+    overrideDevices = true;
+    overrideFolders = true;
     dataDir = "/home/lokesh/.local/syncthing";
     settings = {
-      devices = {
-        "laptop" = {
-          id = "ZUAVAEV-LA24HLW-EIXNXCB-O7DEVOB-CJWPE22-SH5JKJY-MYCOLMN-EUK5LAS";
-          autoAcceptFolders = true;
-        };
-        "phone" = {
-          id = "KITNSPR-KMBOSUP-RLJS4XX-KILL76P-SR3HAEL-VKQR4U3-JN636OM-FXNZ3AX";
-          autoAcceptFolders = true;
-        };
-      };
+      devices.laptop.id = "E35GV3M-GT4AQEH-DEWAIYP-T6MSAM4-UFC7U4C-PWQHMSM-6XGZW5P-62VIKQM";
       folders = {
         "Projects" = {
           path = "/home/lokesh/Projects";
@@ -42,20 +35,9 @@
           devices = [ "laptop" ];
           ignorePatterns = [ ".venv/*" ];
         };
-        "Org" = {
-          path = "/home/lokesh/Documents/Org";
-          devices = [
-            "laptop"
-            "phone"
-          ];
-          ignorePatterns = [ ".venv/*" ];
-        };
         "Notebook" = {
           path = "/home/lokesh/Documents/Notebook";
-          devices = [
-            "laptop"
-            "phone"
-          ];
+          devices = [ "laptop" ];
           ignorePatterns = [ ".venv/*" ];
         };
       };

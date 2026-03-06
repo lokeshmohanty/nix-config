@@ -12,7 +12,7 @@
         inputs.musnix.nixosModules.musnix
         ./configuration.nix
         ./hardware-configuration.nix
-        # ./syncthing.nix
+        ./syncthing.nix
       ];
     };
   };
