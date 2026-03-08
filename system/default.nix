@@ -15,6 +15,7 @@
     # inputs.hardware.nixosModules.common-ssd
 
     # You can also split up your configuration and import pieces of it here:
+    ./packages.nix
     ./security.nix
     ./gaming.nix
     ./services.nix
@@ -22,6 +23,7 @@
     ./desktop-environment.nix
     ./fonts.nix
     ./ssh.nix
+    ./virtualisation.nix
   ];
 
   nixpkgs = {
@@ -119,92 +121,6 @@
   };
   users.defaultUserShell = pkgs.fish;
   environment.binsh = "${pkgs.dash}/bin/dash";
-
-  environment.systemPackages = with pkgs; [
-    # gui applications
-    google-chrome
-    onlyoffice-desktopeditors
-    motrix
-    zotero
-    (inkscape-with-extensions.override { inkscapeExtensions = [ inkscape-extensions.textext ]; })
-    # krita
-    vscode-fhs
-
-    # cli applications
-    # tesseract
-    aria2
-    gh
-
-    # system utilities
-    inxi
-    neofetch
-    bat
-    duf
-    libtool
-    zip
-    unzip
-    unrar
-    file
-    powertop
-    htop
-    bottom
-    openconnect
-    networkmanager-openconnect
-    bluetuith
-
-    # other utilities
-    quickemu
-    waypipe
-    distrobox
-    docker-compose
-    # hledger
-
-    ## programming languages
-    uv
-    swig
-    (pkgs.python3.withPackages (
-      ps: with ps; [
-        pip
-        ipython
-        matplotlib
-        jupyterlab
-        setuptools
-        pytest
-      ]
-    ))
-    gnumake
-    gcc
-    nodejs
-    # cmakeWithGui
-    # shellcheck
-    # quarto
-
-    ## latex
-    texlive.combined.scheme-full
-    texlab
-    typst
-
-    ## nix
-    nix-your-shell # use fish in nix develop / nix shell ...
-    nixd
-    nixfmt # language server and formatter
-  ];
-
-  virtualisation = {
-    # docker = {
-    #   enable = true;
-    #   rootless.enable = true;
-    #   rootless.setSocketVariable = true;
-    # };
-    podman = {
-      enable = true;
-      dockerCompat = true;
-      defaultNetwork.settings.dns_enabled = true;
-    };
-    libvirtd.enable = true;
-    # waydroid.enable = true;
-    # waydroid.package = pkgs.waydroid-nftables;
-  };
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "25.05";
