@@ -11,6 +11,7 @@ in
     bhaskara = inputs.nixpkgs.lib.nixosSystem {
       specialArgs = { inherit inputs self; };
       modules = [
+        inputs.determinate.nixosModules.default
         inputs.nixos-hardware.nixosModules.common-cpu-intel
         inputs.musnix.nixosModules.musnix
         ./configuration.nix

@@ -8,6 +8,7 @@
     sudarshan = inputs.nixpkgs.lib.nixosSystem {
       specialArgs = { inherit inputs self; };
       modules = [
+        inputs.determinate.nixosModules.default
         inputs.nixos-hardware.nixosModules.lenovo-thinkpad-l14-amd
         inputs.musnix.nixosModules.musnix
         ./configuration.nix
