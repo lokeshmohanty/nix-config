@@ -17,6 +17,8 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
 
+    nix-openclaw.url = "github:openclaw/nix-openclaw";
+
     nixCats.url = "github:BirdeeHub/nixCats-nvim";
 
     "plugins-slimline" = {
@@ -51,6 +53,7 @@
       perSystem =
         { pkgs, ... }:
         let
+          pkgs-with-overlays = pkgs.extend inputs.nix-openclaw.overlay;
           packages = import ./pkgs { inherit pkgs inputs; };
           apps = builtins.mapAttrs (name: drv: {
             type = "app";
@@ -64,6 +67,11 @@
         {
           inherit packages apps;
           formatter = pkgs.nixfmt;
+          devShells.default = pkgs-with-overlays.mkShell {
+            packages = with pkgs-with-overlays; [
+              openclaw
+            ];
+          };
         };
     };
 }

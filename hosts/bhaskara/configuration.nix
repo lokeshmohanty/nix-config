@@ -16,7 +16,12 @@
     open = false;
     nvidiaSettings = true;
   };
-  nixpkgs.config.nvidia.acceptLicense = true;
+  nixpkgs.config = {
+    nvidia.acceptLicense = true;
+    permittedInsecurePackages = [
+      "openclaw-2026.2.26"
+    ];
+  };
   gaming.enable = false;
 
   programs.nix-ld = {
