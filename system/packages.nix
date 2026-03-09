@@ -20,7 +20,7 @@
 
     # system utilities
     inxi
-    neofetch
+    fastfetch
     bat
     duf
     libtool

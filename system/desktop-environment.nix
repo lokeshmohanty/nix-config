@@ -47,6 +47,7 @@
     wlr-randr
     qalculate-qt
     ntfs3g
+    brightnessctl
   ];
 
   services.greetd = {
