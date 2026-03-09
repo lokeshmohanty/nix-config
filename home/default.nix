@@ -7,6 +7,8 @@
 }:
 {
   imports = [
+    ../variables.nix
+
     ./terminal
     ./browser
     ./editor.nix
@@ -86,12 +88,15 @@
       # freerdp # remote desktop client
     ];
     activation.hyprland = lib.mkAfter ''
-      ln -sf /home/lokesh/.nix/config/hypr ${config.xdg.configHome}
-      ln -sf /home/lokesh/.nix/config/waybar ${config.xdg.configHome}
-      ln -sf /home/lokesh/.nix/config/wlogout ${config.xdg.configHome}
-      ln -sf /home/lokesh/.nix/config/swappy ${config.xdg.configHome}
-      ln -sf /home/lokesh/.nix/config/gtk.css ${config.xdg.configHome}
-      ln -sf /home/lokesh/.nix/config/icons ${config.xdg.configHome}
+      ln -sf ${config.vars.nixDir}/config/hypr ${config.xdg.configHome}
+      ln -sf ${config.vars.nixDir}/config/waybar ${config.xdg.configHome}
+      ln -sf ${config.vars.nixDir}/config/wlogout ${config.xdg.configHome}
+      ln -sf ${config.vars.nixDir}/config/swappy ${config.xdg.configHome}
+      ln -sf ${config.vars.nixDir}/config/gtk.css ${config.xdg.configHome}
+      ln -sf ${config.vars.nixDir}/config/icons ${config.xdg.configHome}
+    '';
+    activation.scripts = lib.mkAfter ''
+      ln -sf ${config.vars.nixDir}/scripts/* ${config.home.homeDirectory}/.local/bin/
     '';
   };
 

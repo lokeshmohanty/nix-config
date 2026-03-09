@@ -1,0 +1,43 @@
+#!/usr/bin/env fish
+
+set subcommand $argv[1]
+set folder (realpath (pwd))
+set dry_run false
+
+for arg in $argv[2..]
+    if test $arg = --dry-run
+        set dry_run true
+    else
+        set folder (realpath $arg)
+    end
+end
+
+switch $subcommand
+    case syncthing
+        if test $dry_run = true
+            echo "[dry run] Would rename syncthing conflict files in: $folder"
+        else
+            echo "Renaming syncthing conflict files in: $folder"
+        end
+
+        find $folder -type f -name "*.sync-conflict-*" | while read -l f
+            set new_name (string replace -r '\.sync-conflict-[\d]+-[\d]+-[A-Z0-9]+' '' (basename $f))
+            set new_path (dirname $f)/$new_name
+            if test $dry_run = true
+                echo "[dry run] "(basename $f) → $new_name
+            else
+                echo (basename $f) → $new_name
+                mv $f $new_path
+            end
+        end
+        echo "Done."
+
+    case '*'
+        echo "Usage: fixes.sh <subcommand> [folder] [--dry-run]"
+        echo ""
+        echo "Subcommands:"
+        echo "  syncthing   Rename syncthing conflict files (*.sync-conflict-*) recursively"
+        echo ""
+        echo "Options:"
+        echo "  --dry-run   Preview changes without renaming"
+end
