@@ -67,8 +67,12 @@ ls  = "zk edit --interactive"
 lst = "zk edit --interactive --tag $argv"
 lsj = 'zk edit "$ZK_NOTEBOOK_DIR/journal" --sort created- --interactive'
 lss = 'zk edit "$ZK_NOTEBOOK_DIR/standup" --sort created- --interactive'
+lsi = 'zk edit "$ZK_NOTEBOOK_DIR/ideas" --sort created- --interactive'
+lsn = 'zk edit "$ZK_NOTEBOOK_DIR/notes" --sort created- --interactive'
+lsb = 'zk edit "$ZK_NOTEBOOK_DIR/backlog" --sort created- --interactive'
 ni  = 'zk new --no-input "$ZK_NOTEBOOK_DIR/ideas" --title "$argv"'
 nn  = 'zk new --no-input "$ZK_NOTEBOOK_DIR/notes" --title "$argv"'
+nb  = 'zk new --no-input "$ZK_NOTEBOOK_DIR/backlog" --title "$argv"'
 rm  = "zk list --interactive --quiet --format path --delimiter0 $argv | xargs -0 rm -vf --"
 
 standup = "zk new --no-input \"$ZK_NOTEBOOK_DIR/standup\""

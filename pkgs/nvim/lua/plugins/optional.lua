@@ -26,13 +26,6 @@ require('lze').load({
       })
     end,
   }, {
-    "org-bullets",
-    ft = "orgmode",
-    after = function(_)
-      vim.cmd.packadd("org-bullets")
-      require("org-bullets").setup()
-    end,
-  }, {
     "flash.nvim",
     keys = {
       { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },

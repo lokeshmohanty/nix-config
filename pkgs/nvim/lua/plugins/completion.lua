@@ -11,18 +11,12 @@ require("blink.cmp").setup({
   sources = {
     default = { 'lsp', 'path', 'snippets', 'buffer' },
     per_filetype = {
-      org = { 'orgmode' },
       codecompanion = { "codecompanion" },
     },
     providers = {
       path = { score_offset = 50, },
       lsp = { score_offset = 40, },
       snippets = { score_offset = 40, },
-      orgmode = {
-        name = 'Orgmode',
-        module = 'orgmode.org.autocompletion.blink',
-        fallbacks = { 'buffer' },
-      },
     },
   },
 })

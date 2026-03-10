@@ -26,10 +26,6 @@
       url = "github:sschleemilch/slimline.nvim";
       flake = false;
     };
-    "plugins-org-bullets" = {
-      url = "github:nvim-orgmode/org-bullets.nvim";
-      flake = false;
-    };
     "plugins-himalaya-ui" = {
       url = "github:aliyss/vim-himalaya-ui";
       flake = false;

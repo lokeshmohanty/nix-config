@@ -1122,22 +1122,6 @@
         "type": "github"
       }
     },
-    "plugins-org-bullets": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1737617809,
-        "narHash": "sha256-/l8IfvVSPK7pt3Or39+uenryTM5aBvyJZX5trKNh0X0=",
-        "owner": "nvim-orgmode",
-        "repo": "org-bullets.nvim",
-        "rev": "21437cfa99c70f2c18977bffd423f912a7b832ea",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nvim-orgmode",
-        "repo": "org-bullets.nvim",
-        "type": "github"
-      }
-    },
     "plugins-slimline": {
       "flake": false,
       "locked": {
@@ -1191,7 +1175,6 @@
         "nixpkgs": "nixpkgs_8",
         "plugins-everforest": "plugins-everforest",
         "plugins-himalaya-ui": "plugins-himalaya-ui",
-        "plugins-org-bullets": "plugins-org-bullets",
         "plugins-slimline": "plugins-slimline",
         "stylix": "stylix"
       }

@@ -83,8 +83,6 @@ let
 
           vimtex
 
-          orgmode
-          org-roam-nvim
           zk-nvim
 
           nvim-lint
@@ -107,7 +105,6 @@ let
           typst-preview-nvim
 
           nvim-dap-python
-          pkgs.neovimPlugins.org-bullets
 
           grug-far-nvim
           gx-nvim
