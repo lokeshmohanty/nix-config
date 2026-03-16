@@ -34,6 +34,13 @@ filename = "{{ format-date now }}"
 extension = "md"
 template = "standup.md"
 
+[group.articles]
+paths = ["articles"]
+
+[group.articles.note]
+extension = "md"
+template = "articles.md"
+
 [tool]
 editor = "vi"
 shell = "fish"
@@ -73,6 +80,7 @@ lsb = 'zk edit "$ZK_NOTEBOOK_DIR/backlog" --sort created- --interactive'
 ni  = 'zk new --no-input "$ZK_NOTEBOOK_DIR/ideas" --title "$argv"'
 nn  = 'zk new --no-input "$ZK_NOTEBOOK_DIR/notes" --title "$argv"'
 nb  = 'zk new --no-input "$ZK_NOTEBOOK_DIR/backlog" --title "$argv"'
+na  = 'zk new --no-input "$ZK_NOTEBOOK_DIR/articles" --title "$argv"'
 rm  = "zk list --interactive --quiet --format path --delimiter0 $argv | xargs -0 rm -vf --"
 
 standup = "zk new --no-input \"$ZK_NOTEBOOK_DIR/standup\""
