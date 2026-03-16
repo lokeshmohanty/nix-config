@@ -95,6 +95,12 @@
       ln -sf ${config.vars.nixDir}/config/gtk.css ${config.xdg.configHome}
       ln -sf ${config.vars.nixDir}/config/icons ${config.xdg.configHome}
     '';
+    activation.niri = lib.mkAfter ''
+      ln -sf ${config.vars.nixDir}/config/niri ${config.xdg.configHome}
+    '';
+    activation.noctalia = lib.mkAfter ''
+      ln -sf ${config.vars.nixDir}/config/noctalia ${config.xdg.configHome}
+    '';
     activation.scripts = lib.mkAfter ''
       ln -sf ${config.vars.nixDir}/scripts/* ${config.home.homeDirectory}/.local/bin/
     '';

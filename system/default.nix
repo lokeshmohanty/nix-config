@@ -15,6 +15,7 @@
     # inputs.hardware.nixosModules.common-ssd
 
     ../variables.nix
+    ./desktop-environment
 
     # You can also split up your configuration and import pieces of it here:
     ./packages.nix
@@ -22,7 +23,6 @@
     ./gaming.nix
     ./services.nix
     ./programs.nix
-    ./desktop-environment.nix
     ./fonts.nix
     ./ssh.nix
     ./virtualisation.nix

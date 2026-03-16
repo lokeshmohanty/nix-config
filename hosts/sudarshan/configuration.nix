@@ -18,6 +18,8 @@
 
   networking.hostName = "sudarshan";
   gaming.enable = true;
+  desktop.niri.enable = true;
+  desktop.hyprland.enable = true;
 
   powerManagement.enable = true;
   services.thermald.enable = true;

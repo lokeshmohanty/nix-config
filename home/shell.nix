@@ -12,6 +12,12 @@
     };
     zoxide.enable = true;
     starship.enable = true;
+    starship.presets = [
+      # "tokyo-night"
+      # "gruvbox-rainbow"
+      # "jetpack"
+      # "no-runtime-versions"
+    ];
     yazi = {
       enable = true;
       settings = {
@@ -22,20 +28,6 @@
           sort_reverse = true;
         };
       };
-      plugins =
-        let
-          # nix-prefetch-github <owner> <repo>
-          yazi-plugins = pkgs.fetchFromGitHub {
-            owner = "yazi-rs";
-            repo = "plugins";
-            rev = "2bf70d880e02db95394de360668325b46f804791";
-            hash = "sha256-0A5UVbrP9+GRvX14VQm4Yxw+P9Ca5gtlk9qkLCVf5+Q=";
-          };
-        in
-        {
-          # chmod = "${yazi-plugins}/chmod.yazi";
-          # smart-enter = "${yazi-plugins}/smart-enter.yazi";
-        };
       keymap = {
         mgr.prepend_keymap = [
           {
@@ -45,18 +37,13 @@
             '';
             desc = "Drag and drop";
           }
-          # {
-          #   on = ["l"];
-          #   run = "plugin smart-enter";
-          #   desc = "Enter the child directory, or open the file";
-          # }
         ];
       };
     };
-    direnv = {
-      enable = true;
-      nix-direnv.enable = true;
-    };
+    # direnv = {
+    #   enable = true;
+    #   nix-direnv.enable = true;
+    # };
   };
   programs.nushell = {
     enable = true;

@@ -19,7 +19,7 @@
     environment.systemPackages = with pkgs; [
       mangohud
       lutris
-      heroic
+      # heroic
     ];
   };
 }
