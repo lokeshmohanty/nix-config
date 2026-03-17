@@ -12,22 +12,11 @@
   config = lib.mkIf config.desktop.hyprland.enable {
     environment.systemPackages = with pkgs; [
       xdg-desktop-portal-hyprland
-
-      waybar
-      swaybg
-      waypaper
-      brightnessctl
-      networkmanagerapplet
-
-      swappy
-      swayidle
-      swaylock-effects
-      wlogout
-      hyprpicker
-
       hyprpolkitagent
+      hyprshot # required by noctalia for screenshot
     ];
 
+    programs.xwayland.enable = true;
     programs.hyprland =
       let
         hypr = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system};

@@ -52,7 +52,5 @@
     '';
   };
   services.tailscale.enable = true;
-
-  services.blueman.enable = true;
   services.flatpak.enable = true;
 }

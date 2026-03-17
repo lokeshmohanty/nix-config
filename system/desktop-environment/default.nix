@@ -28,6 +28,7 @@
     xdg-desktop-portal
     xdg-desktop-portal-gtk
 
+    brightnessctl
     pinentry-qt
     jmtpfs
     dunst
@@ -37,6 +38,11 @@
     pamixer
     wlr-randr
     ntfs3g
+
+    # screenshot
+    grim
+    slurp
+    satty
 
     graphviz
     qt5.qtwayland

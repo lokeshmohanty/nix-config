@@ -132,16 +132,6 @@
   };
   programs.nix-index.enable = true;
 
-  services.gammastep = {
-    enable = true;
-    temperature = {
-      day = 5000;
-      night = 2500;
-    };
-    latitude = 13.0;
-    longitude = 77.5;
-  };
-
   # dconf.settings = {
   #   "org/virt-manager/virt-manager/connections" = {
   #     autoconnect = [ "qemu:///system" ];

@@ -2,7 +2,7 @@
   "useCustomColors": false,
   "showNumbers": true,
   "forceMegabytes": false,
-  "arrowType": "chevron",
+  "arrowType": "fold",
   "minWidth": 100,
   "byteThresholdActive": 1024,
   "fontSizeModifier": 1,

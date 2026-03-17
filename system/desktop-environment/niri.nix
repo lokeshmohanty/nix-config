@@ -14,7 +14,6 @@
     environment.systemPackages = with pkgs; [
       xdg-desktop-portal-gnome
       xwayland-satellite
-      swappy
     ];
     programs.niri = {
       enable = true;

@@ -36,7 +36,7 @@ input {
         // drag false
         // drag-lock
         natural-scroll
-        accel-speed 0.5
+        accel-speed 0.8
         // accel-profile "flat"
         // scroll-method "two-finger"
         // disabled-on-external-mouse
@@ -45,7 +45,7 @@ input {
     mouse {
         // off
         // natural-scroll
-        accel-speed 0.5
+        accel-speed 0.8
         // accel-profile "flat"
         // scroll-method "no-scroll"
     }
@@ -111,7 +111,7 @@ input {
 // https://yalter.github.io/niri/Configuration:-Layout
 layout {
     // Set gaps around windows in logical pixels.
-    gaps 20
+    gaps 10
 
     // When to center a column when changing focus, options are:
     // - "never", default behavior, focusing an off-screen column will keep at the left
@@ -121,7 +121,7 @@ layout {
     //   together with the previously focused column.
     center-focused-column "never"
 
-    always-center-single-column
+    // always-center-single-column
 
     // You can customize the widths that "switch-preset-column-width" (Mod+R) toggles between.
     preset-column-widths {
@@ -161,7 +161,7 @@ layout {
         // off
 
         // How many logical pixels the ring extends out from the windows.
-        width 1
+        width 2
 
         // Colors can be set in a variety of ways:
         // - CSS named colors: "red"
@@ -178,18 +178,14 @@ layout {
 
         // You can also use gradients. They take precedence over solid colors.
         // Gradients are rendered the same as CSS linear-gradient(angle, from, to).
-        // The angle is the same as in linear-gradient, and is optional,
-        // defaulting to 180 (top-to-bottom gradient).
-        // You can use any CSS linear-gradient tool on the web to set these up.
-        // Changing the color space is also supported, check the wiki for more info.
         //
-        // active-gradient from="#80c8ff" to="#c7ff7f" angle=45
+        // active-gradient from="rgba(47,37,31,1)" to="rgba(84,127,158,1)" angle=45
 
         // You can also color the gradient relative to the entire view
         // of the workspace, rather than relative to just the window itself.
         // To do that, set relative-to="workspace-view".
         //
-        // inactive-gradient from="#505050" to="#808080" angle=45 relative-to="workspace-view"
+        // inactive-gradient from="rgba(79,58,94,170)" to="rgba(79,58,94,170)" relative-to="workspace-view"
     }
 
     // You can also add a border. It's similar to the focus ring, but always visible.
@@ -301,10 +297,7 @@ window-rule {
 
 // Open the Firefox picture-in-picture player as floating by default.
 window-rule {
-    // This app-id regular expression will work for both:
-    // - host Firefox (app-id is "firefox")
-    // - Flatpak Firefox (app-id is "org.mozilla.firefox")
-    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
+    match title="^(nwg-displays|Open File|satty|Picture-in-Picture|Qalculate!)$"
     open-floating true
 }
 
@@ -319,13 +312,27 @@ window-rule {
     // Use this instead if you want them visible on third-party screenshot tools.
     // block-out-from "screencast"
 }
+// window-rule {
+//     opacity 0.8  # Adjust to your preferred inactive level
+// }
+//
+// window-rule {
+//     match is-focused=true
+//     opacity 1.0  # Keep the focused window fully opaque
+// }
 
 // Example: enable rounded corners for all windows.
 // (This example rule is commented out with a "/-" in front.)
 window-rule {
-    geometry-corner-radius 4
+    geometry-corner-radius 5
     clip-to-geometry true
     draw-border-with-background false
+    opacity 0.8
+}
+
+window-rule {
+    match is-focused=true
+    opacity 0.9
 }
 
 binds {
@@ -361,9 +368,10 @@ binds {
     Mod+D { spawn-sh "noctalia-shell ipc call launcher toggle"; } // >settings, ...
     Mod+Q { spawn-sh "noctalia-shell ipc call sessionMenu toggle"; }
     Mod+Shift+S { spawn-sh "noctalia-shell ipc call settings toggle"; } // >settings, ...
+    Mod+Shift+W { spawn-sh "noctalia-shell ipc call wallpaper toggle"; }
     Mod+Shift+B { spawn "qutebrowser"; }
 
-    Print { spawn-sh "grim -g \"$(slurp)\" - | swappy -f -"; }
+    Print { spawn-sh "grim -g \"$(slurp)\" - | satty -f -"; }
     Ctrl+Print { screenshot-screen; }
     Alt+Print { screenshot-window; }
     Shift+Print {
