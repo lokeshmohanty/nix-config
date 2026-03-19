@@ -58,6 +58,7 @@
     gnumake
     gcc
     nodejs
+    lua
     # cmakeWithGui
     # shellcheck
     # quarto

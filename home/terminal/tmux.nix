@@ -34,7 +34,7 @@
       bind -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel
 
       # for image support in yazi
-      set -g allow-passthrough all
+      set -g allow-passthrough on
       set -ga update-environment TERM
       set -ga update-environment TERM_PROGRAM
     '';
