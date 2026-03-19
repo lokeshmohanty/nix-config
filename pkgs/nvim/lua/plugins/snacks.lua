@@ -8,6 +8,7 @@ require("snacks").setup({
   notifier = {},  -- notifications and history
   input = {},
   indent = {},    -- shows a vertical line for the curent indent scope
+  image = {},
   scratch = {},
 })
 

@@ -48,6 +48,7 @@ let
           tree-sitter # for treesitter
           trashy # for Snacks.Explorer
           mermaid-cli
+          imagemagick # for Snacks.Image
           ghostscript # for Snacks.Image
         ];
       };

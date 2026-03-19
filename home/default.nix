@@ -49,7 +49,6 @@
       # tui applications
       # lazygit lazysql lazydocker
 
-      imagemagick
       pandoc
       pass
       rclone
