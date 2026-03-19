@@ -63,6 +63,9 @@ git update-index --skip-worktree ./config/hypr/workspaces.conf
 git ls-files -v . | grep ^S
 ```
 
+# Tips
+
+- Use `nix-prefetch-github` to get the `rev` and `hash` information required for `fetchFromGithub`
 
 # References
 

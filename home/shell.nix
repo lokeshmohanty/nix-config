@@ -99,11 +99,12 @@
     plugins = [
       {
         name = "bass";
-        src = pkgs.fishPlugins.bass;
-      }
-      {
-        name = "colored-man-output";
-        src = pkgs.fishPlugins.colored-man-pages.src;
+        src = pkgs.fetchFromGitHub {
+          owner = "edc";
+          repo = "bass";
+          rev = "79b62958ecf4e87334f24d6743e5766475bcf4d0";
+          sha256 = "3d/qL+hovNA4VMWZ0n1L+dSM1lcz7P5CQJyy+/8exTc=";
+        };
       }
       {
         name = "autopair";

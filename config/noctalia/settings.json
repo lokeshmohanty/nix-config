@@ -41,7 +41,7 @@
     "bar": {
         "autoHideDelay": 500,
         "autoShowDelay": 150,
-        "backgroundOpacity": 0.85,
+        "backgroundOpacity": 0.8,
         "barType": "floating",
         "capsuleColorKey": "none",
         "capsuleOpacity": 0.9500000000000001,
@@ -74,7 +74,7 @@
         "showCapsule": true,
         "showOnWorkspaceSwitch": true,
         "showOutline": false,
-        "useSeparateOpacity": true,
+        "useSeparateOpacity": false,
         "widgetSpacing": 6,
         "widgets": {
             "center": [
@@ -647,7 +647,7 @@
         "fontDefaultScale": 1,
         "fontFixed": "Cascadia Mono",
         "fontFixedScale": 1,
-        "panelBackgroundOpacity": 0.91,
+        "panelBackgroundOpacity": 0.79,
         "panelsAttachedToBar": true,
         "scrollbarAlwaysVisible": true,
         "settingsPanelMode": "attached",
