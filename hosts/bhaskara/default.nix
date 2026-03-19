@@ -3,9 +3,6 @@
   inputs,
   ...
 }:
-let
-  pkgs-with-overlay = inputs.nixpkgs.legacyPackages.x86_64-linux.extend inputs.nix-openclaw.overlays.default;
-in
 {
   flake.nixosConfigurations = {
     bhaskara = inputs.nixpkgs.lib.nixosSystem {
@@ -22,9 +19,8 @@ in
   };
   flake.homeConfigurations = {
     "lokesh@bhaskara" = inputs.home-manager.lib.homeManagerConfiguration {
-      pkgs = pkgs-with-overlay;
       extraSpecialArgs = { inherit inputs self; };
-      modules = [ inputs.nix-openclaw.homeManagerModules.openclaw ./home.nix ];
+      modules = [ ./home.nix ];
     };
   };
 }
