@@ -1,6 +1,7 @@
 require('mini.starter').setup()
 require('mini.icons').setup()
 require('mini.align').setup()
+require('mini.indentscope').setup()
 
 -------------------------------------
 -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren

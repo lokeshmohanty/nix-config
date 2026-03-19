@@ -1,4 +1,4 @@
-require('lze').load({
+return {
   {
     "gx",
     cmd = { "Browse" },
@@ -66,4 +66,4 @@ require('lze').load({
       vim.g.undotree_SplitWidth = 40
     end,
   }
-})
+}

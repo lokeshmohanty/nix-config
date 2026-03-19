@@ -10,7 +10,6 @@ vim.api.nvim_create_autocmd("FileType", {
 			heading = {
 				icons = { "󰎤 ", "󰎧 ", "󰎪 ", "󰎭 ", "󰎱 ", "󰎳 " },
 			},
-			-- completions = { blink = { enabled = true } },
 		})
 	end,
 })

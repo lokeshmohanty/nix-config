@@ -8,13 +8,31 @@ require("snacks").setup({
   notifier = {},  -- notifications and history
   input = {},
   indent = {},    -- shows a vertical line for the curent indent scope
-  image = {},
   scratch = {},
+  image = {
+    enabled = true,
+    doc = {
+      inline = false,
+      float = true,
+      max_width = 60,
+      max_height = 30,
+    },
+  },
 })
 
 -- [[ Picker Keymaps ]]
 vim.keymap.set('n', "<leader><space>", function() Snacks.picker.smart() end, { desc = "Smart Picker" })
-vim.keymap.set('n', "<leader>b", function() Snacks.picker.buffers() end, { desc = "Buffers" })
+
+vim.keymap.set('n', "<leader>b", function()
+  Snacks.picker.buffers({
+    on_show = function()
+      vim.cmd.stopinsert()
+    end,
+    sort_lastused = true,
+    win = { input = { keys = { ["d"] = "bufdelete"}}}
+  })
+end, { desc = "Buffers" })
+
 vim.keymap.set('n', "<leader>/", function() Snacks.picker.grep() end, { desc = "Grep" })
 vim.keymap.set('n', "<leader>e", function() Snacks.explorer() end, { desc = "File Explorer" })
 -- find
