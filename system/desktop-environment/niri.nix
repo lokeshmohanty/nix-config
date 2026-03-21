@@ -12,12 +12,15 @@
   };
   config = lib.mkIf config.desktop.niri.enable {
     nixpkgs.overlays = [ inputs.niri.overlays.niri ];
+    environment.sessionVariables.GDK_BACKEND = "wayland";
     environment.systemPackages = with pkgs; [
       xdg-desktop-portal-gnome
       xwayland-satellite-unstable
       cage # wayland kiosk
       libsecret
     ];
+    xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gnome ];
+    xdg.portal.config.common.default = "gnome";
     programs.niri = {
       enable = true;
       package = pkgs.niri-unstable;

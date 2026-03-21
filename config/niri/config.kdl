@@ -336,6 +336,7 @@ binds {
     // or do a four-finger swipe up on a touchpad.
     Mod+O repeat=false { toggle-overview; }
     Mod+X repeat=false { close-window; }
+    Mod+Shift+X { spawn-sh "niri msg pick-window | rg PID | cut -d':' -f2 | xargs kill"; }
     Mod+Shift+E { quit; }
     Ctrl+Alt+Delete { quit; }
 

@@ -15,6 +15,7 @@
       hyprpolkitagent
       hyprshot # required by noctalia for screenshot
     ];
+    xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
 
     programs.xwayland.enable = true;
     programs.hyprland =

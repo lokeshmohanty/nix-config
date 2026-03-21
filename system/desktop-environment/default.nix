@@ -20,13 +20,10 @@
   xdg.portal = {
     enable = true;
     xdgOpenUsePortal = true;
-    config.common.default = [ "gtk" ];
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
 
   environment.systemPackages = with pkgs; [
     xdg-desktop-portal
-    xdg-desktop-portal-gtk
 
     brightnessctl
     pinentry-qt
