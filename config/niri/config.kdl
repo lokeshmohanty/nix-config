@@ -356,6 +356,9 @@ binds {
     Mod+Shift+S { spawn-sh "noctalia-shell ipc call settings toggle"; } // >settings, ...
     Mod+Shift+W { spawn-sh "noctalia-shell ipc call wallpaper toggle"; }
     Mod+Shift+B { spawn "qutebrowser"; }
+    Mod+I { spawn "~/.config/niri/my-bookmark" "list"; }
+    Mod+Shift+I { spawn "~/.config/niri/my-bookmark" "commands"; }
+
 
     Print { spawn-sh "grim -g \"$(slurp)\" - | satty -f -"; }
     Ctrl+Print { screenshot-screen; }

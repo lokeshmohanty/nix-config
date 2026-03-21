@@ -32,6 +32,7 @@
     libnotify
     wl-clipboard
     wl-screenrec
+    wtype
     pamixer
     wlr-randr
     ntfs3g
@@ -39,7 +40,8 @@
     # screenshot
     grim
     slurp
-    satty
+    satty # configured in home-manager
+    tesseract
 
     graphviz
     qt5.qtwayland

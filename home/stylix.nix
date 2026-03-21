@@ -46,6 +46,7 @@
       enable = true;
       targets = {
         firefox.enable = false;
+        tofi.enable = false;
       };
       polarity = "dark";
       # opacity = {

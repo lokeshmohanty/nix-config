@@ -18,6 +18,8 @@
       xwayland-satellite-unstable
       cage # wayland kiosk
       libsecret
+      tofi # configured in home-manager
+      wtype
     ];
     xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gnome ];
     xdg.portal.config.common.default = "gnome";

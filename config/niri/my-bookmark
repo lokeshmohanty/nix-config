@@ -1,0 +1,35 @@
+#!/usr/bin/env sh
+
+file="$HOME/.local/bookmarks.txt"
+
+add() {
+  bookmark="$(wl-copy -o)"
+
+  if grep -q "^$bookmark$" "$file"; then
+    notify-send "Already bookmarked!"
+  else
+    echo "$bookmark" >> "$file"
+  fi
+}
+
+list() {
+  wtype "$(grep -v 'A#' "$file" | tofi --prompt-text 'bookmark: ')"
+}
+
+commands() {
+  command="$(printf "add\nlist\nview" | tofi --prompt-text 'command: ')"
+  case "$command" in
+    add)  add ;;
+    list) list ;;
+    view) kitty --single-instance vi "$file" ;;
+    *)    notify-send "Usage: $0 {add|list}" ;;
+  esac
+}
+
+case "$1" in
+  add)  add ;;
+  list) list ;;
+  view) kitty --single-instance vi "$file" ;;
+  commands) commands ;;
+  *)    echo "Usage: $0 {add|list}" ;;
+esac

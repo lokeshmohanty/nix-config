@@ -12,7 +12,9 @@
     ./terminal
     ./browser
     ./editor.nix
-    ./launcher.nix
+    # ./rofi.nix
+    ./tofi.nix
+    ./satty.nix
     ./shell.nix
     ./xdg.nix
     ./stylix.nix
