@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-# Required: gpu-screen-recorder, tofi, slurp
+# Required: gpu-screen-recorder, tofi, slurp, pkill
 
 DIRECTORY="$HOME/Videos/Recordings"
 FILENAME="$DIRECTORY/$(date +%Y%m%d_%H%M%S)"
@@ -49,17 +49,19 @@ camera() {
 }
 
 commands() {
-  command="$(printf "portal\narea\ncamera" | tofi --prompt-text 'command: ')"
+  command="$(printf "portal\narea\ncamera\nstop-existing" | tofi --prompt-text 'command: ')"
   case "$command" in
     portal) record ;;
     area)   REGION=1; record ;;
     camera) camera ;;
+    stop-existing) pkill -SIGUSR1 -f gpu-screen-recorder ;;
     *)      notify-send "Usage: $0 {record|camera}" ;;
   esac
 }
 
 if [ -f "$PID_FILE" ]; then
-  kill "$(cat "$PID_FILE")"
+  kill -SIGUSR1 "$(cat "$PID_FILE")"
+  # pkill -SIGUSR1 -f gpu-screen-recorder
   rm "$PID_FILE"
   notify-send "Recording stopped"
 else

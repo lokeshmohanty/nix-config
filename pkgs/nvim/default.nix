@@ -81,6 +81,7 @@ let
           img-clip-nvim
           copilot-lua
           codecompanion-nvim
+          claudecode-nvim
 
           vimtex
 
