@@ -40,6 +40,7 @@
       # enable scrolling in git diff
       DELTA_PAGER = "less -R";
       TERM = "xterm-256color";
+      NIXCONFIG = config.vars.nixDir; 
     };
     packages = with pkgs; [
       # Misc

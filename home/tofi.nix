@@ -1,8 +1,8 @@
-{
+{ config, ... }: {
   programs.tofi = {
     enable = true;
     settings = {
-      font = "Cascadia Code";
+      font = config.vars.fontName;
       font-size = "16";
       width = "100%";
       height = "100%";

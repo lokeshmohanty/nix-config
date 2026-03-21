@@ -1,6 +1,4 @@
-{ config, lib, ... }:
-with lib;
-{
+{ config, lib, ... }: with lib; {
   options.vars = rec {
     username = mkOption {
       type = types.str;
@@ -11,6 +9,11 @@ with lib;
       type = types.str;
       default = "/home/${config.vars.username}/.nix";
       description = "Path to the NixOS configuration directory";
+    };
+    fontName = mkOption {
+      type = types.str;
+      default = "Cascadia Code";
+      description = "Main font name";
     };
   };
 }
