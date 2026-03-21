@@ -1,0 +1,74 @@
+#!/usr/bin/env sh
+
+# Required: gpu-screen-recorder, tofi, slurp
+
+DIRECTORY="$HOME/Videos/Recordings"
+FILENAME="$DIRECTORY/$(date +%Y%m%d_%H%M%S)"
+PID_FILE="/tmp/my-recorder.pid"
+
+record() {
+  mkdir -p "$DIRECTORY"
+
+  set -- -f 60 -k hevc -bm qp -q high -fm content -c mkv
+
+  # Set screen area or portal
+  if [ "$REGION" ]; then
+    set -- -w "$(slurp | awk -F'[, ]' '{print $3"+"$1"+"$2}')" "$@"
+  else
+    set -- -w portal "$@"
+  fi
+
+  # Choose audio
+  AUDIO="$(printf "input\noutput\nno" | tofi --prompt-text 'audio: ')"
+  if [ "$AUDIO" != "no" ] && [ -n "$AUDIO" ]; then
+    set -- "$@" -a "default_${AUDIO}"
+  fi
+
+  # Record replay buffer
+  if [ "$REPLAY_BUFFER" ]; then
+    set -- "$@" -r 60 -ro "$DIRECTORY/replays"
+  else
+    set -- "$@" -o "${FILENAME}.mkv"
+  fi
+
+  # Final command with args
+  gpu-screen-recorder "$@" & echo $! > "$PID_FILE"
+  wl-copy "${FILENAME}.mkv"
+}
+
+camera() {
+  # Open a window with camera input
+  mpv --no-cache --untimed --no-demuxer-thread \
+    --vd-lavc-threads=1 --profile=low-latency \
+    --title="camera-overlay" \
+    --wayland-app-id="camera-overlay" \
+    --geometry=320x240+20+20 \
+    --on-all-workspaces \
+    --ontop \
+    av://v4l2:/dev/video0 &
+}
+
+commands() {
+  command="$(printf "portal\narea\ncamera" | tofi --prompt-text 'command: ')"
+  case "$command" in
+    portal) record ;;
+    area)   REGION=1; record ;;
+    camera) camera ;;
+    *)      notify-send "Usage: $0 {record|camera}" ;;
+  esac
+}
+
+if [ -f "$PID_FILE" ]; then
+  kill "$(cat "$PID_FILE")"
+  rm "$PID_FILE"
+  notify-send "Recording stopped"
+else
+  case "$1" in
+    portal)   record ;;
+    area)     REGION=1; record ;;
+    replay)   REPLAY_BUFFER=1; record ;;
+    camera)   camera ;;
+    commands) commands ;;
+    *)        echo "Usage: $0 {portal|area|replay|camera}" ;;
+  esac
+fi

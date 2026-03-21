@@ -14,8 +14,9 @@
   services.power-profiles-daemon.enable = true;
   services.upower.enable = true;
 
+  programs.gpu-screen-recorder.enable = true;
   programs.nautilus-open-any-terminal.enable = true;
-  programs.nautilus-open-any-terminal.terminal = "${pkgs.kitty}/bin/kitty";
+  programs.nautilus-open-any-terminal.terminal = "${pkgs.kitty}/bin/kitty --single-instance";
   services.gnome.sushi.enable = true; # nautilus file previewer
   xdg.portal = {
     enable = true;
