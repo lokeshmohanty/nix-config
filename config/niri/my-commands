@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+
+labels() {
+  printf '%s\n' \
+    "Restart Noctalia"
+}
+
+run() {
+  case "$1" in
+    "Restart Noctalia") noctalia-shell kill; noctalia-shell & ;;
+  esac
+}
+
+selection="$(labels | tofi --prompt-text 'run: ')"
+[ -n "$selection" ] && run "$selection"
