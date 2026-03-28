@@ -2,7 +2,8 @@
 {
   home.packages = with pkgs; [
     exiftool # Read and write meta information in files
-    nix-your-shell # use fish in nix develop / nix shell ...
+    # nix-your-shell # use fish in nix develop / nix shell ...
+    jc jtbl
   ];
   home.shell.enableShellIntegration = true;
   programs = {
@@ -11,13 +12,13 @@
       tmux.enableShellIntegration = true;
     };
     zoxide.enable = true;
-    starship.enable = true;
-    starship.presets = [
-      # "tokyo-night"
-      # "gruvbox-rainbow"
-      # "jetpack"
-      # "no-runtime-versions"
-    ];
+    # starship.enable = true;
+    # starship.presets = [
+    #   # "tokyo-night"
+    #   "gruvbox-rainbow"
+    #   # "jetpack"
+    #   # "no-runtime-versions"
+    # ];
     yazi = {
       enable = true;
       settings = {
@@ -45,13 +46,18 @@
     #   nix-direnv.enable = true;
     # };
   };
-  programs.nushell = {
+  # programs.bash = {
+  #   enable = true;
+  #   enableVteIntegration = true;
+  # };
+  programs.zsh = {
     enable = true;
-    configFile.text = ''
-      $env.config = {
-        edit_mode: vi
-      }
-    '';
+    enableVteIntegration = true;
+    autosuggestion.enable = true;
+    defaultKeymap = "viins";
+    zsh-abbr.enable = true;
+    zsh-abbr.abbreviations = { d = "docker"; };
+    zsh-abbr.globalAbbreviations = { G = "| rg"; L = "| less -R"; };
   };
   programs.fish = {
     enable = true;
@@ -59,9 +65,7 @@
       set fish_greeting
       fish_vi_key_bindings
 
-      if command -q nix-your-shell
-        nix-your-shell fish | source
-      end
+      ${pkgs.nix-your-shell}/bin/nix-your-shell fish | source
     '';
     shellAbbrs = {
       e = "emacsclient -c -a 'nvim'";
@@ -95,8 +99,10 @@
     };
     functions = {
       gitignore = "curl -sL https://www.gitignore.io/api/$argv";
+      tab = "jc -l $argv | jtbl";
     };
-    plugins = [
+    preferAbbrs = true;
+    plugins = [ 
       {
         name = "bass";
         src = pkgs.fetchFromGitHub {
@@ -107,9 +113,21 @@
         };
       }
       {
+        name = "tide";
+        src = pkgs.fishPlugins.tide.src;
+      }
+      {
         name = "autopair";
         src = pkgs.fishPlugins.autopair.src;
       }
     ];
+  };
+  programs.nushell = {
+    enable = true;
+    configFile.text = ''
+      $env.config = {
+        edit_mode: vi
+      }
+    '';
   };
 }

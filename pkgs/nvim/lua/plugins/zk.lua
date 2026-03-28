@@ -2,6 +2,7 @@ return {
   "zk",
   ft = "markdown",
   after = function()
+    vim.cmd.packadd("zk-nvim")
     require("zk").setup({
       picker = "snacks_picker",
       lsp = {

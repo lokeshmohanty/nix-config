@@ -1,5 +1,7 @@
-{ ... }:
+{ pkgs, ... }:
 {
-  imports = [ ../../home ];
-  programs.obs-studio.enable = true;
+  imports = [
+    ../../home
+  ];
+  home.packages = with pkgs; [ slack ];
 }

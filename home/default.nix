@@ -18,7 +18,9 @@
     ./shell.nix
     ./xdg.nix
     ./stylix.nix
+    ./gui.nix
   ];
+  nix.registry.nixpkgs.flake = inputs.nixpkgs;
 
   nixpkgs = {
     overlays = [
@@ -41,8 +43,11 @@
       DELTA_PAGER = "less -R";
       TERM = "xterm-256color";
       NIXCONFIG = config.vars.nixDir; 
+      BROWSER = "firefox";
+      # SHELL = "fish";
     };
     packages = with pkgs; [
+      pulseaudio zbar curl translate-shell wl-screenrec ffmpeg gifski # noctalia screen-toolkit
       # Misc
       tlrc # rust client for tldr
       # cowsay
@@ -50,7 +55,7 @@
       gnumake
 
       # tui applications
-      # lazygit lazysql lazydocker
+      lazygit lazysql lazydocker
 
       pandoc
       pass

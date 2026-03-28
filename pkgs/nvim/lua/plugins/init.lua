@@ -9,9 +9,16 @@ require("plugins.noice")
 
 require("plugins.mini")
 require("plugins.snacks")
-require("plugins.optional")         -- lazy-loaded plugins
 
+require("lze").load(require("plugins.optional"))
 require("lze").load({
   { import = "plugins.zk" },
+  -- {
+  --   "vim-table-mode",
+  --   ft = "markdown",
+  --   after = function(_)
+  --     vim.cmd.packadd("vim-table-mode")
+  --   end,
+  -- },
 })
 

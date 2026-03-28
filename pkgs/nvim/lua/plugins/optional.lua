@@ -35,14 +35,14 @@ return {
       { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
     },
     after = function(_)
-      vim.packadd("flash.nvim")
-      require("flash.nvim").setup()
+      vim.cmd.packadd("flash.nvim")
+      require("flash").setup()
     end,
   }, {
     "bruno.nvim",
     ft = "bruno",
     after = function(_)
-      vim.packadd("bruno.nvim")
+      vim.cmd.packadd("bruno.nvim")
       require("bruno").setup({
         picker = "snacks",
         show_formatted_output = true,
@@ -54,7 +54,7 @@ return {
     cmd = { "HimalayaUI" },
     keys = { { "<leader>H", "<cmd>HimalayaUI<CR>", mode = { "n" }, desc = "HimalayaUI" }, },
     after = function(_)
-      vim.packadd("vim-himalaya-ui")
+      vim.cmd.packadd("vim-himalaya-ui")
       require("himalaya-ui").setup({})
     end,
   }, {

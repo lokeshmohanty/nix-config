@@ -1149,22 +1149,6 @@
         "type": "github"
       }
     },
-    "plugins-himalaya-ui": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1761359744,
-        "narHash": "sha256-usXHM6ISGoLPSQsT0lBaYX9y1bJXjPoRhNath/lKkGg=",
-        "owner": "aliyss",
-        "repo": "vim-himalaya-ui",
-        "rev": "7f84b8174aa781af7bc3c4b9c7e4bb39e20475e2",
-        "type": "github"
-      },
-      "original": {
-        "owner": "aliyss",
-        "repo": "vim-himalaya-ui",
-        "type": "github"
-      }
-    },
     "plugins-slimline": {
       "flake": false,
       "locked": {
@@ -1219,7 +1203,6 @@
         "noctalia": "noctalia",
         "noctalia-qs": "noctalia-qs",
         "plugins-everforest": "plugins-everforest",
-        "plugins-himalaya-ui": "plugins-himalaya-ui",
         "plugins-slimline": "plugins-slimline",
         "stylix": "stylix",
         "sysc-greet": "sysc-greet"

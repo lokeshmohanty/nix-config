@@ -42,10 +42,6 @@
       url = "github:sschleemilch/slimline.nvim";
       flake = false;
     };
-    "plugins-himalaya-ui" = {
-      url = "github:aliyss/vim-himalaya-ui";
-      flake = false;
-    };
     "plugins-everforest" = {
       url = "github:neanias/everforest-nvim";
       flake = false;

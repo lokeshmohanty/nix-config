@@ -73,9 +73,9 @@ require('lze').load {{
     -- Diff management
     { "<leader>aa", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
     { "<leader>ad", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny diff" },
-    after = function(_)
-      -- require("claudecode").setup()
-      -- require("codecompanion").setup()
-    end
   },
+  after = function(_)
+    -- require("claudecode").setup()
+    -- require("codecompanion").setup()
+  end
 }}

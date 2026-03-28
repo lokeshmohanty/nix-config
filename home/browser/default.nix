@@ -1,5 +1,4 @@
 {
-  home.sessionVariables.BROWSER = "firefox";
   programs.firefox.enable = true;
   programs.qutebrowser = {
     enable = true;

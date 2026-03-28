@@ -85,8 +85,6 @@ let
 
           vimtex
 
-          zk-nvim
-
           nvim-lint
           conform-nvim
           nvim-dap
@@ -106,6 +104,9 @@ let
           vim-startuptime
           typst-preview-nvim
 
+          # vim-table-mode # markdown table creator
+          zk-nvim
+
           nvim-dap-python
 
           grug-far-nvim
@@ -113,7 +114,6 @@ let
           flash-nvim # jump
 
           undotree
-          pkgs.neovimPlugins.himalaya-ui
         ];
       };
     };
@@ -133,6 +133,7 @@ let
           suffix-LD = true;
           aliases = [ "vi" ];
           configDirName = "nvim";
+          wrapRC = false;
           hosts.python3.enable = true;
           hosts.node.enable = true;
           hosts.ruby.enable = false;
@@ -143,9 +144,9 @@ let
         };
         extra = { };
       };
-    vi = nvim // {
-      settings.wrapRC = false;
-    };
+    # vi = nvim // {
+    #   settings.wrapRC = false;
+    # };
   };
 
   # We will build the one named nvim here and export that one.

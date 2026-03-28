@@ -3,12 +3,18 @@
 file="$HOME/.local/bookmarks.txt"
 
 add() {
-  bookmark="$(wl-copy -o)"
+  bookmark="${1:-$(wl-paste --primary)}"
+
+  if [ -z "$bookmark" ]; then
+    notify-send "No text selected"
+    return
+  fi
 
   if grep -q "^$bookmark$" "$file"; then
-    notify-send "Already bookmarked!"
+    notify-send "Already bookmarked!: $bookmark"
   else
     echo "$bookmark" >> "$file"
+    notify-send "Bookmarked: $bookmark"
   fi
 }
 
@@ -17,9 +23,11 @@ list() {
 }
 
 commands() {
+  # Read selection before tofi steals focus
+  selection="$(wl-paste --primary)"
   command="$(printf "add\nlist\nview" | tofi --prompt-text 'command: ')"
   case "$command" in
-    add)  add ;;
+    add)  add "$selection" ;;
     list) list ;;
     view) kitty --single-instance vi "$file" ;;
     *)    notify-send "Usage: $0 {add|list}" ;;
