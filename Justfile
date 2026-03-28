@@ -1,3 +1,5 @@
+# Use current shell for all recipes
+set shell := ["fish", "-c"]
 
 # Default command that lists all available commands
 default:
