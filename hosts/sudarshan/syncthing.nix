@@ -9,7 +9,10 @@
     dataDir = "/home/lokesh/.local/syncthing";
     settings = {
       devices.lab.id = "HQ6HDW5-X6C3VWS-CYRV44J-CCYOENZ-BVYZLYN-VSCFQFU-MYXBB56-AC36ZAG";
-      devices.office.id = "ABQJ7BS-BFMPBTG-ONT7GN5-UICS4SX-4F4AFI5-EMVSSNJ-6LA42IQ-SWZCAAJ";
+      devices.office = {
+        id = "ABQJ7BS-BFMPBTG-ONT7GN5-UICS4SX-4F4AFI5-EMVSSNJ-6LA42IQ-SWZCAAJ";
+        addresses = [ "tcp://100.122.114.27:22000" ];
+      };
       folders = {
         "Projects" = {
           path = "/home/lokesh/Projects";
