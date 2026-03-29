@@ -7,7 +7,7 @@ labels() {
 
 run() {
   case "$1" in
-    "Restart Noctalia") noctalia-shell kill; noctalia-shell & ;;
+    "Restart Noctalia") noctalia-shell kill; sleep 1 && noctalia-shell & ;;
   esac
 }
 

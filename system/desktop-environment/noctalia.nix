@@ -14,6 +14,15 @@
     imagemagick # template processing & wallpaper resizing
     brightnessctl # monitor brightness control
 
+    # screen-toolkit plugin
+    pulseaudio
+    zbar
+    curl
+    translate-shell
+    wl-screenrec
+    ffmpeg
+    gifski
+
     inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
   services.gnome.evolution-data-server.enable = true; # calendar events

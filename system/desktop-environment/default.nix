@@ -32,7 +32,6 @@
     dunst
     libnotify
     wl-clipboard
-    wl-screenrec
     wtype
     pamixer
     wlr-randr

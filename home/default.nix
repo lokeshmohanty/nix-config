@@ -47,7 +47,6 @@
       # SHELL = "fish";
     };
     packages = with pkgs; [
-      pulseaudio zbar curl translate-shell wl-screenrec ffmpeg gifski # noctalia screen-toolkit
       # Misc
       tlrc # rust client for tldr
       # cowsay

@@ -75,6 +75,7 @@ vim.keymap.set('n', "<leader>gs", function() Snacks.picker.git_status() end, { d
 vim.keymap.set('n', "<leader>gS", function() Snacks.picker.git_stash() end, { desc = "Git Stash" })
 vim.keymap.set('n', "<leader>gd", function() Snacks.picker.git_diff() end, { desc = "Git Diff (Hunks)"})
 vim.keymap.set('n', "<leader>gf", function() Snacks.picker.git_log_file() end, { desc = "Git Log File" })
+vim.keymap.set('n', "<leader>gG", function() Snacks.lazygit() end, { desc = "Lazy Git Wrapper" })
 -- LSP
 vim.keymap.set('n', "gd", function() Snacks.picker.lsp_definitions() end, { desc = "Goto Definition" })
 vim.keymap.set('n', "gD", function() Snacks.picker.lsp_declarations() end, { desc = "Goto Declaration" })
