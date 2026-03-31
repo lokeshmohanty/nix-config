@@ -319,12 +319,12 @@ window-rule {
     geometry-corner-radius 5
     clip-to-geometry true
     draw-border-with-background false
-    opacity 0.8
+    opacity 0.9
 }
 
 window-rule {
     match is-focused=true
-    opacity 0.9
+    opacity 0.98
 }
 
 binds {

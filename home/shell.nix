@@ -87,6 +87,13 @@
       tl = "tmux list-sessions";
       tk = "tmux kill-session -t";
 
+      # kubernetes
+      k = "kubectl";
+      kg = "kubectl get";
+      kl = "kubectl logs";
+      ke = "kubectl exec -it";
+      kgp = "kubectl get pods";
+
       # nix
       nd = "nix develop";
       nl = "nix-locate";
