@@ -12,6 +12,7 @@
     ./terminal
     ./browser
     ./editor.nix
+    ./email.nix
     # ./rofi.nix
     ./tofi.nix
     ./satty.nix
