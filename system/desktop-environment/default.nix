@@ -49,16 +49,16 @@
     papirus-icon-theme
 
     # howdy
-    pavucontrol          # manage audio
-    nwg-displays         # manage monitors
-    nwg-look             # manage gtk
-    qalculate-qt         # calculator
-    nautilus             # file manager
+    pavucontrol # manage audio
+    nwg-displays # manage monitors
+    nwg-look # manage gtk
+    qalculate-qt # calculator
+    nautilus # file manager
     ffmpegthumbnailer
-    mpv                  # media player
-    imv                  # image viewer
-    gimp                 # image editor
-    kdePackages.okular   # pdf viewer
+    mpv # media player
+    imv # image viewer
+    gimp # image editor
+    kdePackages.okular # pdf viewer
     kdePackages.gwenview # image viewer
     # kdePackages.kdenlive
   ];

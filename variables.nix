@@ -1,4 +1,6 @@
-{ config, lib, ... }: with lib; {
+{ config, lib, ... }:
+with lib;
+{
   options.vars = rec {
     username = mkOption {
       type = types.str;

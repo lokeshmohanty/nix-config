@@ -124,7 +124,10 @@
   };
   users.defaultUserShell = pkgs.fish;
   environment.binsh = "${pkgs.dash}/bin/dash";
-  environment.pathsToLink = [ "/share/bash-completion" "/share/zsh" ]; # required to enable completion
+  environment.pathsToLink = [
+    "/share/bash-completion"
+    "/share/zsh"
+  ]; # required to enable completion
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "26.05";

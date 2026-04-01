@@ -13,32 +13,50 @@
         "Projects" = {
           path = "/home/lokesh/Projects";
           devices = [ "laptop" ];
-          ignorePatterns = [ ".venv/*" ".direnv/*" ];
+          ignorePatterns = [
+            ".venv/*"
+            ".direnv/*"
+          ];
         };
         "Research" = {
           path = "/home/lokesh/Documents/Research";
           devices = [ "laptop" ];
-          ignorePatterns = [ ".venv/*" ".direnv/*" ];
+          ignorePatterns = [
+            ".venv/*"
+            ".direnv/*"
+          ];
         };
         "Presentations" = {
           path = "/home/lokesh/Documents/Presentations";
           devices = [ "laptop" ];
-          ignorePatterns = [ ".venv/*" ".direnv/*" ];
+          ignorePatterns = [
+            ".venv/*"
+            ".direnv/*"
+          ];
         };
         "Books" = {
           path = "/home/lokesh/Documents/Books";
           devices = [ "laptop" ];
-          ignorePatterns = [ ".venv/*" ".direnv/*" ];
+          ignorePatterns = [
+            ".venv/*"
+            ".direnv/*"
+          ];
         };
         "Practice" = {
           path = "/home/lokesh/Desktop/Practice";
           devices = [ "laptop" ];
-          ignorePatterns = [ ".venv/*" ".direnv/*" ];
+          ignorePatterns = [
+            ".venv/*"
+            ".direnv/*"
+          ];
         };
         "Notebook" = {
           path = "/home/lokesh/Documents/Notebook";
           devices = [ "laptop" ];
-          ignorePatterns = [ ".venv/*" ".direnv/*" ];
+          ignorePatterns = [
+            ".venv/*"
+            ".direnv/*"
+          ];
         };
       };
     };

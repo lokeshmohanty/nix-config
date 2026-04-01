@@ -18,12 +18,11 @@ in
     }:
     inputs.nixpkgs.lib.nixosSystem {
       specialArgs = { inherit inputs self; };
-      modules =
-        [
-          inputs.determinate.nixosModules.default
-          inputs.musnix.nixosModules.musnix
-        ]
-        ++ hardwareModules
-        ++ extraModules;
+      modules = [
+        inputs.determinate.nixosModules.default
+        inputs.musnix.nixosModules.musnix
+      ]
+      ++ hardwareModules
+      ++ extraModules;
     };
 }

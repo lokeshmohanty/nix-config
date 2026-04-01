@@ -1,4 +1,9 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 {
   options.modules.tui.tmux.enable = lib.mkEnableOption "tmux";
 

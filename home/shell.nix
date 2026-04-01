@@ -1,4 +1,9 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 let
   shellCfg = config.modules.shell;
   tuiCfg = config.modules.tui;
@@ -92,8 +97,13 @@ in
         autosuggestion.enable = true;
         defaultKeymap = "viins";
         zsh-abbr.enable = true;
-        zsh-abbr.abbreviations = { d = "docker"; };
-        zsh-abbr.globalAbbreviations = { G = "| rg"; L = "| less -R"; };
+        zsh-abbr.abbreviations = {
+          d = "docker";
+        };
+        zsh-abbr.globalAbbreviations = {
+          G = "| rg";
+          L = "| less -R";
+        };
       };
     })
     (lib.mkIf shellCfg.fish.enable {

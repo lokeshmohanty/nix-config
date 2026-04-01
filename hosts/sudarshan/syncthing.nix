@@ -16,33 +16,69 @@
       folders = {
         "Projects" = {
           path = "/home/lokesh/Projects";
-          devices = [ "lab" "office" ];
-          ignorePatterns = [ ".venv/*" ".direnv/*" ];
+          devices = [
+            "lab"
+            "office"
+          ];
+          ignorePatterns = [
+            ".venv/*"
+            ".direnv/*"
+          ];
         };
         "Research" = {
           path = "/home/lokesh/Documents/Research";
-          devices = [ "lab" "office" ];
-          ignorePatterns = [ ".venv/*" ".direnv/*" ];
+          devices = [
+            "lab"
+            "office"
+          ];
+          ignorePatterns = [
+            ".venv/*"
+            ".direnv/*"
+          ];
         };
         "Presentations" = {
           path = "/home/lokesh/Documents/Presentations";
-          devices = [ "lab" "office" ];
-          ignorePatterns = [ ".venv/*" ".direnv/*" ];
+          devices = [
+            "lab"
+            "office"
+          ];
+          ignorePatterns = [
+            ".venv/*"
+            ".direnv/*"
+          ];
         };
         "Books" = {
           path = "/home/lokesh/Documents/Books";
-          devices = [ "lab" "office" ];
-          ignorePatterns = [ ".venv/*" ".direnv/*" ];
+          devices = [
+            "lab"
+            "office"
+          ];
+          ignorePatterns = [
+            ".venv/*"
+            ".direnv/*"
+          ];
         };
         "Practice" = {
           path = "/home/lokesh/Desktop/Practice";
-          devices = [ "lab" "office" ];
-          ignorePatterns = [ ".venv/*" ".direnv/*" ];
+          devices = [
+            "lab"
+            "office"
+          ];
+          ignorePatterns = [
+            ".venv/*"
+            ".direnv/*"
+          ];
         };
         "Notebook" = {
           path = "/home/lokesh/Documents/Notebook";
-          devices = [ "lab" "office" ];
-          ignorePatterns = [ ".venv/*" ".direnv/*" ];
+          devices = [
+            "lab"
+            "office"
+          ];
+          ignorePatterns = [
+            ".venv/*"
+            ".direnv/*"
+          ];
         };
         # "Personal" = {
         #   path = "/home/lokesh/Documents/Personal";

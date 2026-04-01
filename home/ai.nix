@@ -1,4 +1,9 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 {
   options.modules.ai.enable = lib.mkEnableOption "AI CLI tooling";
 
