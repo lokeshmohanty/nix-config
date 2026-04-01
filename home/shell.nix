@@ -6,19 +6,13 @@
     jc jtbl
   ];
   home.shell.enableShellIntegration = true;
+  home.sessionVariables.SHELL = "fish";
   programs = {
     fzf = {
       enable = true;
       tmux.enableShellIntegration = true;
     };
     zoxide.enable = true;
-    # starship.enable = true;
-    # starship.presets = [
-    #   # "tokyo-night"
-    #   "gruvbox-rainbow"
-    #   # "jetpack"
-    #   # "no-runtime-versions"
-    # ];
     yazi = {
       enable = true;
       settings = {
@@ -46,10 +40,6 @@
       nix-direnv.enable = true;
     };
   };
-  # programs.bash = {
-  #   enable = true;
-  #   enableVteIntegration = true;
-  # };
   programs.zsh = {
     enable = true;
     enableVteIntegration = true;
