@@ -5,12 +5,9 @@
 }:
 {
   flake.nixosConfigurations = {
-    sudarshan = inputs.nixpkgs.lib.nixosSystem {
-      specialArgs = { inherit inputs self; };
-      modules = [
-        inputs.determinate.nixosModules.default
-        inputs.nixos-hardware.nixosModules.lenovo-thinkpad-l14-amd
-        inputs.musnix.nixosModules.musnix
+    sudarshan = self.hostlib.mkNixosHost {
+      hardwareModules = [ inputs.nixos-hardware.nixosModules.lenovo-thinkpad-l14-amd ];
+      extraModules = [
         ./configuration.nix
         ./hardware-configuration.nix
         ./syncthing.nix
@@ -18,10 +15,24 @@
     };
   };
   flake.homeConfigurations = {
-    "lokesh@sudarshan" = inputs.home-manager.lib.homeManagerConfiguration {
-      pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
-      extraSpecialArgs = { inherit inputs self; };
-      modules = [ ./home.nix ];
-    };
+    "lokesh@sudarshan" = self.hostlib.mkHomeHost (
+      { pkgs, ... }:
+      {
+        imports = [
+          ../../home
+          ./email.nix
+        ];
+
+        modules = {
+          activations.enable = true;
+          editor.enable = true;
+          gui.enable = true;
+          shell.enable = true;
+          tui.enable = true;
+        };
+
+        home.packages = with pkgs; [ slack ];
+      }
+    );
   };
 }

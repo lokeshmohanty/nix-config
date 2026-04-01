@@ -2,6 +2,7 @@
   inputs,
   config,
   pkgs,
+  lib,
   ...
 }:
 {
@@ -79,10 +80,6 @@
       # freerdp # remote desktop client
     ];
   };
-
-  stylixConfig.enable = true;
-  stylixConfig.theme = "everforest-dark-hard"; # "terracotta";
-  wallpaper = ./../wallpapers/0016.jpg;
 
   ## Nix Helper
   programs.nh = {

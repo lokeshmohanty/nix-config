@@ -1,3 +1,4 @@
+{ lib, ... }:
 {
   imports = [
     ../variables.nix
@@ -9,7 +10,7 @@
     ./browser
     ./editor.nix
     ./email.nix
-    # ./rofi.nix
+    ./rofi.nix
     ./tofi.nix
     ./satty.nix
     ./shell.nix
@@ -17,4 +18,8 @@
     ./stylix.nix
     ./gui.nix
   ];
+
+  stylixConfig.enable = lib.mkDefault true;
+  stylixConfig.theme = lib.mkDefault "everforest-dark-hard";
+  wallpaper = lib.mkDefault ./../wallpapers/0016.jpg;
 }

@@ -5,12 +5,9 @@
 }:
 {
   flake.nixosConfigurations = {
-    bose = inputs.nixpkgs.lib.nixosSystem {
-      specialArgs = { inherit inputs self; };
-      modules = [
-        inputs.determinate.nixosModules.default
-        inputs.nixos-hardware.nixosModules.common-cpu-intel
-        inputs.musnix.nixosModules.musnix
+    bose = self.hostlib.mkNixosHost {
+      hardwareModules = [ inputs.nixos-hardware.nixosModules.common-cpu-intel ];
+      extraModules = [
         ./configuration.nix
         ./hardware-configuration.nix
         ./syncthing.nix
@@ -18,10 +15,21 @@
     };
   };
   flake.homeConfigurations = {
-    "lokesh@bose" = inputs.home-manager.lib.homeManagerConfiguration {
-      pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
-      extraSpecialArgs = { inherit inputs self; };
-      modules = [ ./home.nix ];
-    };
+    "lokesh@bose" = self.hostlib.mkHomeHost (
+      { pkgs, ... }:
+      {
+        imports = [ ../../home ];
+
+        modules = {
+          activations.enable = true;
+          editor.enable = true;
+          gui.enable = true;
+          shell.enable = true;
+          tui.enable = true;
+        };
+
+        home.packages = with pkgs; [ slack ];
+      }
+    );
   };
 }

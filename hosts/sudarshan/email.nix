@@ -5,7 +5,7 @@
   ...
 }:
 {
-  email.enable = true;
+  modules.email.enable = true;
 
   ########################################
   # EMAIL ACCOUNTS (SOURCE OF TRUTH)

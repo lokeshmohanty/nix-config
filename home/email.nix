@@ -6,7 +6,7 @@
   ...
 }:
 let
-  cfg = config.email;
+  cfg = config.modules.email;
 
   mkEmailAccount =
     name:
@@ -53,7 +53,7 @@ let
     };
 in
 {
-  options.email.enable = lib.mkEnableOption "email tooling and shared account helpers";
+  options.modules.email.enable = lib.mkEnableOption "email tooling and shared account helpers";
 
   config = lib.mkMerge [
     {

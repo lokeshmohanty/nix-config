@@ -5,12 +5,9 @@
 }:
 {
   flake.nixosConfigurations = {
-    bhaskara = inputs.nixpkgs.lib.nixosSystem {
-      specialArgs = { inherit inputs self; };
-      modules = [
-        inputs.determinate.nixosModules.default
-        inputs.nixos-hardware.nixosModules.common-cpu-intel
-        inputs.musnix.nixosModules.musnix
+    bhaskara = self.hostlib.mkNixosHost {
+      hardwareModules = [ inputs.nixos-hardware.nixosModules.common-cpu-intel ];
+      extraModules = [
         ./configuration.nix
         ./hardware-configuration.nix
         ./syncthing.nix
@@ -18,10 +15,19 @@
     };
   };
   flake.homeConfigurations = {
-    "lokesh@bhaskara" = inputs.home-manager.lib.homeManagerConfiguration {
-      pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
-      extraSpecialArgs = { inherit inputs self; };
-      modules = [ ./home.nix ];
-    };
+    "lokesh@bhaskara" = self.hostlib.mkHomeHost (
+      { ... }:
+      {
+        imports = [ ../../home ];
+
+        modules = {
+          activations.enable = true;
+          editor.enable = true;
+          gui.enable = true;
+          shell.enable = true;
+          tui.enable = true;
+        };
+      }
+    );
   };
 }
