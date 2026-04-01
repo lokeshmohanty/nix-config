@@ -4,6 +4,7 @@
     ../variables.nix
 
     ./base.nix
+    ./ai.nix
     ./activations.nix
 
     ./terminal

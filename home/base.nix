@@ -63,6 +63,7 @@
       doggo # DNS client for humans
       duf # Disk Usage/Free Utility - a better 'df' alternative
       gdu # disk usage analyzer(replacement of `du`)
+      qrcp # for generating qr code for file transfer
 
       # nix related
       nix-alien # run unpatched binaries

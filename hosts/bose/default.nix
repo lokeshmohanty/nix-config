@@ -21,6 +21,7 @@
         imports = [ ../../home ];
 
         modules = {
+          ai.enable = true;
           activations.enable = true;
           editor.enable = true;
           gui.enable = true;
