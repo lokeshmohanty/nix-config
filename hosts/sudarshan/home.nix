@@ -2,6 +2,7 @@
 {
   imports = [
     ../../home
+    ./email.nix
   ];
-  home.packages = with pkgs; [ thunderbird slack ];
+  home.packages = with pkgs; [ slack ];
 }
