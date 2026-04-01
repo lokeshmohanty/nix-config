@@ -861,18 +861,23 @@
         "type": "github"
       }
     },
-    "nixCats": {
+    "nix-wrapper-modules": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
       "locked": {
-        "lastModified": 1770584904,
-        "narHash": "sha256-9Zaz8lbKF2W9pwXZEnbiGsicHdBoU+dHt3Wv3mCJoZ8=",
+        "lastModified": 1774879171,
+        "narHash": "sha256-a6JZDuBIwQmuEwYM4dziH+WyrpE8HCP8F7JFIn3CNvw=",
         "owner": "BirdeeHub",
-        "repo": "nixCats-nvim",
-        "rev": "538fdde784d2909700d97a8ef307783b33a86fb1",
+        "repo": "nix-wrapper-modules",
+        "rev": "bab35ffae25cf6f4e4fdb3c2f7f0ac80966ce737",
         "type": "github"
       },
       "original": {
         "owner": "BirdeeHub",
-        "repo": "nixCats-nvim",
+        "repo": "nix-wrapper-modules",
         "type": "github"
       }
     },
@@ -1197,7 +1202,7 @@
         "musnix": "musnix",
         "niri": "niri",
         "nix-alien": "nix-alien",
-        "nixCats": "nixCats",
+        "nix-wrapper-modules": "nix-wrapper-modules",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_6",
         "noctalia": "noctalia",
@@ -1205,8 +1210,7 @@
         "plugins-everforest": "plugins-everforest",
         "plugins-slimline": "plugins-slimline",
         "stylix": "stylix",
-        "sysc-greet": "sysc-greet",
-        "zen-browser": "zen-browser"
+        "sysc-greet": "sysc-greet"
       }
     },
     "stylix": {
@@ -1492,29 +1496,6 @@
       "original": {
         "owner": "Supreeeme",
         "repo": "xwayland-satellite",
-        "type": "github"
-      }
-    },
-    "zen-browser": {
-      "inputs": {
-        "home-manager": [
-          "home-manager"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1774708879,
-        "narHash": "sha256-rTYvYkQL69/YkZB+MRA/IaX1qJ1lPx5KXoQS2/9+7Mw=",
-        "owner": "0xc000022070",
-        "repo": "zen-browser-flake",
-        "rev": "d01d23c798cceef42307d5789bfbce70515e8800",
-        "type": "github"
-      },
-      "original": {
-        "owner": "0xc000022070",
-        "repo": "zen-browser-flake",
         "type": "github"
       }
     }

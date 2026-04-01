@@ -32,11 +32,11 @@
     musnix.url = "github:musnix/musnix";
 
     nix-alien.url = "github:thiagokokada/nix-alien";
+    nix-wrapper-modules.url = "github:BirdeeHub/nix-wrapper-modules";
+    nix-wrapper-modules.inputs.nixpkgs.follows = "nixpkgs";
     stylix.url = "github:danth/stylix";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
-
-    nixCats.url = "github:BirdeeHub/nixCats-nvim";
 
     "plugins-slimline" = {
       url = "github:sschleemilch/slimline.nvim";
@@ -63,14 +63,15 @@
         { pkgs, ... }:
         let
           packages = import ./pkgs { inherit pkgs inputs; };
-          apps = builtins.mapAttrs (name: drv: {
+          mkApp = name: drv: {
             type = "app";
             program =
               let
                 main = drv.meta.mainProgram or name;
               in
               "${drv}/bin/${main}";
-          }) packages;
+          };
+          apps = builtins.mapAttrs mkApp packages;
         in
         {
           inherit packages apps;

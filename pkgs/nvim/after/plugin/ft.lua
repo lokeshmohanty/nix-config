@@ -5,11 +5,7 @@ vim.api.nvim_create_autocmd("FileType", {
 	pattern = { "lua" },
 	callback = function()
 		vim.cmd.packadd('lazydev.nvim')
-		require('lazydev').setup({
-			library = {
-				{ path = nixCats.nixCatsPath and nixCats.nixCatsPath .. 'lua' or nil, words = { "nixCats" } },
-			},
-		})
+		require('lazydev').setup({})
 	end,
 })
 
@@ -60,5 +56,4 @@ vim.api.nvim_create_autocmd("FileType", {
 		end
 	end,
 })
-
 
