@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
+
+maybe_discover() {
+  local pair="$1"
+  local local_path="$2"
+
+  if ! find "$local_path" -mindepth 1 -maxdepth 1 -type d | read -r _; then
+    vdirsyncer discover "$pair"
+  fi
+}
 
 echo "== OAuth setup =="
 
@@ -23,5 +32,13 @@ notmuch new
 echo "== Done =="
 echo "Run: aerc"
 
-vdirsyncer discover
+echo "== DAV bootstrap =="
+maybe_discover contacts_main "$HOME/.local/share/contacts/main"
+maybe_discover contacts_personal "$HOME/.local/share/contacts/personal"
+maybe_discover contacts_zenteiq "$HOME/.local/share/contacts/zenteiq"
+maybe_discover calendar_main "$HOME/.local/share/calendars/main"
+maybe_discover calendar_personal "$HOME/.local/share/calendars/personal"
+maybe_discover calendar_zenteiq "$HOME/.local/share/calendars/zenteiq"
+
+echo "== DAV sync =="
 vdirsyncer sync

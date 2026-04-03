@@ -13,6 +13,7 @@
       gemini-cli
       codex
       opencode
+      mistral-vibe
     ];
   };
 }

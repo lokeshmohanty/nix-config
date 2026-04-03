@@ -492,6 +492,28 @@ def cmd_status(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_client_id(args: argparse.Namespace) -> int:
+    client = resolve_client(args.provider, args.client)
+    client_id = client.get("client_id")
+    if not client_id:
+        raise SystemExit(
+            f"client preset '{args.client or 'thunderbird'}' for provider '{args.provider}' has no client_id"
+        )
+    print(client_id)
+    return 0
+
+
+def cmd_client_secret(args: argparse.Namespace) -> int:
+    client = resolve_client(args.provider, args.client)
+    client_secret = client.get("client_secret")
+    if not client_secret:
+        raise SystemExit(
+            f"client preset '{args.client or 'thunderbird'}' for provider '{args.provider}' has no client_secret"
+        )
+    print(client_secret)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="oauthman",
@@ -551,6 +573,28 @@ def build_parser() -> argparse.ArgumentParser:
     status_parser = subparsers.add_parser("status", help="Print profile/token status")
     status_parser.add_argument("profile")
     status_parser.set_defaults(func=cmd_status)
+
+    client_id_parser = subparsers.add_parser(
+        "client-id", help="Print a built-in OAuth client ID"
+    )
+    client_id_parser.add_argument(
+        "--provider", choices=sorted(PROVIDERS), required=True
+    )
+    client_id_parser.add_argument(
+        "--client", default="thunderbird", help="Built-in client preset"
+    )
+    client_id_parser.set_defaults(func=cmd_client_id)
+
+    client_secret_parser = subparsers.add_parser(
+        "client-secret", help="Print a built-in OAuth client secret"
+    )
+    client_secret_parser.add_argument(
+        "--provider", choices=sorted(PROVIDERS), required=True
+    )
+    client_secret_parser.add_argument(
+        "--client", default="thunderbird", help="Built-in client preset"
+    )
+    client_secret_parser.set_defaults(func=cmd_client_secret)
 
     return parser
 
