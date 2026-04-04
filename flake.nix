@@ -46,6 +46,10 @@
       url = "github:neanias/everforest-nvim";
       flake = false;
     };
+    "plugins-notmuch-nvim" = {
+      url = "github:yousefakbar/notmuch.nvim";
+      flake = false;
+    };
   };
 
   outputs =
