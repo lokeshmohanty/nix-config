@@ -355,9 +355,10 @@ binds {
     // ============
     // Applications
     // ============
-    Mod+Return { spawn "kitty"; }
+    Mod+Return { spawn "kitty" "--single-instance"; }
     Mod+E { spawn "nautilus"; }
     Mod+B { spawn "firefox"; }
+    Mod+M { spawn-sh "kitty --single-instance vi -c 'Notmuch'"; }
     Mod+S { spawn-sh "kitten quick-access-terminal"; }
     Mod+D { spawn-sh "noctalia-shell ipc call launcher toggle"; } // >settings, ...
     Mod+Q { spawn-sh "noctalia-shell ipc call sessionMenu toggle"; }

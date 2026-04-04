@@ -12,6 +12,12 @@ let
       version = "source";
       src = inputs.plugins-everforest;
     };
+    notmuch-nvim = pkgs.vimUtils.buildVimPlugin {
+      pname = "notmuch-nvim";
+      version = "source";
+      src = inputs.plugins-notmuch-nvim;
+      doCheck = false;
+    };
   };
 in
 inputs.nix-wrapper-modules.wrappers.neovim.wrap [
@@ -51,6 +57,8 @@ inputs.nix-wrapper-modules.wrappers.neovim.wrap [
         mermaid-cli
         imagemagick
         ghostscript
+        w3m # required for notmuch
+        notmuch # required for notmuch
       ];
 
       specs.general = {
@@ -98,6 +106,7 @@ inputs.nix-wrapper-modules.wrappers.neovim.wrap [
           gx-nvim
           flash-nvim
           undotree
+          customPlugins.notmuch-nvim
         ];
       };
     }

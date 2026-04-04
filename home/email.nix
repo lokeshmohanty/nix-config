@@ -7,263 +7,190 @@
 }:
 let
   cfg = config.modules.email;
-  vdirsyncerCommand = "${pkgs.vdirsyncer}/bin/vdirsyncer";
-  vdirsyncerSyncCommand = "${vdirsyncerCommand} sync";
-  enabledAttrs = f: attrs: lib.filterAttrs (_: v: v != null) (lib.mapAttrs f attrs);
-  khardSettings = ''
-    [contact table]
-    display=formatted_name
-    preferred_email_address_type=pref, work, home
 
-    [general]
-    default_action=list
-    editor=nvim, -i, NONE
+  defaultVirtualMailboxes = [
+    {
+      name = "Inbox";
+      query = "tag:inbox";
+      type = "threads";
+    }
+    {
+      name = "Unread";
+      query = "tag:unread and not tag:trash";
+      type = "threads";
+    }
+    {
+      name = "Flagged";
+      query = "tag:flagged and not tag:trash";
+      type = "threads";
+    }
+    {
+      name = "Sent";
+      query = "tag:sent";
+      type = "threads";
+    }
+    {
+      name = "Drafts";
+      query = "tag:draft";
+      type = "threads";
+    }
+    {
+      name = "Archive";
+      query = "not tag:inbox and not tag:sent and not tag:draft and not tag:trash";
+      type = "threads";
+    }
+  ];
+
+  pathQuery = account: folder: "path:${account.name}/${folder}/**";
+  emailAccounts = lib.attrValues (
+    lib.filterAttrs (_: account: account.notmuch.enable or false) config.accounts.email.accounts
+  );
+
+  notmuchPostNewScript = pkgs.writeShellScript "notmuch-post-new" ''
+    set -eu
+
+    ${lib.concatStringsSep "\n\n" (
+      map (account: ''
+        notmuch tag +inbox -- ${lib.escapeShellArg (pathQuery account account.folders.inbox)}
+        notmuch tag +sent -inbox -unread -- ${lib.escapeShellArg (pathQuery account account.folders.sent)}
+        notmuch tag +draft -inbox -unread -- ${lib.escapeShellArg (pathQuery account account.folders.drafts)}
+        notmuch tag +trash +deleted -inbox -unread -- ${lib.escapeShellArg (pathQuery account account.folders.trash)}
+      '') emailAccounts
+    )}
   '';
-  googleClientIdCommand = [ "oauthman" "client-id" "--provider" "gmail" "--client" "thunderbird" ];
-  googleClientSecretCommand = [ "oauthman" "client-secret" "--provider" "gmail" "--client" "thunderbird" ];
-  mkGoogleTokenFile = kind: name: "${config.xdg.stateHome}/vdirsyncer/${kind}-${name}.token";
-  mkPasswordCommand =
-    passwordCommand: if builtins.isString passwordCommand then lib.splitString " " passwordCommand else passwordCommand;
-  isGoogleAccount = flavor: flavor == "gmail.com";
-  mkGoogleVdirsyncer =
-    kind: name: attrs:
-    attrs
-    // {
-      tokenFile = attrs.tokenFile or mkGoogleTokenFile kind name;
-      clientIdCommand = attrs.clientIdCommand or googleClientIdCommand;
-      clientSecretCommand = attrs.clientSecretCommand or googleClientSecretCommand;
-    };
-  mkRemote =
-    {
-      name,
-      address,
-      flavor ? null,
-      passwordCommand,
-      remote,
-      googleType,
-      defaultType,
-    }:
+
+  khardAddressbook = name: account: ''
+    [[${name}]]
+    path = ${account.local.path}/default
+  '';
+
+  khardConfig =
     let
-      remoteType = remote.type or (if isGoogleAccount flavor then googleType else defaultType);
+      khardAccounts = lib.filterAttrs (_: account: account.khard.enable) config.accounts.contact.accounts;
     in
-    { type = remoteType; }
-    // lib.optionalAttrs (remoteType != googleType) {
-      url = remote.url or (throw "${name} is missing remote.url");
-      userName = remote.userName or address;
-      passwordCommand = remote.passwordCommand or mkPasswordCommand passwordCommand;
-    };
-  mkVdirsyncerOpts =
-    {
-      kind,
-      name,
-      flavor ? null,
-      remote,
-      vdirsyncer ? { },
-      defaults ? { },
-    }:
-    let
-      googleType = "google_${kind}";
-      attrs = defaults // { enable = vdirsyncer.enable or true; };
-    in
-    if (remote.type or null) == googleType || (remote.type or null) == null && isGoogleAccount flavor then
-      mkGoogleVdirsyncer kind name (attrs // vdirsyncer)
-    else
-      attrs // vdirsyncer;
+    ''
+      [addressbooks]
+      ${lib.concatStringsSep "\n" (lib.mapAttrsToList khardAddressbook khardAccounts)}
 
-  mkEmailAccount =
-    name:
-    {
-      address,
-      flavor,
-      passwordCommand,
-      oauth ? false,
-      realName ? "Lokesh Mohanty",
-      primary ? false,
-      signatureText ? "Lokesh Mohanty",
-      mbsyncExtraConfig ? { },
-      contact ? null,
-      calendar ? null,
-      imapnotify ? {
-        enable = true;
-        boxes = [ "INBOX" ];
-        onNotify = "${pkgs.isync}/bin/mbsync ${name}";
-        onNotifyPost = "${pkgs.notmuch}/bin/notmuch new && ${pkgs.libnotify}/bin/notify-send 'New mail arrived'";
-      },
-    }:
-    {
-      inherit address realName primary;
-      inherit flavor passwordCommand imapnotify;
+      [contact table]
+      display=formatted_name
+      preferred_email_address_type=pref, work, home
 
-      userName = address;
-      imap.authentication = if oauth then "xoauth2" else "app";
-      smtp.authentication = if oauth then "xoauth2" else "app";
+      [general]
+      default_action=list
+      editor=nvim, -i, NONE
+    '';
 
-      mbsync = {
-        enable = true;
-        create = "maildir";
-        extraConfig =
-          (if oauth then { account.AuthMechs = "XOAUTH2"; } else { account.AuthMechs = "PLAIN"; })
-          // mbsyncExtraConfig;
-      };
+  mkEmail = name: account: {
+    inherit (account) address;
+    primary = account.primary or false;
+    realName = account.realName or "Lokesh Mohanty";
+    userName = account.userName or account.address;
+    flavor = account.mail.flavor;
+    passwordCommand = account.passwordCommand;
 
-      msmtp.enable = true;
-      aerc.enable = true;
-      notmuch.enable = true;
+    imap.authentication = if account.mail.oauth or false then "xoauth2" else "app";
+    smtp.authentication = if account.mail.oauth or false then "xoauth2" else "app";
 
-      signature = {
-        showSignature = "append";
-        text = signatureText;
-      };
+    mbsync = {
+      enable = true;
+      create = "maildir";
+      expunge = "both";
+      remove = "both";
+      extraConfig =
+        (
+          if account.mail.oauth or false then
+            { account.AuthMechs = "XOAUTH2"; }
+          else
+            { account.AuthMechs = "PLAIN"; }
+        )
+        // (account.mail.mbsyncExtraConfig or { });
     };
 
-  mkContactAccount =
-    name:
-    {
-      address,
-      flavor ? null,
-      passwordCommand,
-      contact ? null,
-      ...
-    }:
-    if contact == null || !(contact.enable or false) then
-      null
-    else
-      let
-        contactKhard = contact.khard or { };
-      in
-      {
-        local = contact.local or { };
-        remote = mkRemote {
-          inherit name address flavor passwordCommand;
-          remote = contact.remote or { };
-          googleType = "google_contacts";
-          defaultType = "carddav";
-        };
-        khard.enable = contactKhard.enable or true;
-        khard.type = contactKhard.type or "vdir";
-        khard.addressbooks = contactKhard.addressbooks or [ "default" ];
-        vdirsyncer = mkVdirsyncerOpts {
-          kind = "contacts";
-          inherit name flavor;
-          remote = contact.remote or { };
-          vdirsyncer = contact.vdirsyncer or { };
-          defaults = {
-            collections = [
-              "from a"
-              "from b"
-            ];
-          };
-        }
-        ;
-      };
+    msmtp.enable = true;
 
-  mkCalendarAccount =
-    name:
-    {
-      address,
-      flavor ? null,
-      passwordCommand,
-      primary ? false,
-      calendar ? null,
-      ...
-    }:
-    if calendar == null || !(calendar.enable or false) then
-      null
-    else
-      let
-        calendarKhal = calendar.khal or { };
-      in
-      {
-        inherit primary;
-        local = calendar.local or { };
-        remote = mkRemote {
-          inherit name address flavor passwordCommand;
-          remote = calendar.remote or { };
-          googleType = "google_calendar";
-          defaultType = "caldav";
-        };
-        khal.enable = calendarKhal.enable or true;
-        vdirsyncer = mkVdirsyncerOpts {
-          kind = "calendar";
-          inherit name flavor;
-          remote = calendar.remote or { };
-          vdirsyncer = calendar.vdirsyncer or { };
-          defaults = {
-            collections = [
-              "from a"
-              "from b"
-            ];
-            metadata = [
-              "displayname"
-              "color"
-            ];
-          };
-        };
-      };
+    imapnotify = {
+      enable = true;
+      boxes = [ "INBOX" ];
+      onNotify = "mbsync ${name}";
+      onNotifyPost = "notmuch new";
+    }
+    // (account.mail.imapnotify or { });
+
+    notmuch.enable = true;
+
+    signature = {
+      showSignature = "append";
+      text = account.signatureText or "Lokesh Mohanty";
+    };
+  };
+
+  mkContact = _: account: {
+    local = account.contacts.local or { };
+    remote = account.contacts.remote;
+    khard = {
+      enable = true;
+      type = "vdir";
+      addressbooks = [ "default" ];
+    }
+    // (account.contacts.khard or { });
+    vdirsyncer = {
+      enable = true;
+      collections = [
+        "from a"
+        "from b"
+      ];
+    }
+    // (account.contacts.vdirsyncer or { });
+  };
+
+  mkCalendar = _: account: {
+    primary = account.primary or false;
+    local = account.calendar.local or { };
+    remote = account.calendar.remote;
+    khal = {
+      enable = true;
+    }
+    // (account.calendar.khal or { });
+    vdirsyncer = {
+      enable = true;
+      collections = [
+        "from a"
+        "from b"
+      ];
+      metadata = [
+        "displayname"
+        "color"
+      ];
+    }
+    // (account.calendar.vdirsyncer or { });
+  };
+
 in
 {
   options.modules.email.enable = lib.mkEnableOption "email tooling and shared account helpers";
 
   config = lib.mkMerge [
     {
-      _module.args.mkEmailAccount = mkEmailAccount;
-      _module.args.mkContactAccount = mkContactAccount;
-      _module.args.mkCalendarAccount = mkCalendarAccount;
-      _module.args.enabledAttrs = enabledAttrs;
+      _module.args = {
+        inherit mkEmail mkContact mkCalendar;
+      };
     }
 
     (lib.mkIf cfg.enable {
       home.packages =
         with pkgs;
         [
-          w3m
-          pandoc
-          oauth2ms
           aspell
           khard
+          oauth2ms
+          w3m
         ]
         ++ [
           self.packages.${pkgs.stdenv.hostPlatform.system}.oauthman
         ];
 
-      xdg.configFile."khard/khard.conf".text =
-        let
-          khardAccounts = lib.filterAttrs (_: account: account.khard.enable) config.accounts.contact.accounts;
-          khardAddressbook =
-            name: account: ''
-              [[${name}]]
-              path = ${account.local.path}/default
-            '';
-        in
-        ''
-          [addressbooks]
-          ${lib.concatStringsSep "\n" (lib.mapAttrsToList khardAddressbook khardAccounts)}
-
-          ${khardSettings}
-        '';
-
-      programs.aerc = {
-        enable = true;
-        extraConfig = {
-          general.unsafe-accounts-conf = true;
-        };
-      };
-
-      programs.notmuch = {
-        enable = true;
-        hooks.postNew = ''
-          notmuch tag -new -- tag:new
-          notmuch tag +inbox +unread -- tag:unread
-
-          # priority
-          # notmuch tag +important -- 'from:advisor@ OR from:prof@'
-          # notmuch tag +work -- 'from:@iisc.ac.in'
-          # notmuch tag +zenteiq -- 'from:@zentieq.com'
-          #
-          # # remove noise
-          # notmuch tag +promo -inbox -- 'subject:unsubscribe'
-        '';
-      };
+      xdg.configFile."khard/khard.conf".text = khardConfig;
 
       programs.mbsync = {
         enable = true;
@@ -276,6 +203,17 @@ in
       programs.khal.enable = true;
       programs.vdirsyncer.enable = true;
 
+      programs.notmuch = {
+        enable = true;
+        new.tags = [ "unread" ];
+        search.excludeTags = [
+          "deleted"
+          "spam"
+          "trash"
+        ];
+        hooks.postNew = "${notmuchPostNewScript}";
+      };
+
       services.imapnotify.enable = true;
 
       systemd.user.services.vdirsyncer-sync = {
@@ -286,23 +224,19 @@ in
         };
         Service = {
           Type = "oneshot";
-          ExecStart = vdirsyncerSyncCommand;
+          ExecStart = "vdirsyncer sync";
         };
       };
 
       systemd.user.timers.vdirsyncer-sync = {
-        Unit = {
-          Description = "Periodic contacts and calendar sync";
-        };
+        Unit.Description = "Periodic contacts and calendar sync";
         Timer = {
           OnBootSec = "2m";
           OnUnitActiveSec = "15m";
           Persistent = true;
           Unit = "vdirsyncer-sync.service";
         };
-        Install = {
-          WantedBy = [ "timers.target" ];
-        };
+        Install.WantedBy = [ "timers.target" ];
       };
     })
   ];

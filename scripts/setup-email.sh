@@ -16,6 +16,13 @@ for acc in main iisc zenteiq personal; do
   echo "run oauthman setup $acc --email <address> before syncing"
 done
 
+echo "== Maildir scaffold =="
+for acc in main zenteiq personal iisc; do
+  for folder in Sent Drafts Trash; do
+    mkdir -p "$HOME/.local/share/Mail/$acc/$folder"
+  done
+done
+
 echo "== Initial sync =="
 mbsync -a || true
 
@@ -30,7 +37,6 @@ EOF
 notmuch new
 
 echo "== Done =="
-echo "Run: aerc"
 
 echo "== DAV bootstrap =="
 maybe_discover contacts_main "$HOME/.local/share/contacts/main"

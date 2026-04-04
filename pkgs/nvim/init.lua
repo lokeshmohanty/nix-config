@@ -40,3 +40,5 @@ vim.cmd([[
 ]])
 vim.keymap.set("n", "<leader>ss", "<Plug>SlimeParagraphSend")
 vim.keymap.set("v", "<leader>ss", "<Plug>SlimeRegionSend")
+
+

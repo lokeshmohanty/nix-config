@@ -49,7 +49,6 @@ in
         jtbl
       ];
       home.shell.enableShellIntegration = true;
-      home.sessionVariables.SHELL = "fish";
     })
     (lib.mkIf tuiCfg.fzf.enable {
       programs.fzf = {
@@ -107,13 +106,14 @@ in
       };
     })
     (lib.mkIf shellCfg.fish.enable {
+      home.packages = [ pkgs.nix-your-shell ];
       programs.fish = {
         enable = true;
         interactiveShellInit = ''
           set fish_greeting
           fish_vi_key_bindings
 
-          ${pkgs.nix-your-shell}/bin/nix-your-shell fish | source
+          nix-your-shell fish | source
         '';
         shellAbbrs = {
           e = "emacsclient -c -a 'nvim'";
