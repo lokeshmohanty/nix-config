@@ -1136,22 +1136,6 @@
         "type": "github"
       }
     },
-    "plugins-notmuch-nvim": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1770978366,
-        "narHash": "sha256-TW+xCO0PGGyHO0UbuEo0yKhILC+htxjz/xkrmgzb3eY=",
-        "owner": "yousefakbar",
-        "repo": "notmuch.nvim",
-        "rev": "b086edfc22aaa56c007c2013f35fcd5ad720e5ca",
-        "type": "github"
-      },
-      "original": {
-        "owner": "yousefakbar",
-        "repo": "notmuch.nvim",
-        "type": "github"
-      }
-    },
     "plugins-slimline": {
       "flake": false,
       "locked": {
@@ -1206,7 +1190,6 @@
         "noctalia": "noctalia",
         "noctalia-qs": "noctalia-qs",
         "plugins-everforest": "plugins-everforest",
-        "plugins-notmuch-nvim": "plugins-notmuch-nvim",
         "plugins-slimline": "plugins-slimline",
         "stylix": "stylix",
         "sysc-greet": "sysc-greet"

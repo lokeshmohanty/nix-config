@@ -1,0 +1,3 @@
+[submodule "pkgs/nvim/lua/notmuch.nvim"]
+	path = pkgs/nvim/lua/notmuch.nvim
+	url = https://github.com/lokeshmohanty/notmuch.nvim

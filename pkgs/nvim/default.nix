@@ -15,7 +15,7 @@ let
     notmuch-nvim = pkgs.vimUtils.buildVimPlugin {
       pname = "notmuch-nvim";
       version = "source";
-      src = inputs.plugins-notmuch-nvim;
+      src = ./lua/notmuch.nvim;
       doCheck = false;
     };
   };
