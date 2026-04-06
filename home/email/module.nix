@@ -8,78 +8,10 @@
 let
   cfg = config.modules.email;
 
-  defaultVirtualMailboxes = [
-    {
-      name = "Inbox";
-      query = "tag:inbox";
-      type = "threads";
-    }
-    {
-      name = "Unread";
-      query = "tag:unread and not tag:trash";
-      type = "threads";
-    }
-    {
-      name = "Flagged";
-      query = "tag:flagged and not tag:trash";
-      type = "threads";
-    }
-    {
-      name = "Sent";
-      query = "tag:sent";
-      type = "threads";
-    }
-    {
-      name = "Drafts";
-      query = "tag:draft";
-      type = "threads";
-    }
-    {
-      name = "Archive";
-      query = "not tag:inbox and not tag:sent and not tag:draft and not tag:trash";
-      type = "threads";
-    }
-  ];
-
-  pathQuery = account: folder: "path:${account.name}/${folder}/**";
+  accountTagQuery = account: "(to:${account.address} or from:${account.address})";
   emailAccounts = lib.attrValues (
     lib.filterAttrs (_: account: account.notmuch.enable or false) config.accounts.email.accounts
   );
-
-  notmuchPostNewScript = pkgs.writeShellScript "notmuch-post-new" ''
-    set -eu
-
-    ${lib.concatStringsSep "\n\n" (
-      map (account: ''
-        notmuch tag +inbox -- ${lib.escapeShellArg (pathQuery account account.folders.inbox)}
-        notmuch tag +sent -inbox -unread -- ${lib.escapeShellArg (pathQuery account account.folders.sent)}
-        notmuch tag +draft -inbox -unread -- ${lib.escapeShellArg (pathQuery account account.folders.drafts)}
-        notmuch tag +trash +deleted -inbox -unread -- ${lib.escapeShellArg (pathQuery account account.folders.trash)}
-      '') emailAccounts
-    )}
-  '';
-
-  khardAddressbook = name: account: ''
-    [[${name}]]
-    path = ${account.local.path}/default
-  '';
-
-  khardConfig =
-    let
-      khardAccounts = lib.filterAttrs (_: account: account.khard.enable) config.accounts.contact.accounts;
-    in
-    ''
-      [addressbooks]
-      ${lib.concatStringsSep "\n" (lib.mapAttrsToList khardAddressbook khardAccounts)}
-
-      [contact table]
-      display=formatted_name
-      preferred_email_address_type=pref, work, home
-
-      [general]
-      default_action=list
-      editor=nvim, -i, NONE
-    '';
 
   mkEmail = name: account: {
     inherit (account) address;
@@ -108,12 +40,17 @@ let
     };
 
     msmtp.enable = true;
+    msmtp.extraConfig = { auth = "xoauth2"; };
 
     imapnotify = {
       enable = true;
       boxes = [ "INBOX" ];
       onNotify = "mbsync ${name}";
-      onNotifyPost = "notmuch new";
+      onNotifyPost = ''
+        notmuch new
+        notify-send "New mail: ${name}" "Mail synced"
+      '';
+      extraConfig = { xoAuth2 = true; };
     }
     // (account.mail.imapnotify or { });
 
@@ -165,7 +102,6 @@ let
     }
     // (account.calendar.vdirsyncer or { });
   };
-
 in
 {
   options.modules.email.enable = lib.mkEnableOption "email tooling and shared account helpers";
@@ -178,19 +114,27 @@ in
     }
 
     (lib.mkIf cfg.enable {
-      home.packages =
-        with pkgs;
-        [
-          aspell
-          khard
-          oauth2ms
-          w3m
-        ]
-        ++ [
-          self.packages.${pkgs.stdenv.hostPlatform.system}.oauthman
-        ];
+      home.packages = with pkgs; [
+        aspell
+        oauth2ms
+        w3m
+      ] ++ [
+        self.packages.${pkgs.stdenv.hostPlatform.system}.oauthman
+      ];
 
-      xdg.configFile."khard/khard.conf".text = khardConfig;
+      programs.khard = {
+        enable = true;
+        settings = {
+          general = {
+            default_action = "list";
+            editor = [ "nvim" "-i" "NONE" ];
+          };
+          "contact table" = {
+            display = "formatted_name";
+            preferred_email_address_type = [ "pref" "work" "home" ];
+          };
+        };
+      };
 
       programs.mbsync = {
         enable = true;
@@ -205,38 +149,46 @@ in
 
       programs.notmuch = {
         enable = true;
-        new.tags = [ "unread" ];
+        new.tags = [
+          "new"
+          "unread"
+        ];
         search.excludeTags = [
           "deleted"
           "spam"
           "trash"
         ];
-        hooks.postNew = "${notmuchPostNewScript}";
+        hooks.postNew = ''
+          notmuch tag --batch <<EOM
+          ${lib.concatStringsSep "\n" (
+            map (account: "+${account.name} -- tag:new and (${accountTagQuery account})") emailAccounts
+          )}
+          ${lib.concatStringsSep "\n" (
+            map (account: "+inbox -- tag:new and path:${account.name}/${account.folders.inbox}/cur") emailAccounts
+          )}
+          ${lib.concatStringsSep "\n" (
+            map (account: "+sent -inbox -unread -- tag:new and path:${account.name}/${account.folders.sent}/cur") emailAccounts
+          )}
+          ${lib.concatStringsSep "\n" (
+            map (account: "+draft -inbox -unread -- tag:new and path:${account.name}/${account.folders.drafts}/cur") emailAccounts
+          )}
+          ${lib.concatStringsSep "\n" (
+            map (account: "+trash +deleted -inbox -unread -- tag:new and path:${account.name}/${account.folders.trash}/cur") emailAccounts
+          )}
+          -new -- tag:new
+          EOM
+        '';
       };
 
       services.imapnotify.enable = true;
+      services.imapnotify.path = [
+        self.packages.${pkgs.stdenv.hostPlatform.system}.oauthman
+        pkgs.libnotify
+      ];
 
-      systemd.user.services.vdirsyncer-sync = {
-        Unit = {
-          Description = "Sync contacts and calendars with vdirsyncer";
-          After = [ "network-online.target" ];
-          Wants = [ "network-online.target" ];
-        };
-        Service = {
-          Type = "oneshot";
-          ExecStart = "vdirsyncer sync";
-        };
-      };
-
-      systemd.user.timers.vdirsyncer-sync = {
-        Unit.Description = "Periodic contacts and calendar sync";
-        Timer = {
-          OnBootSec = "2m";
-          OnUnitActiveSec = "15m";
-          Persistent = true;
-          Unit = "vdirsyncer-sync.service";
-        };
-        Install.WantedBy = [ "timers.target" ];
+      services.vdirsyncer = {
+        enable = true;
+        frequency = "*:0/15";
       };
     })
   ];

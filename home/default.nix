@@ -6,12 +6,11 @@
     ./base.nix
     ./ai.nix
     ./activations.nix
-    ./accounts.nix
 
     ./terminal
     ./browser
     ./editor.nix
-    ./email.nix
+    ./email
     ./rofi.nix
     ./tofi.nix
     ./satty.nix

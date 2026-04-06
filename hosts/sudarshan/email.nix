@@ -4,40 +4,38 @@
   mkCalendar,
   mkContact,
   mkEmail,
-  selectAccounts,
-  setPrimaryAccount,
   ...
 }:
-{
-  modules.email.enable = true;
-
-  accounts.contact = {
-    basePath = "${config.xdg.dataHome}/contacts";
-    accounts = lib.mapAttrs mkContact (selectAccounts [
-      "main"
-      "personal"
-      "zenteiq"
-    ]);
+(import ../../home/email/accounts.nix {
+  inherit config lib mkCalendar mkContact mkEmail;
+}) {
+  main = {
+    address = "lokesh1197@gmail.com";
+    flavor = "gmail";
+    signature = ''
+      Lokesh Mohanty
+    '';
+    primary = true;
   };
 
-  accounts.calendar = {
-    basePath = "${config.xdg.dataHome}/calendars";
-    accounts = lib.mapAttrs mkCalendar (selectAccounts [
-      "main"
-      "personal"
-      "zenteiq"
-    ]);
+  personal = {
+    address = "me.lokeshmohanty@gmail.com";
+    flavor = "gmail";
+    signature = "Lokesh Mohanty";
   };
 
-  accounts.email = {
-    maildirBasePath = "${config.xdg.dataHome}/Mail";
-    accounts = lib.mapAttrs mkEmail (
-      setPrimaryAccount "main" (selectAccounts [
-        "main"
-        "personal"
-        "iisc"
-        "zenteiq"
-      ])
-    );
+  zenteiq = {
+    address = "lokeshmohanty@zenteiq.com";
+    flavor = "gmail";
+    signature = "Lokesh Mohanty";
+  };
+
+  iisc = {
+    address = "lokeshm@iisc.ac.in";
+    flavor = "outlook";
+    signature = ''
+      Lokesh Mohanty
+      Indian Institute of Science
+    '';
   };
 }

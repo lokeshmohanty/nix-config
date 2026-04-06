@@ -271,11 +271,16 @@ def cmd_setup(args: argparse.Namespace) -> int:
         force=args.force,
     )
     cmd_init(init_args)
+    config_path, _ = profile_paths(args.profile)
+    config = load_json(config_path)
+    flow = args.flow
+    if flow == "auto":
+        flow = "device" if config.get("device_authorize_url") else "authcode"
     auth_args = argparse.Namespace(
         profile=args.profile,
         timeout=args.timeout,
         no_open=args.no_open,
-        flow=args.flow,
+        flow=flow,
     )
     return cmd_authorize(auth_args)
 
@@ -518,12 +523,21 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="oauthman",
         description="OAuth helper for mbsync/msmtp with browser login, refresh, and XOAUTH2 output.",
+        epilog=(
+            "Provider mapping: use '--provider gmail' for Gmail/Google accounts and "
+            "'--provider microsoft' for Outlook/Microsoft 365 accounts."
+        ),
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     setup_parser = subparsers.add_parser("setup", help="Create a profile and authorize it")
     setup_parser.add_argument("profile")
-    setup_parser.add_argument("--provider", choices=sorted(PROVIDERS), default="microsoft")
+    setup_parser.add_argument(
+        "--provider",
+        choices=sorted(PROVIDERS),
+        default="microsoft",
+        help="OAuth provider preset. Gmail/Google accounts use 'gmail'; Outlook/Microsoft 365 accounts use 'microsoft'.",
+    )
     setup_parser.add_argument("--email", required=True)
     setup_parser.add_argument("--client")
     setup_parser.add_argument("--client-id")
@@ -531,7 +545,12 @@ def build_parser() -> argparse.ArgumentParser:
     setup_parser.add_argument("--tenant")
     setup_parser.add_argument("--scope", action="append")
     setup_parser.add_argument("--redirect-port", type=int)
-    setup_parser.add_argument("--flow", choices=["authcode", "device"], default="device")
+    setup_parser.add_argument(
+        "--flow",
+        choices=["auto", "authcode", "device"],
+        default="auto",
+        help="OAuth flow to use. 'auto' picks device flow when supported, otherwise authcode.",
+    )
     setup_parser.add_argument("--timeout", type=int, default=300)
     setup_parser.add_argument("--no-open", action="store_true")
     setup_parser.add_argument("--force", action="store_true")
@@ -539,7 +558,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     init_parser = subparsers.add_parser("init", help="Create or update a profile")
     init_parser.add_argument("profile")
-    init_parser.add_argument("--provider", choices=sorted(PROVIDERS), default="microsoft")
+    init_parser.add_argument(
+        "--provider",
+        choices=sorted(PROVIDERS),
+        default="microsoft",
+        help="OAuth provider preset. Gmail/Google accounts use 'gmail'; Outlook/Microsoft 365 accounts use 'microsoft'.",
+    )
     init_parser.add_argument("--email", required=True)
     init_parser.add_argument("--client", help="Built-in client preset, defaults to thunderbird")
     init_parser.add_argument("--client-id")
