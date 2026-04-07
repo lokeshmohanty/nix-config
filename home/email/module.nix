@@ -47,8 +47,9 @@ let
       boxes = [ "INBOX" ];
       onNotify = "mbsync ${name}";
       onNotifyPost = ''
-        notmuch new
-        notify-send "New mail: ${name}" "Mail synced"
+        ${pkgs.notmuch}/bin/notmuch new
+        msg=$(${pkgs.notmuch}/bin/notmuch search --limit=1 --sort=newest-first --format=json tag:inbox and tag:${name} | ${pkgs.jq}/bin/jq '.[0]["authors"], .[0]["subject"]' | ${pkgs.coreutils}/bin/paste -d': ' - -)
+        if [ -n "$msg" ]; then ${pkgs.libnotify}/bin/notify-send "(${name}) $msg"; fi
       '';
       extraConfig = { xoAuth2 = true; };
     }
