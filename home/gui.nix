@@ -8,6 +8,7 @@
         browser.enable = lib.mkDefault config.modules.gui.enable;
         foot.enable = lib.mkDefault config.modules.gui.enable;
         kitty.enable = lib.mkDefault config.modules.gui.enable;
+        ghostty.enable = lib.mkDefault config.modules.gui.enable;
         rofi.enable = lib.mkDefault config.modules.gui.enable;
         satty.enable = lib.mkDefault config.modules.gui.enable;
         tofi.enable = lib.mkDefault config.modules.gui.enable;

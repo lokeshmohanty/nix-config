@@ -52,6 +52,7 @@ inputs.nix-wrapper-modules.wrappers.neovim.wrap [
         tailwindcss-language-server
         nginx-language-server
         bash-language-server
+        helm-ls
         tree-sitter
         trashy
         mermaid-cli
@@ -91,6 +92,8 @@ inputs.nix-wrapper-modules.wrappers.neovim.wrap [
           nvim-dap-view
           nvim-dap-virtual-text
           customPlugins.everforest
+
+          helm-ls-nvim
         ];
       };
 
