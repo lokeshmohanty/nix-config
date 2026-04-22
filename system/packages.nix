@@ -12,6 +12,7 @@
     (inkscape-with-extensions.override { inkscapeExtensions = [ inkscape-extensions.textext ]; })
     # krita
     vscode-fhs
+    bruno
 
     # cli applications
     # tesseract

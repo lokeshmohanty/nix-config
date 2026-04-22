@@ -1120,6 +1120,22 @@
         "type": "github"
       }
     },
+    "plugins-bruno": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1763718568,
+        "narHash": "sha256-kSL2LchnGDPqb36d1bzKUEmjLVrjky8PZrGImWcLcSY=",
+        "owner": "romek-codes",
+        "repo": "bruno.nvim",
+        "rev": "ad3b2c0039174ac1e7b7247016e95bd7e5d84755",
+        "type": "github"
+      },
+      "original": {
+        "owner": "romek-codes",
+        "repo": "bruno.nvim",
+        "type": "github"
+      }
+    },
     "plugins-everforest": {
       "flake": false,
       "locked": {
@@ -1189,6 +1205,7 @@
         "nixpkgs": "nixpkgs_6",
         "noctalia": "noctalia",
         "noctalia-qs": "noctalia-qs",
+        "plugins-bruno": "plugins-bruno",
         "plugins-everforest": "plugins-everforest",
         "plugins-slimline": "plugins-slimline",
         "stylix": "stylix",

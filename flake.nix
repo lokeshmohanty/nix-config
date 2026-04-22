@@ -46,6 +46,10 @@
       url = "github:neanias/everforest-nvim";
       flake = false;
     };
+    "plugins-bruno" = {
+      url = "github:romek-codes/bruno.nvim";
+      flake = false;
+    };
   };
 
   outputs =

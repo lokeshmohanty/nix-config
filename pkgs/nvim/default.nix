@@ -18,6 +18,12 @@ let
       src = ./lua/notmuch.nvim;
       doCheck = false;
     };
+    bruno = pkgs.vimUtils.buildVimPlugin {
+      pname = "bruno";
+      version = "source";
+      src = inputs.plugins-bruno;
+      doCheck = false;
+    };
   };
 in
 inputs.nix-wrapper-modules.wrappers.neovim.wrap [
@@ -60,6 +66,7 @@ inputs.nix-wrapper-modules.wrappers.neovim.wrap [
         ghostscript
         w3m # required for notmuch
         notmuch # required for notmuch
+        bruno-cli # required for bruno
       ];
 
       specs.general = {
@@ -110,6 +117,7 @@ inputs.nix-wrapper-modules.wrappers.neovim.wrap [
           flash-nvim
           undotree
           customPlugins.notmuch-nvim
+          customPlugins.bruno
         ];
       };
     }
