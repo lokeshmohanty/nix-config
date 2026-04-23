@@ -32,7 +32,7 @@ inputs.nix-wrapper-modules.wrappers.neovim.wrap [
     { pkgs, ... }:
     {
       settings = {
-        config_directory = ./.;
+        config_directory = ./.; # "~/.config/nvim";
         aliases = [ "vi" ];
       };
 
@@ -116,7 +116,7 @@ inputs.nix-wrapper-modules.wrappers.neovim.wrap [
           gx-nvim
           flash-nvim
           undotree
-          customPlugins.notmuch-nvim
+          # customPlugins.notmuch-nvim
           customPlugins.bruno
         ];
       };
