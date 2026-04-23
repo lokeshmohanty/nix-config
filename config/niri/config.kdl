@@ -258,6 +258,7 @@ layout {
 // Note that running niri as a session supports xdg-desktop-autostart,
 // which may be more convenient to use.
 spawn-at-startup "noctalia-shell"
+spawn-at-startup "foot --server"
 hotkey-overlay { skip-at-startup; }
 prefer-no-csd // omit client-side decorations
 
@@ -355,10 +356,10 @@ binds {
     // ============
     // Applications
     // ============
-    Mod+Return { spawn "ghostty"; }
+    Mod+Return { spawn "footclient"; }
     Mod+E { spawn "nautilus"; }
     Mod+B { spawn "firefox"; }
-    Mod+M { spawn-sh "ghostty -e vi -c 'Notmuch'"; }
+    Mod+M { spawn-sh "kitty vi -c 'Notmuch'"; }
     Mod+S { spawn-sh "kitten quick-access-terminal"; }
     Mod+D { spawn-sh "noctalia-shell ipc call launcher toggle"; } // >settings, ...
     Mod+Q { spawn-sh "noctalia-shell ipc call sessionMenu toggle"; }

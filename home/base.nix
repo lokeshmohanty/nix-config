@@ -2,7 +2,6 @@
   inputs,
   config,
   pkgs,
-  lib,
   ...
 }:
 {
@@ -20,7 +19,7 @@
   home = {
     username = "lokesh";
     homeDirectory = "/home/lokesh";
-    sessionPath = [ "$HOME/.local/bin" ];
+    sessionPath = [ "$HOME/.local/bin" "$HOME/.cargo/bin" ];
     sessionVariables = {
       LESSHISTFILE = config.xdg.cacheHome + "/less/history";
       LESSKEY = config.xdg.configHome + "/less/lesskey";
