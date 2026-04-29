@@ -32,7 +32,7 @@ inputs.nix-wrapper-modules.wrappers.neovim.wrap [
     { pkgs, ... }:
     {
       settings = {
-        config_directory = ./.; # "~/.config/nvim";
+        config_directory = "/home/lokesh/.config/nvim";
         aliases = [ "vi" ];
       };
 
