@@ -258,7 +258,7 @@ layout {
 // Note that running niri as a session supports xdg-desktop-autostart,
 // which may be more convenient to use.
 spawn-at-startup "noctalia-shell"
-spawn-at-startup "foot --server"
+spawn-at-startup "foot" "--server"
 hotkey-overlay { skip-at-startup; }
 prefer-no-csd // omit client-side decorations
 

@@ -25,6 +25,12 @@ require("blink.cmp").setup({
 -- Examples: https://github.com/rafamadriz/friendly-snippets/tree/main/snippets
 local ms = require('mini.snippets')
 local gen_loader = ms.gen_loader
+-- Adjust language patterns
+local latex_patterns = { 'latex/**/*.json', '**/latex.json' }
+local lang_patterns = {
+  tex = latex_patterns, plaintex = latex_patterns,
+  markdown_inline = { 'markdown.lua' },
+}
 ms.setup({
   snippets = {
     -- Load custom file with global snippets first
@@ -32,23 +38,24 @@ ms.setup({
 
     -- Load snippets based on current language by reading files from
     -- "snippets/" subdirectories from 'runtimepath' directories.
-    gen_loader.from_lang(),
+    gen_loader.from_lang({ lang_patterns = lang_patterns }),
+
   },
 })
 
-vim.keymap.set("i", "<C-g><C-j>", function() ms.expand({ match = false }) end)
--- vim.keymap.set("i", "<C-j>", function() ms.expand() end)
--- vim.keymap.set("i", "<C-l>", function() ms.session.jump("next") end)
--- vim.keymap.set("i", "<C-h>", function() ms.session.jump("prev") end)
+vim.keymap.set("i", "<C-j>", function() ms.expand({ match = false }) end)
+vim.keymap.set("i", "<C-j>", function() ms.expand() end)
+vim.keymap.set("i", "<C-l>", function() ms.session.jump("next") end)
+vim.keymap.set("i", "<C-h>", function() ms.session.jump("prev") end)
 
 
 -- [[ AI Completion ]]
 -- Run :copilot auth
-require("copilot").setup({})
-local cs = require("copilot.suggestion")
-vim.keymap.set("i", "<C-l>", cs.accept_line)
-vim.keymap.set("i", "<C-j>", cs.accept_word)
-vim.keymap.set("n", "<leader>ac", "<cmd>Copilot toggle<cr>", { desc = "Toggle Copilot" })
+-- require("copilot").setup({})
+-- local cs = require("copilot.suggestion")
+-- vim.keymap.set("i", "<C-l>", cs.accept_line)
+-- vim.keymap.set("i", "<C-j>", cs.accept_word)
+-- vim.keymap.set("n", "<leader>ac", "<cmd>Copilot toggle<cr>", { desc = "Toggle Copilot" })
 
 require("claudecode").setup()
 require("codecompanion").setup()
