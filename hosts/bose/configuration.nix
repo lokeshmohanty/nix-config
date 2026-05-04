@@ -1,24 +1,11 @@
 {
-  inputs,
-  lib,
-  config,
   pkgs,
   ...
 }:
 {
-  imports = [ ../../system ];
+  imports = [ ../../system ./tailscale-second.nix ];
 
   hardware.graphics.enable = true;
-  #   hardware.nvidia = {
-  #     modesetting.enable = true;
-  #     powerManagement.enable = false;
-  #     powerManagement.finegrained = false;
-  #     open = false;
-  #     nvidiaSettings = true;
-  #   };
-  #   nixpkgs.config = {
-  #    nvidia.acceptLicense = true;
-  #  };
   gaming.enable = false;
 
   programs.nix-ld = {
