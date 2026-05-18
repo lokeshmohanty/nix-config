@@ -59,12 +59,13 @@ inputs.nix-wrapper-modules.wrappers.neovim.wrap [
         nginx-language-server
         bash-language-server
         helm-ls
+        terraform-ls
         tree-sitter
         trashy
         mermaid-cli
         imagemagick
         ghostscript
-        w3m # required for notmuch
+        w3m-full # required for notmuch
         notmuch # required for notmuch
         bruno-cli # required for bruno
       ];

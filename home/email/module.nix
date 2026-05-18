@@ -118,7 +118,7 @@ in
       home.packages = with pkgs; [
         aspell
         oauth2ms
-        w3m
+        w3m-full
       ] ++ [
         self.packages.${pkgs.stdenv.hostPlatform.system}.oauthman
       ];

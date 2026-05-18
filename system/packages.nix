@@ -13,10 +13,13 @@
     # krita
     vscode-fhs
     bruno
+    rustdesk-flutter
 
     # cli applications
     # tesseract
     aria2
+    wget
+    marp-cli # create slides from markdown
     gh
 
     # system utilities

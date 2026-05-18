@@ -11,9 +11,8 @@
     home.packages = with pkgs; [
       qwen-code
       gemini-cli
-      codex
-      opencode
-      mistral-vibe
+      # codex claude-code antigravity
+      # pi
     ];
   };
 }
