@@ -28,6 +28,7 @@
       DELTA_PAGER = "less -R";
       TERM = "xterm-256color";
       NIXCONFIG = config.vars.nixDir;
+      NIXPKGS_ALLOW_UNFREE=1;
     };
     packages = with pkgs; [
       # Misc
