@@ -2,6 +2,7 @@
   inputs,
   config,
   pkgs,
+  self,
   ...
 }:
 {
@@ -31,6 +32,9 @@
       NIXPKGS_ALLOW_UNFREE=1;
     };
     packages = with pkgs; [
+      self.packages.${pkgs.stdenv.hostPlatform.system}.ghost-build
+      postgresql
+
       # Misc
       tlrc # rust client for tldr
       # cowsay
