@@ -369,6 +369,7 @@ binds {
     Mod+I { spawn "~/.config/niri/my-bookmark" "list"; }
     Mod+Shift+I { spawn "~/.config/niri/my-bookmark" "commands"; }
     Mod+Alt+R { spawn "~/.config/niri/my-recorder" "commands"; }
+    Mod+Alt+K { spawn "pkill" "-SIGUSR1" "-f" "gpu-screen-recorder"; }
 
 
     Print { spawn-sh "grim -g \"$(slurp)\" - | satty -f -"; }

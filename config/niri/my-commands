@@ -2,12 +2,14 @@
 
 labels() {
   printf '%s\n' \
-    "Restart Noctalia"
+    "Restart Noctalia" \
+    "Screen Recorder"
 }
 
 run() {
   case "$1" in
     "Restart Noctalia") noctalia-shell kill; sleep 1 && noctalia-shell & ;;
+    "Screen Recorder") ~/.config/niri/my-recorder commands ;;
   esac
 }
 

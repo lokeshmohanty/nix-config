@@ -59,18 +59,21 @@ commands() {
   esac
 }
 
-if [ -f "$PID_FILE" ]; then
-  kill -SIGUSR1 "$(cat "$PID_FILE")"
-  # pkill -SIGUSR1 -f gpu-screen-recorder
-  rm "$PID_FILE"
-  notify-send "Recording stopped"
-else
-  case "$1" in
-    portal)   record ;;
-    area)     REGION=1; record ;;
-    replay)   REPLAY_BUFFER=1; record ;;
-    camera)   camera ;;
-    commands) commands ;;
-    *)        echo "Usage: $0 {portal|area|replay|camera}" ;;
-  esac
-fi
+case "$1" in
+  portal)   record ;;
+  area)     REGION=1; record ;;
+  replay)   REPLAY_BUFFER=1; record ;;
+  camera)   camera ;;
+  commands) commands ;;
+  "")
+    if [ -f "$PID_FILE" ]; then
+      kill -SIGUSR1 "$(cat "$PID_FILE")"
+      # pkill -SIGUSR1 -f gpu-screen-recorder
+      rm "$PID_FILE"
+      notify-send "Recording stopped"
+    else
+      echo "Usage: $0 {portal|area|replay|camera}"
+    fi
+    ;;
+  *)        echo "Usage: $0 {portal|area|replay|camera}" ;;
+esac
