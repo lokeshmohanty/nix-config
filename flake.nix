@@ -1,6 +1,11 @@
 {
   description = "Lokesh's NixOS Configuration";
 
+  nixConfig = {
+    extra-substituters = [ "https://cache.numtide.com" ];
+    extra-trusted-public-keys = [ "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=" ];
+  };
+
   inputs = {
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -35,6 +40,8 @@
 
     nixos-hardware.url = "github:NixOS/nixos-hardware";
     musnix.url = "github:musnix/musnix";
+
+    llm-agents.url = "github:numtide/llm-agents.nix";
 
     nix-alien.url = "github:thiagokokada/nix-alien";
     nix-wrapper-modules.url = "github:BirdeeHub/nix-wrapper-modules";
