@@ -20,10 +20,6 @@ in
       claude-code 
       antigravity-cli 
       pi
-
-      # tools
-      agent-browser
-      gitnexus
     ];
   };
 }
