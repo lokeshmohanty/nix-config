@@ -26,7 +26,7 @@ require("blink.cmp").setup({
 local ms = require('mini.snippets')
 local gen_loader = ms.gen_loader
 -- Adjust language patterns
-local latex_patterns = { 'latex/**/*.json', '**/latex.json' }
+local latex_patterns = { 'latex/**/*.lua', 'latex/**/*.json', '**/latex.json' }
 local lang_patterns = {
   tex = latex_patterns, plaintex = latex_patterns,
   markdown_inline = { 'markdown.lua' },
@@ -43,7 +43,34 @@ ms.setup({
   },
 })
 
-vim.keymap.set("i", "<C-j>", function() ms.expand({ match = false }) end)
+-- <Tab>: expand snippet if prefix matches → else native Tab (indent/spaces)
+-- Uses 'n' feedkeys so the fallback cannot re-trigger this mapping.
+local function tab_expand(match_fn)
+  local session = ms.session.get()
+  if session ~= nil then
+    ms.session.jump('next')
+    return
+  end
+  local matched = false
+  ms.expand({
+    match = function(snippets)
+      local m = (match_fn or ms.default_match)(snippets)
+      matched = #m > 0
+      return m
+    end,
+  })
+  if not matched then
+    vim.api.nvim_feedkeys(
+      vim.api.nvim_replace_termcodes('<Tab>', true, false, true), 'n', false
+    )
+  end
+end
+
+vim.keymap.set('i', '<Tab>', tab_expand)
+
+-- Export so ft.lua can reuse the wrapper with a custom match function
+_G.MiniSnippetsTabExpand = tab_expand
+
 vim.keymap.set("i", "<C-j>", function() ms.expand() end)
 vim.keymap.set("i", "<C-l>", function() ms.session.jump("next") end)
 vim.keymap.set("i", "<C-h>", function() ms.session.jump("prev") end)

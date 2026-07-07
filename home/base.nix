@@ -101,6 +101,34 @@
       set synctex-editor-command "nvim --headless -c \"VimtexInverseSearch %{line} '%{input}'\""
     '';
   };
+  programs.sioyek = {
+    enable = true;
+    config = {
+      # Inverse search: Ctrl+click in sioyek → jump to source in Neovim via VimTeX
+      inverse_search_command = "nvim --headless -c \"VimtexInverseSearch %2 '%1'\"";
+
+      # Open new files in the same window (matches --reuse-window in vimtex forward search)
+      should_load_tutorial_when_no_other_file = "0";
+      should_open_new_pdf_in_existing_window = "1";
+
+      # SyncTeX: highlight the synced location briefly
+      # synctex_highlight_color = "0.5 0.8 0.5";  # soft green
+
+      # UI
+      # # background_color = "0.12 0.12 0.12";
+      # text_color = "0.90 0.90 0.85";
+      # ui_background_color = "0.15 0.15 0.15";
+      # ui_text_color = "0.90 0.90 0.85";
+      # ui_selected_background_color = "0.25 0.45 0.65";
+
+      # Smooth scrolling
+      smooth_scroll_speed = "3";
+    };
+    bindings = {
+      # sync forward search toggle
+      turn_on_synctex = "F4";
+    };
+  };
   # programs.keychain = { enable = true; keys = [ "id_ed25519" ]; };
   programs.gh = {
     enable = true;

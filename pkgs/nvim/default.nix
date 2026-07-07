@@ -68,6 +68,7 @@ inputs.nix-wrapper-modules.wrappers.neovim.wrap [
         w3m-full # required for notmuch
         notmuch # required for notmuch
         bruno-cli # required for bruno
+        texlab # LaTeX
       ];
 
       specs.general = {
