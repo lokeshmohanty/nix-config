@@ -6,7 +6,7 @@ vim.g.vimtex_view_method = 'sioyek'
 -- latexmk with LuaLaTeX, continuous mode, SyncTeX
 vim.g.vimtex_compiler_method = 'latexmk'
 vim.g.vimtex_compiler_latexmk = {
-  build_dir = '',
+  build_dir = 'latex.out',
   callback = 1,
   continuous = 1,
   executable = 'latexmk',
@@ -45,7 +45,7 @@ vim.lsp.config('texlab', {
     texlab = {
       build = {
         executable = 'latexmk',
-        args = { '-lualatex', '-interaction=nonstopmode', '-synctex=1', '-shell-escape', '%f' },
+        args = { '-lualatex', '-interaction=nonstopmode', '-synctex=1', '-shell-escape', '-outdir=latex.out', '%f' },
         onSave = false,
         forwardSearchAfter = false,
       },
