@@ -21,6 +21,9 @@
       scripts = lib.mkAfter ''
         ln -sf ${config.vars.nixDir}/scripts/* ${config.home.homeDirectory}/.local/bin/
       '';
+      inkscape = lib.mkAfter ''
+        ln -sf ${config.vars.nixDir}/config/inkscape ${config.xdg.configHome}/inkscape
+      '';
       pi = lib.mkAfter ''
         ln -sf ${config.vars.nixDir}/config/pi ${config.home.homeDirectory}/.pi
       '';
