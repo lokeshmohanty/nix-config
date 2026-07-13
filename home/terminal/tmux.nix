@@ -23,6 +23,7 @@
         set -g renumber-windows on
         set-option -g status-position top
         set-option -sg escape-time 0
+        set -g extended-keys-format csi-u
 
         # keybindings
         bind "\`" switch-client -t "{marked}"
