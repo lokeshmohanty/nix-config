@@ -31,6 +31,9 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 
 require('plugins')
 
+require('lean').setup() -- required only because I use nix
+vim.g.lean_config = { mappings = true }
+
 vim.cmd([[
   "let g:slime_target = "kitty"
   let g:slime_target = "tmux"

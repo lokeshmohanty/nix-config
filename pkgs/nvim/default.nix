@@ -69,6 +69,7 @@ inputs.nix-wrapper-modules.wrappers.neovim.wrap [
         notmuch # required for notmuch
         bruno-cli # required for bruno
         texlab # LaTeX
+        resvg # svg rendering for lean-nvim
       ];
 
       specs.general = {
@@ -102,6 +103,7 @@ inputs.nix-wrapper-modules.wrappers.neovim.wrap [
           nvim-dap-virtual-text
           customPlugins.everforest
 
+          lean-nvim
           helm-ls-nvim
         ];
       };
