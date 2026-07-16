@@ -6,9 +6,11 @@
     ./base.nix
     ./ai.nix
     ./activations.nix
+    ./programs.nix
 
     ./terminal
     ./browser
+    ./pdf.nix
     ./editor.nix
     ./email
     ./rofi.nix
