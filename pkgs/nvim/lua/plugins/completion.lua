@@ -52,6 +52,17 @@ local function tab_expand(match_fn)
     return
   end
   local matched = false
+  local line = vim.api.nvim_get_current_line()
+  local col = vim.api.nvim_win_get_cursor(0)[2]
+  local prev_char = line:sub(col, col)
+
+  if prev_char == "" or prev_char:match("%s") then
+    vim.api.nvim_feedkeys(
+      vim.api.nvim_replace_termcodes('<Tab>', true, false, true), 'n', false
+    )
+    return
+  end
+
   ms.expand({
     match = function(snippets)
       local m = (match_fn or ms.default_match)(snippets)
