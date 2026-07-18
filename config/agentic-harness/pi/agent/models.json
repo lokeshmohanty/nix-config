@@ -22,17 +22,18 @@
         }
       ]
     },
-    "vllm-nematron": {
-      "baseUrl": "http://10.169.20.57:8000/v1",
+    "vllm-ziq": {
+      "baseUrl": "http://10.169.20.183:8002/v1",
       "api": "openai-completions",
       "apiKey": "none",
       "models": [
         {
-          "id": "openai/nvidia/nemotron-3-super",
+          "id": "deepseek-ai/DeepSeek-V4-Flash",
           "input": [ "text" ]
         }
       ]
     }
   }
 }
+
 

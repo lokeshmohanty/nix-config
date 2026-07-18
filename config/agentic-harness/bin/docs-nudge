@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Claude Code Stop hook: once per session, remind the agent when tracked source
+# changed but docs/ did not. Exit 2 + stderr feeds the reminder back to the model.
+set -uo pipefail
+
+command -v python3 >/dev/null 2>&1 || exit 0
+input="$(cat 2>/dev/null || true)"
+read -r active sid <<EOF
+$(printf '%s' "$input" | python3 -c 'import json,sys
+try: d=json.load(sys.stdin)
+except Exception: d={}
+print(str(d.get("stop_hook_active",False)).lower(), d.get("session_id","nosession"))' 2>/dev/null || echo "false nosession")
+EOF
+[ "$active" = "true" ] && exit 0
+marker="${TMPDIR:-/tmp}/docs-nudge-${sid}"
+[ -e "$marker" ] && exit 0
+
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+[ -d "$ROOT/docs" ] || exit 0
+
+changed="$(git -C "$ROOT" status --porcelain 2>/dev/null | grep -vE '^\?\?' | awk '{print $NF}')"
+[ -n "$changed" ] || exit 0
+src="$(printf '%s\n' "$changed" | grep -vE '^(docs/|STATUS\.md|AGENTS\.md|TODO\.md|\.gitignore)' | head -5)"
+[ -n "$src" ] || exit 0
+printf '%s\n' "$changed" | grep -qE '^docs/' && exit 0
+
+touch "$marker"
+{
+  echo "docs-nudge: tracked files are modified ($(printf '%s ' $src)) but docs/ was not updated."
+  echo "If this session made significant changes, update docs/ (docs-sync skill); otherwise state briefly why no docs update is needed and finish."
+} >&2
+exit 2

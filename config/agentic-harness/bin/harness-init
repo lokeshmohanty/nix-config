@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Scaffold the standard agent-harness layout in a project. Idempotent; never overwrites.
+# Usage: harness-init [dir]   (defaults to cwd; operates on the git toplevel if inside a repo)
+set -euo pipefail
+
+TPL="$(dirname "$(readlink -f "$0")")/../templates/project"
+cd "${1:-.}"
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$ROOT"
+NAME="$(basename "$ROOT")"
+created=()
+
+if [ ! -e AGENTS.md ]; then
+  if [ -f CLAUDE.md ] && [ ! -L CLAUDE.md ]; then
+    # existing CLAUDE.md content becomes canonical: content wins, names are fixed
+    mv CLAUDE.md AGENTS.md
+  else
+    sed "s/PROJECT_NAME/${NAME}/g" "$TPL/AGENTS.md" > AGENTS.md
+  fi
+  created+=(AGENTS.md)
+fi
+if [ ! -e CLAUDE.md ]; then ln -s AGENTS.md CLAUDE.md; created+=(CLAUDE.md); fi
+if [ ! -e STATUS.md ]; then sed "s/DATE/$(date +%F)/" "$TPL/STATUS.md" > STATUS.md; created+=(STATUS.md); fi
+if [ ! -d docs ]; then
+  mkdir docs
+  sed "s/PROJECT_NAME/${NAME}/g" "$TPL/docs/index.md" > docs/index.md
+  created+=(docs/)
+fi
+if [ ! -d .agents/skills ]; then mkdir -p .agents/skills; created+=(.agents/skills/); fi
+if [ ! -e .claude ]; then ln -s .agents .claude; created+=(.claude); fi
+
+if [ -d .git ] && ! grep -qs '\.claude/settings\.local\.json' .gitignore 2>/dev/null; then
+  { [ -s .gitignore ] && printf '\n'; cat "$TPL/gitignore-snippet"; } >> .gitignore
+  created+=(.gitignore+harness-ignores)
+fi
+
+if [ "${#created[@]}" -eq 0 ]; then
+  echo "harness-init: $ROOT already conforms (nothing created)"
+else
+  echo "harness-init: scaffolded in $ROOT: ${created[*]}"
+fi

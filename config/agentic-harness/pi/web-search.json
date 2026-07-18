@@ -1,7 +1,6 @@
 {
   "provider": "exa",
-  "allowBrowserCookies": false,
-  "summaryModel": "google/gemma-4-31B-it",
-  "workflow": "none",
-  "curatorTimeoutSeconds": 20
+  "webSearch": {
+    "enabled": true
+  }
 }

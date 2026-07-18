@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Claude Code SessionStart hook: auto-scaffold the harness layout in unharnessed git repos.
+# Fast no-op in already-harnessed repos, non-repos, and system/throwaway paths.
+set -uo pipefail
+
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+case "$ROOT" in
+  "$HOME" | /tmp/* | /nix/* | "$HOME/.nix" | "$HOME/.nix"/*) exit 0 ;;
+esac
+[ -e "$ROOT/AGENTS.md" ] || [ -e "$ROOT/CLAUDE.md" ] && exit 0
+
+"$(dirname "$(readlink -f "$0")")/harness-init" "$ROOT" >/dev/null 2>&1 || exit 0
+echo "harness: this repo was unharnessed — scaffolded AGENTS.md, STATUS.md, docs/, .agents/ (contract: ~/.agents/docs/project-template.md). Fill the TODOs in AGENTS.md/docs/index.md when convenient; use the docs-sync skill to populate docs/."

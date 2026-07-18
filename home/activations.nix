@@ -24,14 +24,39 @@
       inkscape = lib.mkAfter ''
         ln -sf ${config.vars.nixDir}/config/inkscape ${config.xdg.configHome}/inkscape
       '';
-      pi = lib.mkAfter ''
-        ln -sf ${config.vars.nixDir}/config/agentic-harness/pi ${config.home.homeDirectory}/.pi
+      # Agentic harness (see config/agentic-harness/agents/docs/layout.md).
+      # ~/.agents is a whole-dir symlink; ~/.claude and ~/.pi stay REAL dirs
+      # (runtime state, credentials) with selective links inside.
+      # ln -sfn, never ln -sf: -sf on an existing dir drops the link INSIDE it.
+      agents = lib.mkAfter ''
+        ln -sfn ${config.vars.nixDir}/config/agentic-harness/agents ${config.home.homeDirectory}/.agents
       '';
       claude = lib.mkAfter ''
-        ln -sf ${config.vars.nixDir}/config/agentic-harness/claude ${config.home.homeDirectory}/.claude
+        mkdir -p ${config.home.homeDirectory}/.claude
+        ln -sfn ${config.home.homeDirectory}/.agents/AGENTS.md ${config.home.homeDirectory}/.claude/CLAUDE.md
+        ln -sfn ${config.home.homeDirectory}/.agents/skills ${config.home.homeDirectory}/.claude/skills
+        ln -sfn ${config.vars.nixDir}/config/agentic-harness/claude/settings.json ${config.home.homeDirectory}/.claude/settings.json
+        ln -sfn ${config.vars.nixDir}/config/agentic-harness/claude/rules ${config.home.homeDirectory}/.claude/rules
       '';
-      agents = lib.mkAfter ''
-        ln -sf ${config.vars.nixDir}/config/agentic-harness/agents ${config.home.homeDirectory}/.agents
+      pi = lib.mkAfter ''
+        mkdir -p ${config.home.homeDirectory}/.pi/agent
+        ln -sfn ${config.vars.nixDir}/config/agentic-harness/pi/web-search.json ${config.home.homeDirectory}/.pi/web-search.json
+        ln -sfn ${config.vars.nixDir}/config/agentic-harness/pi/agent/settings.json ${config.home.homeDirectory}/.pi/agent/settings.json
+        ln -sfn ${config.vars.nixDir}/config/agentic-harness/pi/agent/models.json ${config.home.homeDirectory}/.pi/agent/models.json
+        ln -sfn ${config.home.homeDirectory}/.agents/AGENTS.md ${config.home.homeDirectory}/.pi/agent/APPEND_SYSTEM.md
+        ln -sfn ${config.home.homeDirectory}/.agents/skills ${config.home.homeDirectory}/.pi/agent/skills
+      '';
+      codex = lib.mkAfter ''
+        mkdir -p ${config.home.homeDirectory}/.codex
+        ln -sfn ${config.home.homeDirectory}/.agents/AGENTS.md ${config.home.homeDirectory}/.codex/AGENTS.md
+        ln -sfn ${config.home.homeDirectory}/.agents/skills ${config.home.homeDirectory}/.codex/skills
+      '';
+      gemini = lib.mkAfter ''
+        mkdir -p ${config.home.homeDirectory}/.gemini
+        ln -sfn ${config.home.homeDirectory}/.agents/AGENTS.md ${config.home.homeDirectory}/.gemini/GEMINI.md
+      '';
+      harness-bin = lib.mkAfter ''
+        ln -sf ${config.vars.nixDir}/config/agentic-harness/bin/* ${config.home.homeDirectory}/.local/bin/
       '';
     };
   };
