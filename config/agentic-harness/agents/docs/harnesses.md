@@ -4,16 +4,16 @@
 
 ## Summary table
 
-| | Claude Code | pi | Codex | Gemini CLI |
-|---|---|---|---|---|
-| Context file | `~/.claude/CLAUDE.md` → `~/.agents/AGENTS.md`; project `CLAUDE.md` | `AGENTS.md`/`CLAUDE.md` from cwd + `APPEND_SYSTEM.md` → `~/.agents/AGENTS.md` | `~/.codex/AGENTS.md` → `~/.agents/AGENTS.md` | `~/.gemini/GEMINI.md` → `~/.agents/AGENTS.md` |
-| Skills | yes — `~/.claude/skills` → `~/.agents/skills` + `<repo>/.claude/skills` | yes — `~/.pi/agent/skills` → `~/.agents/skills`, `--skill` | yes — `~/.codex/skills` → `~/.agents/skills` | yes — `~/.gemini/skills` → `~/.agents/skills` (VERIFY discovery semantics) |
-| Hooks | yes — JSON in settings files (6 events) | no native hook events (extensions instead) | yes — `config.toml` `[[hooks.*]]` + `hooks.json` | yes — `settings.json` (`SessionStart`/`BeforeTool`/`AfterTool` naming) |
-| MCP | yes — `~/.claude.json` global, `.mcp.json` per-project | no (VERIFY — nothing configured; extensions cover tool needs) | yes — `[mcp_servers]` in config.toml | yes — `mcpServers` in settings.json |
-| Subagents | yes — `agents/*.md` global + per-repo | no | no | no (VERIFY) |
-| Plugins / extensions | plugins (`enabledPlugins`, marketplaces) | extensions (`~/.pi/agent/extensions/`, `pi install`) | no | `~/.gemini/extensions/` |
-| Config | `~/.claude/settings.json` (+ `.local`, per-project) | `~/.pi/agent/settings.json`, `models.json` | `~/.codex/config.toml` | `~/.gemini/settings.json` |
-| Nix-managed? | selective links (`CLAUDE.md`, `skills`, `settings.json`, `rules`); runtime dirs stay real | selective links (`settings.json`, `models.json`, `web-search.json`, `APPEND_SYSTEM.md`, `skills`) | AGENTS.md + skills links only — `config.toml` machine-local (secrets) | GEMINI.md link only |
+| | Claude Code | pi | Codex | Gemini CLI | Antigravity |
+|---|---|---|---|---|---|
+| Context file | `~/.claude/CLAUDE.md` → `~/.agents/AGENTS.md`; project `CLAUDE.md` | `AGENTS.md`/`CLAUDE.md` from cwd + `APPEND_SYSTEM.md` → `~/.agents/AGENTS.md` | `~/.codex/AGENTS.md` → `~/.agents/AGENTS.md` | `~/.gemini/GEMINI.md` → `~/.agents/AGENTS.md` | `~/.gemini/antigravity/AGENTS.md` → `~/.agents/AGENTS.md` + project `AGENTS.md` |
+| Skills | yes — `~/.claude/skills` → `~/.agents/skills` + `<repo>/.claude/skills` | yes — `~/.pi/agent/skills` → `~/.agents/skills`, `--skill` | yes — `~/.codex/skills` → `~/.agents/skills` | yes — `~/.gemini/skills` → `~/.agents/skills` (VERIFY discovery semantics) | yes — `~/.gemini/antigravity/skills` → `~/.agents/skills` |
+| Hooks | yes — JSON in settings files (6 events) | no native hook events (extensions instead) | yes — `config.toml` `[[hooks.*]]` + `hooks.json` | yes — `settings.json` (`SessionStart`/`BeforeTool`/`AfterTool` naming) | no native hooks (VERIFY) |
+| MCP | yes — `~/.claude.json` global, `.mcp.json` per-project | no (VERIFY — nothing configured; extensions cover tool needs) | yes — `[mcp_servers]` in config.toml | yes — `mcpServers` in settings.json | yes — `mcp_config.json` (nix-managed, empty; gortex removed) |
+| Subagents | yes — `agents/*.md` global + per-repo | no | no | no (VERIFY) | no (VERIFY) |
+| Plugins / extensions | plugins (`enabledPlugins`, marketplaces) | extensions (`~/.pi/agent/extensions/`, `pi install`) | no | `~/.gemini/extensions/` | plugins via `agy plugin`; IDE extensions in `~/.antigravity` |
+| Config | `~/.claude/settings.json` (+ `.local`, per-project) | `~/.pi/agent/settings.json`, `models.json` | `~/.codex/config.toml` | `~/.gemini/settings.json` | `~/.gemini/antigravity/` (agent home) + `~/.antigravity` (IDE) |
+| Nix-managed? | selective links (`CLAUDE.md`, `skills`, `settings.json`, `rules`); runtime dirs stay real | selective links (`settings.json`, `models.json`, `web-search.json`, `APPEND_SYSTEM.md`, `skills`) | AGENTS.md + skills links only — `config.toml` machine-local (secrets) | GEMINI.md link only | links for AGENTS.md, skills, mcp_config.json |
 
 Symlink map and full file layout: [layout.md](layout.md).
 
@@ -78,6 +78,16 @@ Verified: `pi 0.79.1`, `/nix/store/…-pi-0.79.1/bin/pi`; flake input `llm-agent
 - Context: `~/.gemini/GEMINI.md` → `~/.agents/AGENTS.md` (note the filename is GEMINI.md, not AGENTS.md).
 - Skills: `~/.gemini/skills` → `~/.agents/skills`. VERIFY: whether Gemini CLI actually discovers/loads this skills dir.
 - Hooks: supported in `~/.gemini/settings.json` under `hooks` with event names `SessionStart`, `BeforeTool`, `AfterTool`. Gortex MCP + graphify hook removed 2026-07-18; hooks section currently empty. Trusted-hook state in `trusted_hooks.json`.
-- MCP: `mcpServers` in settings.json (verified: `context7`, `ghost`, `gortex`).
+- MCP: `mcpServers` in settings.json (verified: `context7`, `ghost`; gortex removed 2026-07-18).
 - Extensions: `~/.gemini/extensions/` exists (verified). VERIFY: extension format/loading details.
 - Misc: `trustedFolders.json`, session retention 30d, antigravity profile dirs alongside. Subagent/slash-command support: VERIFY — not confirmed on this machine.
+
+## Antigravity (`agy` / `antigravity`) — Google agentic IDE + CLI
+
+- Binaries `antigravity` (IDE) and `agy` (CLI) from the llm-agents.nix flake. CLI: `agy -p "<prompt>"` non-interactive, `--model`, `--continue`, `--sandbox`, `agy models`, `agy plugin`.
+- Agent home: `~/.gemini/antigravity/` — runtime state (conversations, brain, knowledge, context_state, browser_recordings) stays real/local; auth shares the Gemini `oauth_creds.json` (never touch).
+- Context: `~/.gemini/antigravity/AGENTS.md` → `~/.agents/AGENTS.md`; also reads project `AGENTS.md` from the workspace.
+- Skills: `~/.gemini/antigravity/skills` → `~/.agents/skills` (an old `.antigravity-install-manifest.json` from the gortex-skill install era lives in the pre-v2 backup).
+- MCP: `~/.gemini/antigravity/mcp_config.json` — nix-managed symlink, currently `{"mcpServers": {}}` (gortex removed 2026-07-18; if antigravity supports per-workspace MCP config, prefer that for zenteiq — VERIFY).
+- Knowledge items: `~/.gemini/antigravity/knowledge/` — antigravity's own memory store; the stale `gortex-workflow` item was moved to the 2026-07-18 backup.
+- IDE app state: `~/.antigravity` (argv.json, extensions) and `~/.config/Antigravity` (Electron data) — machine-local, not nix-managed.

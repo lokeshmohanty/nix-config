@@ -55,6 +55,12 @@
         mkdir -p ${config.home.homeDirectory}/.gemini
         ln -sfn ${config.home.homeDirectory}/.agents/AGENTS.md ${config.home.homeDirectory}/.gemini/GEMINI.md
       '';
+      antigravity = lib.mkAfter ''
+        mkdir -p ${config.home.homeDirectory}/.gemini/antigravity
+        ln -sfn ${config.home.homeDirectory}/.agents/AGENTS.md ${config.home.homeDirectory}/.gemini/antigravity/AGENTS.md
+        ln -sfn ${config.home.homeDirectory}/.agents/skills ${config.home.homeDirectory}/.gemini/antigravity/skills
+        ln -sfn ${config.vars.nixDir}/config/agentic-harness/antigravity/mcp_config.json ${config.home.homeDirectory}/.gemini/antigravity/mcp_config.json
+      '';
       harness-bin = lib.mkAfter ''
         ln -sf ${config.vars.nixDir}/config/agentic-harness/bin/* ${config.home.homeDirectory}/.local/bin/
       '';

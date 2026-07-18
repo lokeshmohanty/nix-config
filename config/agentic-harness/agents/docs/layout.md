@@ -40,9 +40,12 @@
 | `~/.pi/agent/skills` | `~/.agents/skills` | |
 | `~/.codex/AGENTS.md` | `~/.agents/AGENTS.md` | `~/.codex/config.toml` is machine-local (secrets, trust) — NOT nix-managed |
 | `~/.codex/skills` | `~/.agents/skills` | |
-| `~/.gemini/AGENTS.md` | `~/.agents/AGENTS.md` | |
+| `~/.gemini/GEMINI.md` | `~/.agents/AGENTS.md` | filename is GEMINI.md by convention |
+| `~/.gemini/antigravity/AGENTS.md` | `~/.agents/AGENTS.md` | antigravity agent home stays a REAL dir (conversations, knowledge, brain) |
+| `~/.gemini/antigravity/skills` | `~/.agents/skills` | |
+| `~/.gemini/antigravity/mcp_config.json` | `…/agentic-harness/antigravity/mcp_config.json` | |
 
-**Never** whole-dir-symlink `~/.claude`, `~/.pi`, or `~/.codex` into the nix repo:
+**Never** whole-dir-symlink `~/.claude`, `~/.pi`, `~/.codex`, or `~/.gemini` into the nix repo:
 they hold credentials and runtime state. Selective links only. Use `ln -sfn`
 (never bare `ln -sf` on an existing directory — it drops the link *inside* it).
 
