@@ -25,7 +25,13 @@
         ln -sf ${config.vars.nixDir}/config/inkscape ${config.xdg.configHome}/inkscape
       '';
       pi = lib.mkAfter ''
-        ln -sf ${config.vars.nixDir}/config/pi ${config.home.homeDirectory}/.pi
+        ln -sf ${config.vars.nixDir}/config/agentic-harness/pi ${config.home.homeDirectory}/.pi
+      '';
+      claude = lib.mkAfter ''
+        ln -sf ${config.vars.nixDir}/config/agentic-harness/claude ${config.home.homeDirectory}/.claude
+      '';
+      agents = lib.mkAfter ''
+        ln -sf ${config.vars.nixDir}/config/agentic-harness/agents ${config.home.homeDirectory}/.agents
       '';
     };
   };

@@ -1,0 +1,38 @@
+{
+  "providers": {
+    "vllm-qwen35-122": {
+      "baseUrl": "http://default-qwen35-122-http:8000/v1",
+      "api": "openai-completions",
+      "apiKey": "none",
+      "models": [
+        {
+          "id": "Qwen/Qwen3.5-122B-A10B",
+          "input": [ "text", "image" ]
+        }
+      ]
+    },
+    "vllm-gemma4-31": {
+      "baseUrl": "http://default-gemma4-mm-it-http:8000/v1",
+      "api": "openai-completions",
+      "apiKey": "none",
+      "models": [
+        {
+          "id": "google/gemma-4-31B-it",
+          "input": [ "text", "image" ]
+        }
+      ]
+    },
+    "vllm-nematron": {
+      "baseUrl": "http://10.169.20.57:8000/v1",
+      "api": "openai-completions",
+      "apiKey": "none",
+      "models": [
+        {
+          "id": "openai/nvidia/nemotron-3-super",
+          "input": [ "text" ]
+        }
+      ]
+    }
+  }
+}
+

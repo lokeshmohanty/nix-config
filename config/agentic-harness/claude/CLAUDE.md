@@ -1,0 +1,1 @@
+/home/lokesh/.nix/config/agentic-harness/agents/AGENTS.md
