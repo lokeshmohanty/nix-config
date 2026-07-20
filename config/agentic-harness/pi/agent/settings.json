@@ -1,9 +1,14 @@
 {
-  "lastChangelogVersion": "0.79.1",
+  "lastChangelogVersion": "0.80.10",
   "defaultProvider": "vllm-gemma4-31",
   "defaultModel": "google/gemma-4-31B-it",
   "defaultThinkingLevel": "medium",
   "packages": [
-    "../../Documents/Research/myDA/.pi/npm/node_modules/pi-web-access"
-  ]
+    "npm:@tintinweb/pi-subagents",
+    "npm:pi-web-access",
+    "npm:@zosmaai/pi-llm-wiki",
+    "npm:pi-codex-goal",
+    "npm:pi-observational-memory"
+  ],
+  "theme": "dark"
 }

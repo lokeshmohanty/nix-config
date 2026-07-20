@@ -1,6 +1,7 @@
 ---
 name: systematic-debugging
-description: Use when encountering any bug, test failure, build break, or unexpected behavior — before proposing a fix. Guides root-cause investigation: reproduce, isolate, hypothesize, verify, then fix at the source.
+description: >
+  Use when encountering any bug, test failure, build break, or unexpected behavior — before proposing a fix. Guides root-cause investigation: reproduce, isolate, hypothesize, verify, then fix at the source.
 ---
 
 # Systematic Debugging

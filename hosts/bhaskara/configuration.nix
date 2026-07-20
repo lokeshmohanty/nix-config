@@ -20,6 +20,7 @@
     nvidia.acceptLicense = true;
   };
   gaming.enable = false;
+  desktop.niri.enable = true;
 
   programs.nix-ld = {
     enable = true;
