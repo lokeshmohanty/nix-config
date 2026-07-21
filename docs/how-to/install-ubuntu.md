@@ -86,8 +86,8 @@ Interactive APT installs display a numbered checkbox list for system packages,
 Python/shell tools, downloads, Neovim, Node.js CLIs, AI CLIs, and repository
 configuration. Enter comma-separated numbers to deselect groups, or press Enter
 to install everything. The bootstrap packages needed to clone and synchronize
-the repository are always installed. Noninteractive invocations keep all groups
-selected.
+the repository are always installed. Python and Node.js groups also provide
+sub-selections, such as installing only pi; vdirsyncer is off by default.
 
 APT mode cannot reproduce the wrapped Neovim plugin/LSP closure or Home
 Manager-generated shell/program settings. AI authentication remains a separate

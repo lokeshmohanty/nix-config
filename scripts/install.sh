@@ -18,6 +18,7 @@ backup_root=""
 update_tools=false
 select_packages=false
 declare -A selected_group=()
+declare -A selected_tool=()
 
 cleanup() {
   if [[ -n "${installer_file}" && -f "${installer_file}" ]]; then
@@ -95,6 +96,7 @@ choose_package_groups() {
     "Repository configuration links"
   )
   local i answer
+  selected_tool[vdirsyncer]=0
   for i in "${!names[@]}"; do selected_group["${i}"]=1; done
   [[ -r /dev/tty && -w /dev/tty ]] || return
   printf '\nSelect packages to install (comma-separated numbers; Enter keeps all):\n' >/dev/tty
@@ -109,9 +111,39 @@ choose_package_groups() {
     [[ "${item}" =~ ^[1-8]$ ]] || die "invalid package selection: ${item}"
     selected_group[$((item - 1))]=0
   done
+  group_selected 1 && {
+    selected_tool[vdirsyncer]=0
+    choose_subgroup "Python tools" "jc,pre-commit,vdirsyncer" "jc|pre-commit|vdirsyncer"
+  }
+  group_selected 5 && {
+    choose_subgroup "Node.js tools" "gemini,pi" "Gemini CLI|pi coding agent"
+  }
 }
 
 group_selected() { [[ "${selected_group[$1]:-0}" == 1 ]]; }
+
+choose_subgroup() {
+  local title="$1" keys_csv="$2" labels_csv="$3" key label i answer
+  local -a keys labels items
+  IFS=',' read -ra keys <<<"${keys_csv}"
+  IFS='|' read -ra labels <<<"${labels_csv}"
+  for i in "${!keys[@]}"; do
+    [[ -v "selected_tool[${keys[i]}]" ]] || selected_tool["${keys[i]}"]=1
+  done
+  printf '\n%s (comma-separated numbers to deselect; Enter keeps defaults):\n' "${title}" >/dev/tty
+  for i in "${!keys[@]}"; do
+    printf '  [%s] %d) %s\n' "${selected_tool[${keys[i]}]:-0}" "$((i + 1))" "${labels[i]}" >/dev/tty
+  done
+  printf 'Numbers to deselect: ' >/dev/tty
+  IFS= read -r answer </dev/tty || die "could not read package selection"
+  [[ -z "${answer}" ]] && return
+  IFS=',' read -ra items <<<"${answer}"
+  for key in "${items[@]}"; do
+    [[ "${key}" =~ ^[1-9][0-9]*$ && key -le ${#keys[@]} ]] \
+      || die "invalid selection in ${title}: ${key}"
+    selected_tool["${keys[$((key - 1))]}"]=0
+  done
+}
 
 download_installer() {
   local name="$1"
@@ -383,6 +415,7 @@ install_uv_tools() {
 
   for package in "${python_tools[@]}"; do
     IFS='|' read -r command package <<<"${package}"
+    [[ "${selected_tool[${command}]:-1}" == 1 ]] || continue
     if ! managed_command_exists "${command}"; then
       log "Installing ${package} with uv from its official Python package"
       "${USER_BIN}/uv" tool install "${package}"
@@ -524,6 +557,7 @@ install_node_clis() {
 
   for package in "${npm_tools[@]}"; do
     IFS='|' read -r command package <<<"${package}"
+    [[ "${selected_tool[${command}]:-1}" == 1 ]] || continue
     if should_install_managed_command "${command}"; then
       log "Installing ${package} from its official npm package"
       "${USER_BIN}/npm" install --global --prefix "${TARGET_HOME}/.local" "${package}"

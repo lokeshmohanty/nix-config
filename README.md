@@ -18,15 +18,16 @@ The installer asks `Is Nix required on this system? [y/N]`:
 
 APT mode installs system-integrated packages from Ubuntu, then installs
 release-sensitive command-line tools into `~/.local/bin` from their official
-upstream installers. This includes current `uv` tools (`jc`, `pre-commit`, and
-`vdirsyncer`), zoxide, just, direnv, fzf, yt-dlp, Neovim, Node.js 22, Gemini,
+upstream installers. This includes current `uv` tools (`jc` and `pre-commit`;
+`vdirsyncer` is optional), zoxide, just, direnv, fzf, yt-dlp, Neovim, Node.js 22, Gemini,
 pi, Qwen Code, Codex, Claude Code, and Antigravity. Use
 `--update-tools` to rerun those upstream installers.
 
 In an interactive APT install, the installer shows a checklist of these groups
 and deselects any numbers you enter. Press Enter to keep every group. Bootstrap
 packages (`ca-certificates`, `curl`, and `git`) are always installed so the
-checkout can be synchronized.
+checkout can be synchronized. Python and Node.js groups also provide
+sub-selections, such as installing only pi; vdirsyncer is off by default.
 
 For noninteractive installation, use either:
 
