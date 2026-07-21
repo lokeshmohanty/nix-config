@@ -39,13 +39,16 @@ Is Nix required on this system? [y/N]
 
 - **Yes:** preserve a working Nix installation or install Determinate Nix, then
   apply `lokesh@server` with the Home Manager package pinned by `flake.lock`.
-- **No/default:** enable Ubuntu universe, install the conservative APT package
-  set, and link static Neovim, zk, scripts, and agent-harness configuration.
+- **No/default:** enable Ubuntu universe, install OS-integrated packages with
+  APT, install current release-sensitive tools from their official upstream
+  installers into `~/.local/bin`, and link the static configuration.
 
 For noninteractive use, pass `--with-nix` or `--without-nix`:
 
 ```sh
 ~/.nix/scripts/install.sh --without-nix
+# Re-run upstream installers (otherwise existing user-local tools are reused)
+~/.nix/scripts/install.sh --without-nix --update-tools
 ```
 
 Equivalent Just recipes are available from the checkout:
@@ -70,14 +73,24 @@ In APT mode, conflicting config paths are moved to a timestamped directory under
 
 ## APT-mode limits
 
-APT mode installs packages available from the current Ubuntu release, including
-Git, Neovim, fish/zsh/tmux, common CLI tools, PostgreSQL client tools, Go, and
-XDG/PDF utilities. Release-specific extras are installed only when
-`apt-cache` reports them available.
+APT mode keeps Ubuntu responsible for system-integrated dependencies such as
+Python, ffmpeg, shells, mail/database clients, and desktop helpers. Fast-moving
+CLIs are installed per-user from upstream: `uv` provides `jc`, `pre-commit`, and
+`vdirsyncer`; official installers provide zoxide, just, direnv, fzf, yt-dlp,
+Neovim, Node.js 22, and the configured AI CLIs (Gemini, pi, Qwen Code, Codex,
+Claude Code, and Antigravity). Existing commands in `~/.local/bin` are reused;
+pass `--update-tools` to refresh them. Ubuntu packages unavailable on a given
+release are skipped with a warning.
 
-APT cannot reproduce the wrapped Neovim plugin/LSP closure, Home
-Manager-generated shell/program settings, or Nix-only AI CLIs and custom tools.
+APT mode cannot reproduce the wrapped Neovim plugin/LSP closure or Home
+Manager-generated shell/program settings. AI authentication remains a separate
+first-run step and is never performed by the installer.
 The installer reports this rather than silently downloading unpinned binaries.
+
+Warnings from unrelated third-party APT sources (expired keys, missing keys, or
+duplicate source entries) belong to the host and are not rewritten by this
+installer. If `apt-get update` completes using older indexes, installation can
+continue; repair those repositories separately.
 
 Log out and back in after the first installation so the new session environment
 and PATH are fully loaded.

@@ -16,6 +16,13 @@ The installer asks `Is Nix required on this system? [y/N]`:
 - **No/default:** install the Ubuntu-available package subset with APT and link
   the static configuration files directly.
 
+APT mode installs system-integrated packages from Ubuntu, then installs
+release-sensitive command-line tools into `~/.local/bin` from their official
+upstream installers. This includes current `uv` tools (`jc`, `pre-commit`, and
+`vdirsyncer`), zoxide, just, direnv, fzf, yt-dlp, Neovim, Node.js 22, Gemini,
+pi, Qwen Code, Codex, Claude Code, and Antigravity. Use
+`--update-tools` to rerun those upstream installers.
+
 For noninteractive installation, use either:
 
 ```sh
@@ -23,8 +30,8 @@ just server-install-nix
 just server-install-apt
 ```
 
-APT mode cannot reproduce Nix-only AI tools, the wrapped Neovim plugin/LSP
-closure, or Home Manager-generated shell settings. Existing config paths are
+APT mode cannot reproduce the wrapped Neovim plugin/LSP closure or Home
+Manager-generated shell settings. Existing config paths are
 preserved under `~/.local/state/lokesh-config/backups/` before managed links are
 created. Full platform requirements and safety behavior are documented in
 [the Ubuntu installation guide](docs/how-to/install-ubuntu.md).

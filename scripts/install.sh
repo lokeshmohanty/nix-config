@@ -8,11 +8,14 @@ readonly REPO_DIR="${TARGET_HOME}/.nix"
 readonly REPO_URL="https://github.com/lokeshmohanty/nix.git"
 readonly REPO_BRANCH="main"
 readonly FLAKE_TARGET="lokesh@server"
+readonly USER_BIN="${TARGET_HOME}/.local/bin"
+readonly USER_SHARE="${TARGET_HOME}/.local/share/lokesh-config"
 
 installer_file=""
 install_mode=""
 apt_updated=false
 backup_root=""
+update_tools=false
 
 cleanup() {
   if [[ -n "${installer_file}" && -f "${installer_file}" ]]; then
@@ -40,12 +43,13 @@ have() {
 
 usage() {
   cat <<'EOF'
-Usage: install.sh [--with-nix | --without-nix]
+Usage: install.sh [--with-nix | --without-nix] [--update-tools]
 
 Install this repository's Ubuntu configuration for the current login user.
 
   --with-nix     Install/reuse Nix and apply the Home Manager server profile.
-  --without-nix  Install Ubuntu packages with APT and link configs directly.
+  --without-nix  Install Ubuntu/system and upstream user tools, then link configs.
+  --update-tools Re-run upstream installers even when their user-local command exists.
   -h, --help     Show this help.
 
 With no mode flag, the installer asks whether Nix is required.
@@ -64,6 +68,7 @@ parse_args() {
     case "$1" in
       --with-nix) set_install_mode nix ;;
       --without-nix) set_install_mode apt ;;
+      --update-tools) update_tools=true ;;
       -h|--help)
         usage
         exit 0
@@ -72,6 +77,43 @@ parse_args() {
     esac
     shift
   done
+}
+
+download_installer() {
+  local name="$1"
+  local url="$2"
+
+  installer_file="$(mktemp)"
+  log "Downloading the official ${name} installer"
+  curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location \
+    --retry 3 --connect-timeout 15 "${url}" --output "${installer_file}"
+  [[ -s "${installer_file}" ]] || die "the ${name} installer download was empty"
+}
+
+finish_installer() {
+  rm -f -- "${installer_file}"
+  installer_file=""
+}
+
+managed_command_exists() {
+  [[ -x "${USER_BIN}/$1" ]]
+}
+
+should_install_managed_command() {
+  [[ "${update_tools}" == true ]] || ! managed_command_exists "$1"
+}
+
+ensure_user_path() {
+  local path_line='export PATH="$HOME/.local/bin:$PATH"'
+  local profile="${TARGET_HOME}/.profile"
+
+  mkdir -p -- "${USER_BIN}" "${USER_SHARE}"
+  export PATH="${USER_BIN}:${PATH}"
+  if [[ ! -f "${profile}" ]] || ! grep -Fqx "${path_line}" "${profile}"; then
+    log "Adding ~/.local/bin to the login PATH"
+    printf '\n# User-local tools installed by ~/.nix/scripts/install.sh\n%s\n' \
+      "${path_line}" >>"${profile}"
+  fi
 }
 
 choose_install_mode() {
@@ -203,94 +245,334 @@ sync_repository() {
   git -C "${REPO_DIR}" merge --ff-only FETCH_HEAD
 }
 
+ubuntu_universe_enabled() {
+  grep -RqsE \
+    '^[[:space:]]*(deb .*([[:space:]])universe([[:space:]]|$)|Components:.*([[:space:]])universe([[:space:]]|$))' \
+    /etc/apt/sources.list /etc/apt/sources.list.d 2>/dev/null
+}
+
 install_apt_packages() {
-  local -a core_packages=(
+  local -a required_packages=(
     ca-certificates
     curl
-    fd-find
-    ffmpeg
-    fish
-    fzf
-    gh
     git
+    python3
+    xz-utils
+  )
+  local -a requested_packages=(
+    ffmpeg
+    file
+    fish
     gnupg
-    golang-go
-    jc
+    isync
+    jq
     libimage-exiftool-perl
     make
-    neovim
-    nodejs
-    npm
+    notmuch
     pandoc
     pass
+    poppler-utils
     postgresql-client
-    pre-commit
-    python3
-    rclone
-    ripgrep
+    python3-venv
     sqlite3
     tmux
     xdg-user-dirs
     xdg-utils
-    yt-dlp
     zathura
     zathura-pdf-poppler
-    zoxide
     zsh
   )
-  local -a optional_packages=(
-    direnv
-    duf
-    gdu
-    git-delta
-    gping
-    hyperfine
-    isync
-    just
-    lazygit
-    notmuch
-    sioyek
-    tldr
-    vdirsyncer
-  )
-  local -a available_optional=()
-  local -a missing_core=()
-  local -a skipped_optional=()
+  local -a available_packages=()
+  local -a missing_required=()
+  local -a skipped_packages=()
   local package
 
-  update_apt
-  if ! have add-apt-repository; then
-    sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-      software-properties-common
+  if ! ubuntu_universe_enabled; then
+    update_apt
+    if ! have add-apt-repository; then
+      sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        software-properties-common
+    fi
+    log "Enabling the Ubuntu universe repository"
+    sudo add-apt-repository --yes universe
+    apt_updated=false
+  else
+    log "Ubuntu universe repository is already enabled"
   fi
-  log "Enabling the Ubuntu universe repository"
-  sudo add-apt-repository --yes universe
-  apt_updated=false
   update_apt
 
-  for package in "${core_packages[@]}"; do
+  for package in "${required_packages[@]}"; do
     if ! apt-cache show "${package}" >/dev/null 2>&1; then
-      missing_core+=("${package}")
+      missing_required+=("${package}")
     fi
   done
-  (( ${#missing_core[@]} == 0 )) \
-    || die "required Ubuntu packages are unavailable: ${missing_core[*]}"
+  (( ${#missing_required[@]} == 0 )) \
+    || die "bootstrap Ubuntu packages are unavailable: ${missing_required[*]}"
 
-  for package in "${optional_packages[@]}"; do
+  for package in "${requested_packages[@]}"; do
     if apt-cache show "${package}" >/dev/null 2>&1; then
-      available_optional+=("${package}")
+      available_packages+=("${package}")
     else
-      skipped_optional+=("${package}")
+      skipped_packages+=("${package}")
     fi
   done
 
-  log "Installing packages from Ubuntu repositories"
+  log "Installing OS-integrated packages available from this Ubuntu release"
   sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    "${core_packages[@]}" "${available_optional[@]}"
+    "${required_packages[@]}" "${available_packages[@]}"
 
-  if (( ${#skipped_optional[@]} > 0 )); then
-    warn "not available for this Ubuntu release/architecture: ${skipped_optional[*]}"
+  if (( ${#skipped_packages[@]} > 0 )); then
+    warn "skipped packages unavailable for this Ubuntu release/architecture: ${skipped_packages[*]}"
   fi
+}
+
+install_uv_tools() {
+  local command package
+  local -a python_tools=(
+    "jc|jc"
+    "pre-commit|pre-commit"
+    "vdirsyncer|vdirsyncer"
+  )
+
+  if should_install_managed_command uv; then
+    download_installer uv https://astral.sh/uv/install.sh
+    UV_NO_MODIFY_PATH=1 UV_INSTALL_DIR="${USER_BIN}" sh "${installer_file}"
+    finish_installer
+  fi
+  managed_command_exists uv || die "uv installed but ${USER_BIN}/uv is unavailable"
+
+  for package in "${python_tools[@]}"; do
+    IFS='|' read -r command package <<<"${package}"
+    if ! managed_command_exists "${command}"; then
+      log "Installing ${package} with uv from its official Python package"
+      "${USER_BIN}/uv" tool install "${package}"
+    elif [[ "${update_tools}" == true ]]; then
+      log "Updating ${package} with uv"
+      "${USER_BIN}/uv" tool upgrade "${package}"
+    fi
+  done
+}
+
+install_zoxide() {
+  should_install_managed_command zoxide || return
+  download_installer zoxide \
+    https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh
+  sh "${installer_file}" --bin-dir "${USER_BIN}"
+  finish_installer
+  managed_command_exists zoxide || die "zoxide installed but ${USER_BIN}/zoxide is unavailable"
+}
+
+install_just() {
+  should_install_managed_command just || return
+  download_installer just https://just.systems/install.sh
+  sh "${installer_file}" --to "${USER_BIN}"
+  finish_installer
+  managed_command_exists just || die "just installed but ${USER_BIN}/just is unavailable"
+}
+
+install_direnv() {
+  should_install_managed_command direnv || return
+  download_installer direnv https://direnv.net/install.sh
+  bin_path="${USER_BIN}" bash "${installer_file}"
+  finish_installer
+  managed_command_exists direnv || die "direnv installed but ${USER_BIN}/direnv is unavailable"
+}
+
+install_fzf() {
+  local fzf_dir="${USER_SHARE}/fzf"
+
+  if [[ ! -d "${fzf_dir}/.git" ]]; then
+    log "Cloning the official fzf repository"
+    git clone --depth 1 https://github.com/junegunn/fzf.git "${fzf_dir}"
+  elif [[ "${update_tools}" == true ]]; then
+    log "Updating fzf from its official repository"
+    git -C "${fzf_dir}" pull --ff-only
+  elif managed_command_exists fzf; then
+    return
+  fi
+
+  "${fzf_dir}/install" --bin --no-update-rc
+  ln -sfnT -- "${fzf_dir}/bin/fzf" "${USER_BIN}/fzf"
+  managed_command_exists fzf || die "fzf installed but ${USER_BIN}/fzf is unavailable"
+}
+
+install_yt_dlp() {
+  local asset_url
+
+  should_install_managed_command yt-dlp || return
+  case "$(uname -m)" in
+    x86_64)
+      asset_url=https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux
+      ;;
+    aarch64|arm64)
+      asset_url=https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux_aarch64
+      ;;
+    *)
+      warn "yt-dlp has no configured standalone asset for $(uname -m); skipping"
+      return
+      ;;
+  esac
+
+  installer_file="$(mktemp)"
+  log "Downloading the official yt-dlp standalone binary"
+  curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location \
+    --retry 3 --connect-timeout 15 "${asset_url}" --output "${installer_file}"
+  install -m 0755 "${installer_file}" "${USER_BIN}/yt-dlp"
+  finish_installer
+}
+
+install_node() {
+  local node_arch node_filename node_version node_root node_target node_tmp
+
+  case "$(uname -m)" in
+    x86_64) node_arch=x64 ;;
+    aarch64|arm64) node_arch=arm64 ;;
+    *) die "the official Node.js binary install is unsupported on $(uname -m)" ;;
+  esac
+
+  node_tmp="$(mktemp -d)"
+  log "Resolving the latest official Node.js 22 release"
+  curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location \
+    --retry 3 --connect-timeout 15 \
+    https://nodejs.org/dist/latest-v22.x/SHASUMS256.txt \
+    --output "${node_tmp}/SHASUMS256.txt"
+  node_filename="$(
+    awk -v suffix="linux-${node_arch}.tar.xz" '$2 ~ suffix "$" { print $2; exit }' \
+      "${node_tmp}/SHASUMS256.txt"
+  )"
+  [[ -n "${node_filename}" ]] || die "could not resolve a Node.js 22 ${node_arch} archive"
+  node_version="${node_filename#node-}"
+  node_version="${node_version%-linux-${node_arch}.tar.xz}"
+  node_root="${USER_SHARE}/node"
+  node_target="${node_root}/${node_version}"
+
+  if [[ ! -x "${node_target}/bin/node" ]]; then
+    log "Downloading official Node.js ${node_version}"
+    curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location \
+      --retry 3 --connect-timeout 15 \
+      "https://nodejs.org/dist/latest-v22.x/${node_filename}" \
+      --output "${node_tmp}/${node_filename}"
+    grep -F " ${node_filename}" "${node_tmp}/SHASUMS256.txt" \
+      >"${node_tmp}/node.sha256"
+    (cd "${node_tmp}" && sha256sum --check node.sha256)
+    tar -xJf "${node_tmp}/${node_filename}" -C "${node_tmp}"
+    mkdir -p -- "${node_root}"
+    mv -- "${node_tmp}/${node_filename%.tar.xz}" "${node_target}"
+  fi
+
+  ln -sfnT -- "${node_target}/bin/node" "${USER_BIN}/node"
+  ln -sfnT -- "${node_target}/bin/npm" "${USER_BIN}/npm"
+  ln -sfnT -- "${node_target}/bin/npx" "${USER_BIN}/npx"
+  ln -sfnT -- "${node_target}/bin/corepack" "${USER_BIN}/corepack"
+  rm -rf -- "${node_tmp}"
+  log "Using $(${USER_BIN}/node --version) from the official Node.js release"
+}
+
+install_node_clis() {
+  local -a npm_tools=(
+    "gemini|@google/gemini-cli@latest"
+    "pi|@earendil-works/pi-coding-agent@latest"
+  )
+  local command package
+
+  for package in "${npm_tools[@]}"; do
+    IFS='|' read -r command package <<<"${package}"
+    if should_install_managed_command "${command}"; then
+      log "Installing ${package} from its official npm package"
+      "${USER_BIN}/npm" install --global --prefix "${TARGET_HOME}/.local" "${package}"
+    fi
+  done
+}
+
+install_neovim() {
+  local archive_name archive_url neovim_arch neovim_tmp release_tag target
+
+  should_install_managed_command nvim || return
+  case "$(uname -m)" in
+    x86_64) neovim_arch=x86_64 ;;
+    aarch64|arm64) neovim_arch=arm64 ;;
+    *)
+      warn "Neovim has no configured official archive for $(uname -m); skipping"
+      return
+      ;;
+  esac
+
+  archive_name="nvim-linux-${neovim_arch}.tar.gz"
+  archive_url="https://github.com/neovim/neovim/releases/latest/download/${archive_name}"
+  neovim_tmp="$(mktemp -d)"
+  log "Resolving the latest official Neovim release"
+  curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location \
+    --retry 3 --connect-timeout 15 \
+    https://api.github.com/repos/neovim/neovim/releases/latest \
+    --output "${neovim_tmp}/release.json"
+  release_tag="$(
+    python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["tag_name"])' \
+      "${neovim_tmp}/release.json"
+  )"
+  [[ "${release_tag}" =~ ^v[0-9] ]] || die "could not resolve the latest Neovim version"
+  target="${USER_SHARE}/neovim/${release_tag}"
+
+  if [[ ! -x "${target}/bin/nvim" ]]; then
+    log "Downloading official Neovim ${release_tag}"
+    curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location \
+      --retry 3 --connect-timeout 15 "${archive_url}" \
+      --output "${neovim_tmp}/${archive_name}"
+    curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location \
+      --retry 3 --connect-timeout 15 \
+      https://github.com/neovim/neovim/releases/latest/download/shasum.txt \
+      --output "${neovim_tmp}/shasum.txt"
+    grep -F " ${archive_name}" "${neovim_tmp}/shasum.txt" \
+      >"${neovim_tmp}/neovim.sha256"
+    (cd "${neovim_tmp}" && sha256sum --check neovim.sha256)
+    tar -xzf "${neovim_tmp}/${archive_name}" -C "${neovim_tmp}"
+    mkdir -p -- "$(dirname "${target}")"
+    mv -- "${neovim_tmp}/nvim-linux-${neovim_arch}" "${target}"
+  fi
+
+  ln -sfnT -- "${target}/bin/nvim" "${USER_BIN}/nvim"
+  rm -rf -- "${neovim_tmp}"
+}
+
+install_native_ai_tools() {
+  if should_install_managed_command qwen; then
+    download_installer "Qwen Code" \
+      https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh
+    bash "${installer_file}"
+    finish_installer
+  fi
+
+  if should_install_managed_command codex; then
+    download_installer "OpenAI Codex" https://chatgpt.com/codex/install.sh
+    sh "${installer_file}"
+    finish_installer
+  fi
+
+  if should_install_managed_command claude; then
+    download_installer "Claude Code" https://claude.ai/install.sh
+    bash "${installer_file}"
+    finish_installer
+  fi
+
+  if should_install_managed_command agy; then
+    download_installer "Google Antigravity CLI" \
+      https://antigravity.google/cli/install.sh
+    bash "${installer_file}" --skip-aliases --skip-path
+    finish_installer
+  fi
+}
+
+install_upstream_tools() {
+  ensure_user_path
+  install_uv_tools
+  install_zoxide
+  install_just
+  install_direnv
+  install_fzf
+  install_yt_dlp
+  install_neovim
+  install_node
+  install_node_clis
+  install_native_ai_tools
 }
 
 backup_existing_path() {
@@ -387,18 +669,20 @@ setup_config_files() {
     link_managed_path "${source_path}" "${target_path}"
   done
 
-  local nvim_version
-  nvim_version="$(nvim --version | sed -n '1s/^NVIM v//p')"
+  local nvim_version=""
+  if have nvim; then
+    nvim_version="$(nvim --version | sed -n '1s/^NVIM v//p')"
+  fi
   if [[ -n "${nvim_version}" ]] && dpkg --compare-versions "${nvim_version}" ge 0.7; then
     link_managed_path "${REPO_DIR}/pkgs/nvim" "${TARGET_HOME}/.config/nvim"
   else
-    warn "Ubuntu Neovim ${nvim_version:-unknown} is too old for this config; leaving ~/.config/nvim unchanged"
+    warn "Neovim ${nvim_version:-unavailable} is too old for this config; leaving ~/.config/nvim unchanged"
   fi
 
   if [[ -x /usr/bin/fdfind ]]; then
     link_managed_path /usr/bin/fdfind "${TARGET_HOME}/.local/bin/fd"
   fi
-  warn "APT mode cannot install Nix-only AI CLIs, the wrapped Neovim plugin/LSP bundle, or Home Manager-generated shell settings"
+  warn "APT mode cannot reproduce the wrapped Neovim plugin/LSP bundle or Home Manager-generated shell settings"
 }
 
 nix_cmd() {
@@ -459,6 +743,7 @@ main() {
     apply_home_configuration
   else
     install_apt_packages
+    install_upstream_tools
     setup_config_files
   fi
 
