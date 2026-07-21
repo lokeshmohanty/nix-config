@@ -28,6 +28,11 @@ server-install-nix:
 server-install-apt:
     ./scripts/install.sh --without-nix
 
+# Resume APT installation with all tools and configurations, including fish,
+# tmux, and Neovim; refresh existing upstream tools as well.
+server-install-apt-full:
+    ./scripts/install.sh --without-nix --all-packages --update-tools
+
 # Apply the current lokesh@server Home Manager configuration
 server-switch:
     #!/usr/bin/env bash

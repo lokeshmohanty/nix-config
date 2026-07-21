@@ -17,6 +17,7 @@ apt_updated=false
 backup_root=""
 update_tools=false
 select_packages=false
+all_packages=false
 declare -A selected_group=()
 declare -A selected_tool=()
 
@@ -46,7 +47,7 @@ have() {
 
 usage() {
   cat <<'EOF'
-Usage: install.sh [--with-nix | --without-nix] [--select-packages] [--update-tools]
+Usage: install.sh [--with-nix | --without-nix] [--select-packages] [--all-packages] [--update-tools]
 
 Install this repository's Ubuntu configuration for the current login user.
 
@@ -54,6 +55,7 @@ Install this repository's Ubuntu configuration for the current login user.
   --without-nix  Install Ubuntu/system and upstream user tools, then link configs.
   --update-tools Re-run upstream installers even when their user-local command exists.
   --select-packages Show the package checklist in APT mode (defaults to all selected).
+  --all-packages   Install every selectable package and configuration group.
   -h, --help     Show this help.
 
 With no mode flag, the installer asks whether Nix is required.
@@ -74,6 +76,7 @@ parse_args() {
       --without-nix) set_install_mode apt ;;
       --update-tools) update_tools=true ;;
       --select-packages) select_packages=true ;;
+      --all-packages) all_packages=true ;;
       -h|--help)
         usage
         exit 0
@@ -98,6 +101,7 @@ choose_package_groups() {
   local i answer
   selected_tool[vdirsyncer]=0
   for i in "${!names[@]}"; do selected_group["${i}"]=1; done
+  [[ "${all_packages}" == true ]] && return
   [[ -r /dev/tty && -w /dev/tty ]] || return
   printf '\nSelect packages to install (comma-separated numbers; Enter keeps all):\n' >/dev/tty
   for i in "${!names[@]}"; do printf '  [%s] %d) %s\n' x "$((i + 1))" "${names[i]}" >/dev/tty; done
