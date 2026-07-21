@@ -780,9 +780,14 @@ setup_config_files() {
   fi
   if group_selected 0 && have fish; then
     link_managed_path "${REPO_DIR}/config/fish/config.fish" "${TARGET_HOME}/.config/fish/config.fish"
+  elif group_selected 0; then
+    warn "fish was selected but is not installed; skipping fish configuration"
   fi
   if group_selected 0 && have tmux; then
     link_managed_path "${REPO_DIR}/config/tmux/tmux.conf" "${TARGET_HOME}/.config/tmux/tmux.conf"
+    link_managed_path "${REPO_DIR}/config/tmux/tmux.conf" "${TARGET_HOME}/.tmux.conf"
+  elif group_selected 0; then
+    warn "tmux was selected but is not installed; skipping tmux configuration"
   fi
   if group_selected 0 && have fish; then
     local current_shell
