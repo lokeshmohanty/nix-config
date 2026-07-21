@@ -778,6 +778,25 @@ setup_config_files() {
   if [[ -x /usr/bin/fdfind ]]; then
     link_managed_path /usr/bin/fdfind "${TARGET_HOME}/.local/bin/fd"
   fi
+  if group_selected 0 && have fish; then
+    link_managed_path "${REPO_DIR}/config/fish/config.fish" "${TARGET_HOME}/.config/fish/config.fish"
+  fi
+  if group_selected 0 && have tmux; then
+    link_managed_path "${REPO_DIR}/config/tmux/tmux.conf" "${TARGET_HOME}/.config/tmux/tmux.conf"
+  fi
+  if group_selected 0 && have fish; then
+    local current_shell
+    current_shell="$(getent passwd "${TARGET_USER}" | cut -d: -f7)"
+    if [[ "${current_shell}" != "$(command -v fish)" ]]; then
+      if have chsh; then
+        chsh -s "$(command -v fish)" "${TARGET_USER}" \
+          && log "Set fish as the default login shell" \
+          || warn "could not set fish as the default login shell; run chsh -s $(command -v fish)"
+      else
+        warn "chsh is unavailable; run chsh -s $(command -v fish) to select fish"
+      fi
+    fi
+  fi
   warn "APT mode cannot reproduce the wrapped Neovim plugin/LSP bundle or Home Manager-generated shell settings"
 }
 
