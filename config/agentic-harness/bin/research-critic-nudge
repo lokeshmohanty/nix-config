@@ -24,11 +24,17 @@ case "$prompt" in
   *contribution*|*evaluat*|*sufficient*|*enough*|*conclude*|*shows*|*proves*|\
   *significan*|*compare*|*sota*|*state-of-the-art*|*reviewer*)
     cat <<'EOF'
-[research-critic] This turn touches a research decision. Per Lokesh's standing
-request, invoke the `research-critic` skill and dispatch the adversarial
-ICLR-spotlight reviewer as a subagent BEFORE acting on or reporting the
-decision. Report its top objections and their cost to fix. Do not suppress an
-inconvenient critique.
+[research-gate] This turn touches a research decision. Per Lokesh's standing
+requests, run the chain BEFORE acting on or reporting it:
+  1. `research-theorist` — what existing theory predicts this outcome, or the
+     NOVEL falsifiable hypothesis the experiment will prove/disprove (novelty
+     checked against litgraph + the hypothesis ledger). No hypothesis => not a
+     severe test => send the design back.
+  2. `research-critic` — adversarial ICLR-spotlight review as a subagent; for an
+     experiment plan this is a HARD GATE (no compute until cleared as a severe
+     test whose failure is as informative as its success).
+Report the hypothesis, the top objections, and their cost to fix. Do not
+suppress an inconvenient critique.
 EOF
     ;;
 esac

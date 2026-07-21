@@ -26,7 +26,7 @@ Applied 2026-07-18: the three AXI SessionStart hooks plus `harness-session-start
 
 | Event | Hook | What it does |
 |---|---|---|
-| UserPromptSubmit | `research-critic-nudge` | Added 2026-07-22. Keeps the adversarial ICLR-spotlight reviewer in play without the user asking: on prompts that look like a *research decision* (keyword screen over the prompt), injects a line telling the model to invoke the `research-critic` skill and dispatch it as a subagent. Silent for non-thesis cwd and for mechanical prompts. Script: `~/.nix/config/agentic-harness/bin/research-critic-nudge` (no-op path ~8 ms). |
+| UserPromptSubmit | `research-critic-nudge` | Added 2026-07-22. Keeps the adversarial ICLR-spotlight reviewer in play without the user asking: on prompts that look like a *research decision* (keyword screen over the prompt), injects the research-gate chain: `research-theorist` (theory grounding / novel falsifiable hypothesis, novelty-checked against litgraph) then `research-critic` (adversarial ICLR-spotlight review; a HARD GATE for experiment plans). Silent for non-thesis cwd and for mechanical prompts. Script: `~/.nix/config/agentic-harness/bin/research-critic-nudge` (no-op path ~8 ms). |
 
 ### Gortex hooks — REMOVED globally 2026-07-18, now per-repo only
 
