@@ -16,6 +16,8 @@ install_mode=""
 apt_updated=false
 backup_root=""
 update_tools=false
+select_packages=false
+declare -A selected_group=()
 
 cleanup() {
   if [[ -n "${installer_file}" && -f "${installer_file}" ]]; then
@@ -43,13 +45,14 @@ have() {
 
 usage() {
   cat <<'EOF'
-Usage: install.sh [--with-nix | --without-nix] [--update-tools]
+Usage: install.sh [--with-nix | --without-nix] [--select-packages] [--update-tools]
 
 Install this repository's Ubuntu configuration for the current login user.
 
   --with-nix     Install/reuse Nix and apply the Home Manager server profile.
   --without-nix  Install Ubuntu/system and upstream user tools, then link configs.
   --update-tools Re-run upstream installers even when their user-local command exists.
+  --select-packages Show the package checklist in APT mode (defaults to all selected).
   -h, --help     Show this help.
 
 With no mode flag, the installer asks whether Nix is required.
@@ -69,6 +72,7 @@ parse_args() {
       --with-nix) set_install_mode nix ;;
       --without-nix) set_install_mode apt ;;
       --update-tools) update_tools=true ;;
+      --select-packages) select_packages=true ;;
       -h|--help)
         usage
         exit 0
@@ -78,6 +82,36 @@ parse_args() {
     shift
   done
 }
+
+choose_package_groups() {
+  local -a names=(
+    "Ubuntu system packages"
+    "Python tools (uv, jc, pre-commit, vdirsyncer)"
+    "Shell tools (zoxide, just, direnv, fzf)"
+    "Media/download tools (yt-dlp)"
+    "Neovim"
+    "Node.js tools (Gemini CLI, pi)"
+    "AI CLIs (Qwen, Codex, Claude, Antigravity)"
+    "Repository configuration links"
+  )
+  local i answer
+  for i in "${!names[@]}"; do selected_group["${i}"]=1; done
+  [[ -r /dev/tty && -w /dev/tty ]] || return
+  printf '\nSelect packages to install (comma-separated numbers; Enter keeps all):\n' >/dev/tty
+  for i in "${!names[@]}"; do printf '  [%s] %d) %s\n' x "$((i + 1))" "${names[i]}" >/dev/tty; done
+  printf 'Numbers to deselect: ' >/dev/tty
+  IFS= read -r answer </dev/tty || die "could not read package selection"
+  [[ -z "${answer}" ]] && return
+  for i in "${!names[@]}"; do selected_group["${i}"]=1; done
+  local item
+  IFS=',' read -ra items <<<"${answer}"
+  for item in "${items[@]}"; do
+    [[ "${item}" =~ ^[1-8]$ ]] || die "invalid package selection: ${item}"
+    selected_group[$((item - 1))]=0
+  done
+}
+
+group_selected() { [[ "${selected_group[$1]:-0}" == 1 ]]; }
 
 download_installer() {
   local name="$1"
@@ -287,6 +321,11 @@ install_apt_packages() {
   local -a skipped_packages=()
   local package
 
+  if ! group_selected 0; then
+    requested_packages=()
+    log "Skipping optional Ubuntu system packages"
+  fi
+
   if ! ubuntu_universe_enabled; then
     update_apt
     if ! have add-apt-repository; then
@@ -327,6 +366,7 @@ install_apt_packages() {
 }
 
 install_uv_tools() {
+  group_selected 1 || return
   local command package
   local -a python_tools=(
     "jc|jc"
@@ -354,6 +394,7 @@ install_uv_tools() {
 }
 
 install_zoxide() {
+  group_selected 2 || return
   should_install_managed_command zoxide || return
   download_installer zoxide \
     https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh
@@ -363,6 +404,7 @@ install_zoxide() {
 }
 
 install_just() {
+  group_selected 2 || return
   should_install_managed_command just || return
   download_installer just https://just.systems/install.sh
   sh "${installer_file}" --to "${USER_BIN}"
@@ -371,6 +413,7 @@ install_just() {
 }
 
 install_direnv() {
+  group_selected 2 || return
   should_install_managed_command direnv || return
   download_installer direnv https://direnv.net/install.sh
   bin_path="${USER_BIN}" bash "${installer_file}"
@@ -379,6 +422,7 @@ install_direnv() {
 }
 
 install_fzf() {
+  group_selected 2 || return
   local fzf_dir="${USER_SHARE}/fzf"
 
   if [[ ! -d "${fzf_dir}/.git" ]]; then
@@ -397,6 +441,7 @@ install_fzf() {
 }
 
 install_yt_dlp() {
+  group_selected 3 || return
   local asset_url
 
   should_install_managed_command yt-dlp || return
@@ -422,6 +467,7 @@ install_yt_dlp() {
 }
 
 install_node() {
+  group_selected 5 || return
   local node_arch node_filename node_version node_root node_target node_tmp
 
   case "$(uname -m)" in
@@ -469,6 +515,7 @@ install_node() {
 }
 
 install_node_clis() {
+  group_selected 5 || return
   local -a npm_tools=(
     "gemini|@google/gemini-cli@latest"
     "pi|@earendil-works/pi-coding-agent@latest"
@@ -485,6 +532,7 @@ install_node_clis() {
 }
 
 install_neovim() {
+  group_selected 4 || return
   local archive_name archive_url neovim_arch neovim_tmp release_tag target
 
   should_install_managed_command nvim || return
@@ -534,6 +582,7 @@ install_neovim() {
 }
 
 install_native_ai_tools() {
+  group_selected 6 || return
   if should_install_managed_command qwen; then
     download_installer "Qwen Code" \
       https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh
@@ -621,6 +670,7 @@ link_managed_path() {
 }
 
 setup_config_files() {
+  group_selected 7 || { log "Skipping repository configuration links"; return; }
   local agents_dir="${REPO_DIR}/config/agentic-harness/agents"
   local -a runtime_directories=(
     "${TARGET_HOME}/.claude"
@@ -732,6 +782,9 @@ main() {
   choose_install_mode
   ensure_bootstrap_dependencies
   sync_repository
+  if [[ "${install_mode}" == "apt" ]]; then
+    choose_package_groups
+  fi
 
   if [[ "${install_mode}" == "nix" ]]; then
     require_nix_mode_host

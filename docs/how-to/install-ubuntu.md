@@ -82,6 +82,13 @@ Claude Code, and Antigravity). Existing commands in `~/.local/bin` are reused;
 pass `--update-tools` to refresh them. Ubuntu packages unavailable on a given
 release are skipped with a warning.
 
+Interactive APT installs display a numbered checkbox list for system packages,
+Python/shell tools, downloads, Neovim, Node.js CLIs, AI CLIs, and repository
+configuration. Enter comma-separated numbers to deselect groups, or press Enter
+to install everything. The bootstrap packages needed to clone and synchronize
+the repository are always installed. Noninteractive invocations keep all groups
+selected.
+
 APT mode cannot reproduce the wrapped Neovim plugin/LSP closure or Home
 Manager-generated shell/program settings. AI authentication remains a separate
 first-run step and is never performed by the installer.

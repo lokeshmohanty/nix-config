@@ -23,6 +23,11 @@ upstream installers. This includes current `uv` tools (`jc`, `pre-commit`, and
 pi, Qwen Code, Codex, Claude Code, and Antigravity. Use
 `--update-tools` to rerun those upstream installers.
 
+In an interactive APT install, the installer shows a checklist of these groups
+and deselects any numbers you enter. Press Enter to keep every group. Bootstrap
+packages (`ca-certificates`, `curl`, and `git`) are always installed so the
+checkout can be synchronized.
+
 For noninteractive installation, use either:
 
 ```sh
