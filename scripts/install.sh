@@ -10,6 +10,7 @@ readonly REPO_BRANCH="main"
 readonly FLAKE_TARGET="lokesh@server"
 readonly USER_BIN="${TARGET_HOME}/.local/bin"
 readonly USER_SHARE="${TARGET_HOME}/.local/share/lokesh-config"
+readonly SELECTION_STATE="${TARGET_HOME}/.local/state/lokesh-config/package-selection.tsv"
 
 installer_file=""
 install_mode=""
@@ -99,16 +100,16 @@ choose_package_groups() {
     "Repository configuration links"
   )
   local i answer
+  load_package_selection
   selected_tool[vdirsyncer]=0
-  for i in "${!names[@]}"; do selected_group["${i}"]=1; done
-  [[ "${all_packages}" == true ]] && return
-  [[ -r /dev/tty && -w /dev/tty ]] || return
+  for i in "${!names[@]}"; do [[ -v "selected_group[${i}]" ]] || selected_group["${i}"]=1; done
+  if [[ "${all_packages}" == true ]]; then save_package_selection; return; fi
+  if [[ ! -r /dev/tty || ! -w /dev/tty ]]; then save_package_selection; return; fi
   printf '\nSelect packages to install (comma-separated numbers; Enter keeps all):\n' >/dev/tty
   for i in "${!names[@]}"; do printf '  [%s] %d) %s\n' x "$((i + 1))" "${names[i]}" >/dev/tty; done
   printf 'Numbers to deselect: ' >/dev/tty
   IFS= read -r answer </dev/tty || die "could not read package selection"
-  [[ -z "${answer}" ]] && return
-  for i in "${!names[@]}"; do selected_group["${i}"]=1; done
+  [[ -z "${answer}" ]] && { save_package_selection; return; }
   local item
   IFS=',' read -ra items <<<"${answer}"
   for item in "${items[@]}"; do
@@ -122,9 +123,30 @@ choose_package_groups() {
   group_selected 5 && {
     choose_subgroup "Node.js tools" "gemini,pi" "Gemini CLI|pi coding agent"
   }
+  save_package_selection
 }
 
 group_selected() { [[ "${selected_group[$1]:-0}" == 1 ]]; }
+
+load_package_selection() {
+  local kind key value
+  [[ -r "${SELECTION_STATE}" ]] || return
+  while IFS=$'\t' read -r kind key value; do
+    [[ "${value}" == 0 || "${value}" == 1 ]] || continue
+    [[ "${kind}" == group ]] && selected_group["${key}"]="${value}"
+    [[ "${kind}" == tool ]] && selected_tool["${key}"]="${value}"
+  done <"${SELECTION_STATE}"
+}
+
+save_package_selection() {
+  local tmp key
+  mkdir -p -- "$(dirname "${SELECTION_STATE}")"
+  tmp="$(mktemp)"
+  for key in "${!selected_group[@]}"; do printf 'group\t%s\t%s\n' "${key}" "${selected_group[${key}]}"; done >"${tmp}"
+  for key in "${!selected_tool[@]}"; do printf 'tool\t%s\t%s\n' "${key}" "${selected_tool[${key}]}" >>"${tmp}"; done
+  install -m 0644 "${tmp}" "${SELECTION_STATE}"
+  rm -f -- "${tmp}"
+}
 
 choose_subgroup() {
   local title="$1" keys_csv="$2" labels_csv="$3" key label i answer
