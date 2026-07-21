@@ -25,11 +25,15 @@ and `hostlib.mkHomeHost <module>`. Each host dir (`sudarshan`, `bhaskara`,
 - **home** (`lokesh@<host>`): imports `../../home` (+ host extras like
   `email.nix`) and flips feature toggles:
   `modules = { ai.enable; activations.enable; editor.enable; gui.enable; shell.enable; tui.enable; }`.
+- **Ubuntu/server home** (`lokesh@server`): imported from `hosts/server.nix`.
+  It enables AI, editor, shell, TUI, and their activations while disabling GUI
+  styling. `scripts/install.sh` applies this standalone Home Manager profile.
 
 ## Options pattern
 
-- `variables.nix` → `options.vars.*`: `username` (lokesh), `nixDir`
-  (`~/.nix` — used by activations to point symlinks at the repo), `fontName`.
+- `variables.nix` → `options.vars.*`: `username` (lokesh by default),
+  `homeDirectory`, `nixDir` (`~/.nix` — used by activations to point symlinks at
+  the repo), and `fontName`.
 - Feature modules declare `options.modules.<name>.enable = mkEnableOption` and
   gate their config with `lib.mkIf`. Hosts opt in per machine.
 - `home/default.nix` imports every home module unconditionally plus defaults
@@ -40,8 +44,10 @@ and `hostlib.mkHomeHost <module>`. Each host dir (`sudarshan`, `bhaskara`,
 - `system/` — NixOS: desktop-environment, fonts, packages, programs, security,
   services, ssh, virtualisation, gaming.
 - `home/` — home-manager: `base`, `ai` (installs agent CLIs from llm-agents),
-  `activations` (**all runtime symlinks — app configs from `config/`, scripts
-  into `~/.local/bin`, and the agentic-harness links; `ln -sfn` mandatory**),
+  `activations` (**runtime symlinks guarded by their owning home feature: GUI
+  configs by `modules.gui`, scripts by `modules.shell`, and agent-harness links
+  by `modules.ai`; `modules.activations` is the master switch; `ln -sfn`
+  mandatory**),
   `programs`, terminal/, browser/, email/, editor, shell, gui, stylix, xdg, etc.
 
 ## Agentic harness
@@ -54,3 +60,20 @@ self-documenting subtree. Do not modify it from this page's context; read
 
 `pkgs/default.nix` maps each subdir (nvim, ghost-build/-charity/-wrapper,
 oauthman) into flake packages and apps (`nix run ~/.nix#<name>`).
+
+## Ubuntu bootstrap flow
+
+`scripts/install.sh` is the supported non-NixOS entry point. It asks whether Nix
+is required, then synchronizes a clean checkout at `$HOME/.nix` and follows one
+of two paths:
+
+- **Nix:** preserve or install Nix, resolve the Home Manager CLI from the locked
+  flake, and switch `lokesh@server`. Installer-driven impure evaluation passes
+  the validated login user, passwd home, and checkout path; pure evaluation
+  retains the `lokesh` defaults. This path is currently x86_64-only and requires
+  systemd when Nix must be installed.
+- **APT:** enable Ubuntu universe, install the available server-tool subset, and
+  link static Neovim/zk/scripts/agent-harness configs directly. It cannot render
+  Home Manager shell/program settings or install Nix-only packages.
+
+Unsupported hosts fail before configuration is changed.

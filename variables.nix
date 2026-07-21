@@ -7,9 +7,14 @@ with lib;
       default = "lokesh";
       description = "My username";
     };
+    homeDirectory = mkOption {
+      type = types.str;
+      default = "/home/${config.vars.username}";
+      description = "Home directory for the configured user";
+    };
     nixDir = mkOption {
       type = types.str;
-      default = "/home/${config.vars.username}/.nix";
+      default = "${config.vars.homeDirectory}/.nix";
       description = "Path to the NixOS configuration directory";
     };
     fontName = mkOption {

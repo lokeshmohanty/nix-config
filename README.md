@@ -1,5 +1,53 @@
 # My Dotfiles in Nix
 
+## Ubuntu installation
+
+Clone the repository as the login user whose home should be configured:
+
+```sh
+git clone https://github.com/lokeshmohanty/nix.git ~/.nix
+cd ~/.nix
+./scripts/install.sh
+```
+
+The installer asks `Is Nix required on this system? [y/N]`:
+
+- **Yes:** install/reuse Nix and apply `hosts/server.nix` with Home Manager.
+- **No/default:** install the Ubuntu-available package subset with APT and link
+  the static configuration files directly.
+
+For noninteractive installation, use either:
+
+```sh
+just server-install-nix
+just server-install-apt
+```
+
+APT mode cannot reproduce Nix-only AI tools, the wrapped Neovim plugin/LSP
+closure, or Home Manager-generated shell settings. Existing config paths are
+preserved under `~/.local/state/lokesh-config/backups/` before managed links are
+created. Full platform requirements and safety behavior are documented in
+[the Ubuntu installation guide](docs/how-to/install-ubuntu.md).
+
+## Server Home Manager maintenance
+
+Once Nix is installed, apply the current `lokesh@server` configuration with:
+
+```sh
+cd ~/.nix
+just server-switch
+```
+
+Update only the locked Home Manager input and then apply the server profile:
+
+```sh
+cd ~/.nix
+just server-update-home-manager
+```
+
+The server recipes pass the current login user, home directory, and repository
+path to `hosts/server.nix`; do not run them with `sudo`.
+
 ## NixOS
 
 - Apply system configuration (`nixos-install --flake .#hostname` on live installation media)
@@ -8,7 +56,7 @@
 sudo nixos-rebuild switch --flake .#sudarshan
 # nh variant (path isn't required if programs.nh.flake is defined)
 nh os switch . -c sudarshan
-````
+```
 
 - Apply home configuration
 
@@ -80,4 +128,3 @@ git ls-files -v . | grep ^S
 - Modularize (<https://www.youtube.com/watch?v=-TRbzkw6Hjs>)
 - Enable secure boot (<https://github.com/nix-community/lanzaboote/blob/master/docs/QUICK_START.md>)
 - Use <https://github.com/fufexan/nix-gaming>
-

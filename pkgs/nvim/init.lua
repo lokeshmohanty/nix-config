@@ -29,10 +29,13 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   pattern = '*',
 })
 
-require('plugins')
-
-require('lean').setup() -- required only because I use nix
-vim.g.lean_config = { mappings = true }
+-- The Nix wrapper injects plugins.lua and the plugin closure. Plain Ubuntu
+-- Neovim still gets the core options/keymaps when the wrapper is unavailable.
+local has_plugins = pcall(require, 'plugins')
+if has_plugins then
+  require('lean').setup() -- required only because I use nix
+  vim.g.lean_config = { mappings = true }
+end
 
 vim.cmd([[
   "let g:slime_target = "kitty"
@@ -43,5 +46,4 @@ vim.cmd([[
 ]])
 vim.keymap.set("n", "<leader>ss", "<Plug>SlimeParagraphSend")
 vim.keymap.set("v", "<leader>ss", "<Plug>SlimeRegionSend")
-
 

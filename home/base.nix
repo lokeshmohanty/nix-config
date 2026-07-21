@@ -18,9 +18,12 @@
   };
 
   home = {
-    username = "lokesh";
-    homeDirectory = "/home/lokesh";
-    sessionPath = [ "$HOME/.local/bin" "$HOME/.cargo/bin" ];
+    username = config.vars.username;
+    homeDirectory = config.vars.homeDirectory;
+    sessionPath = [
+      "$HOME/.local/bin"
+      "$HOME/.cargo/bin"
+    ];
     sessionVariables = {
       LESSHISTFILE = config.xdg.cacheHome + "/less/history";
       LESSKEY = config.xdg.configHome + "/less/lesskey";
@@ -29,7 +32,7 @@
       DELTA_PAGER = "less -R";
       TERM = "xterm-256color";
       NIXCONFIG = config.vars.nixDir;
-      NIXPKGS_ALLOW_UNFREE=1;
+      NIXPKGS_ALLOW_UNFREE = 1;
     };
     packages = with pkgs; [
       self.packages.${pkgs.stdenv.hostPlatform.system}.ghost-build

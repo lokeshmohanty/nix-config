@@ -1,12 +1,16 @@
 # ~/.nix — Documentation
 
-*Last synced: 2026-07-18 (docs-sync). Entry point — any LLM should answer
+*Last synced: 2026-07-21 (docs-sync). Entry point — any LLM should answer
 questions about this repo from this folder plus the linked pages.*
 
 ## Contents
 
 - [architecture.md](architecture.md) — how the flake is wired: flake-parts,
   hostlib, module toggles, variables, activations, custom packages.
+- [how-to/install-ubuntu.md](how-to/install-ubuntu.md) — bootstrap Nix and apply
+  the portable server Home Manager profile on a fresh Ubuntu machine.
+- [decisions.md](decisions.md) — dated rationale for significant configuration
+  decisions.
 - Harness documentation lives at `../config/agentic-harness/agents/docs/`
   (layout, per-harness matrix, hooks, tools) — linked, not duplicated.
 
@@ -16,6 +20,7 @@ questions about this repo from this folder plus the linked pages.*
 |---|---|
 | Apply system config | `sudo nixos-rebuild switch --flake ~/.nix#sudarshan` (or `nh os switch . -c sudarshan`) |
 | Apply home config | `home-manager switch --flake ~/.nix#lokesh@sudarshan` |
+| Install on Ubuntu | `~/.nix/scripts/install.sh` (see the Ubuntu install guide) |
 | Update inputs | `nix flake update` (in `~/.nix`) |
 | Syntax-check a module | `nix-instantiate --parse <file.nix>` |
 | Format | `nix fmt` (formatter: nixfmt) |
