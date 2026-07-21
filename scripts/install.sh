@@ -242,7 +242,19 @@ update_apt() {
   have sudo || die "sudo is required to install Ubuntu packages"
   sudo -v
   log "Refreshing Ubuntu package metadata"
+  local update_status
+  set +e
   sudo env DEBIAN_FRONTEND=noninteractive apt-get update
+  update_status=$?
+  set -e
+  if (( update_status != 0 )); then
+    warn "apt-get update reported errors from one or more repositories; continuing with usable cached indexes"
+  fi
+  local package
+  for package in ca-certificates curl git; do
+    apt-cache show "${package}" >/dev/null 2>&1 \
+      || die "Ubuntu package indexes are unavailable for required package ${package}; repair APT sources and retry"
+  done
   apt_updated=true
 }
 

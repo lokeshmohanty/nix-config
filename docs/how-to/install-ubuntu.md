@@ -94,10 +94,10 @@ Manager-generated shell/program settings. AI authentication remains a separate
 first-run step and is never performed by the installer.
 The installer reports this rather than silently downloading unpinned binaries.
 
-Warnings from unrelated third-party APT sources (expired keys, missing keys, or
-duplicate source entries) belong to the host and are not rewritten by this
-installer. If `apt-get update` completes using older indexes, installation can
-continue; repair those repositories separately.
+Warnings or errors from unrelated third-party APT sources (expired keys, missing
+keys, authentication failures, or duplicate entries) belong to the host and are
+not rewritten by this installer. If the required Ubuntu indexes remain usable,
+installation continues using them; repair the failing repositories separately.
 
 Log out and back in after the first installation so the new session environment
 and PATH are fully loaded.
