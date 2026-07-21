@@ -22,6 +22,12 @@
 
 Applied 2026-07-18: the three AXI SessionStart hooks plus `harness-session-start` (SessionStart) and `docs-nudge` (Stop) are registered in the nix-managed settings.json; scripts live in `agentic-harness/bin/` (tested: scaffold, idempotency, one-nudge-per-session).
 
+### Thesis repo (`~/Documents/Research/LiteratureSurvey/.claude/settings.json` → `.agents/settings.json`)
+
+| Event | Hook | What it does |
+|---|---|---|
+| UserPromptSubmit | `research-critic-nudge` | Added 2026-07-22. Keeps the adversarial ICLR-spotlight reviewer in play without the user asking: on prompts that look like a *research decision* (keyword screen over the prompt), injects a line telling the model to invoke the `research-critic` skill and dispatch it as a subagent. Silent for non-thesis cwd and for mechanical prompts. Script: `~/.nix/config/agentic-harness/bin/research-critic-nudge` (no-op path ~8 ms). |
+
 ### Gortex hooks — REMOVED globally 2026-07-18, now per-repo only
 
 Global `~/.claude/settings.local.json`, Codex `config.toml`, and Gemini `settings.json` no longer carry gortex hooks (removed 2026-07-18). Per-repo scoping below is live.

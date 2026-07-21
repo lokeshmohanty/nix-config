@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# UserPromptSubmit hook (thesis repo only): keeps the adversarial ICLR-spotlight
+# reviewer in play WITHOUT Lokesh having to ask for it (standing request,
+# 2026-07-22). Emits a one-line reminder when the prompt looks like a research
+# decision; silent otherwise so it never taxes mechanical turns.
+#
+# Contract: stdin = JSON event payload; stdout = context injected for the model.
+# Must stay <1s on the no-op path.
+set -uo pipefail
+
+payload="$(cat 2>/dev/null || true)"
+
+# Only for the thesis repo.
+case "${PWD:-}" in
+  *Research/LiteratureSurvey*) ;;
+  *) exit 0 ;;
+esac
+
+# Cheap keyword screen over the prompt text (no jq dependency).
+prompt="$(printf '%s' "$payload" | tr '[:upper:]' '[:lower:]')"
+case "$prompt" in
+  *experiment*|*baseline*|*benchmark*|*ablation*|*claim*|*result*|*metric*|\
+  *scenario*|*seed*|*paper*|*iclr*|*spotlight*|*present*|*report*|*novel*|\
+  *contribution*|*evaluat*|*sufficient*|*enough*|*conclude*|*shows*|*proves*|\
+  *significan*|*compare*|*sota*|*state-of-the-art*|*reviewer*)
+    cat <<'EOF'
+[research-critic] This turn touches a research decision. Per Lokesh's standing
+request, invoke the `research-critic` skill and dispatch the adversarial
+ICLR-spotlight reviewer as a subagent BEFORE acting on or reporting the
+decision. Report its top objections and their cost to fix. Do not suppress an
+inconvenient critique.
+EOF
+    ;;
+esac
+exit 0
