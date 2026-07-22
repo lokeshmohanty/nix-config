@@ -16,7 +16,7 @@
   };
   flake.homeConfigurations = {
     "lokesh@bhaskara" = self.hostlib.mkHomeHost (
-      { ... }:
+      { pkgs, ... }:
       {
         imports = [ ../../home ];
 
@@ -28,6 +28,7 @@
           shell.enable = true;
           tui.enable = true;
         };
+        home.packages = with pkgs; [ wayvnc tigervnc];
       }
     );
   };

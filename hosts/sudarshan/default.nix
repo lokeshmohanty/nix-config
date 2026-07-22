@@ -32,7 +32,7 @@
           tui.enable = true;
         };
 
-        home.packages = with pkgs; [ slack ];
+        home.packages = with pkgs; [ slack tigervnc ];
       }
     );
   };

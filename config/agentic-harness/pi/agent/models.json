@@ -12,7 +12,7 @@
       ]
     },
     "vllm-gemma4-31": {
-      "baseUrl": "http://default-gemma4-mm-it-http:8000/v1",
+      "baseUrl": "http://default-gemma4-extra-http:8000/v1",
       "api": "openai-completions",
       "apiKey": "none",
       "models": [
