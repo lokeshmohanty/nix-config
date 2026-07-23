@@ -46,42 +46,22 @@
       );
       claude = lib.mkIf config.modules.ai.enable (
         lib.mkAfter ''
-          mkdir -p ${config.home.homeDirectory}/.claude
-          ln -sfn ${config.home.homeDirectory}/.agents/AGENTS.md ${config.home.homeDirectory}/.claude/CLAUDE.md
-          ln -sfn ${config.home.homeDirectory}/.agents/skills ${config.home.homeDirectory}/.claude/skills
-          ln -sfn ${config.vars.nixDir}/config/agentic-harness/claude/settings.json ${config.home.homeDirectory}/.claude/settings.json
-          ln -sfn ${config.vars.nixDir}/config/agentic-harness/claude/rules ${config.home.homeDirectory}/.claude/rules
+          ln -sfn ${config.vars.nixDir}/config/agentic-harness/claude ${config.home.homeDirectory}/.claude
         ''
       );
       pi = lib.mkIf config.modules.ai.enable (
         lib.mkAfter ''
-          mkdir -p ${config.home.homeDirectory}/.pi/agent
-          ln -sfn ${config.vars.nixDir}/config/agentic-harness/pi/web-search.json ${config.home.homeDirectory}/.pi/web-search.json
-          ln -sfn ${config.vars.nixDir}/config/agentic-harness/pi/agent/settings.json ${config.home.homeDirectory}/.pi/agent/settings.json
-          ln -sfn ${config.vars.nixDir}/config/agentic-harness/pi/agent/models.json ${config.home.homeDirectory}/.pi/agent/models.json
-          ln -sfn ${config.home.homeDirectory}/.agents/AGENTS.md ${config.home.homeDirectory}/.pi/agent/APPEND_SYSTEM.md
-          ln -sfn ${config.home.homeDirectory}/.agents/skills ${config.home.homeDirectory}/.pi/agent/skills
+          ln -sfn ${config.vars.nixDir}/config/agentic-harness/pi ${config.home.homeDirectory}/.pi
         ''
       );
       codex = lib.mkIf config.modules.ai.enable (
         lib.mkAfter ''
-          mkdir -p ${config.home.homeDirectory}/.codex
-          ln -sfn ${config.home.homeDirectory}/.agents/AGENTS.md ${config.home.homeDirectory}/.codex/AGENTS.md
-          ln -sfn ${config.home.homeDirectory}/.agents/skills ${config.home.homeDirectory}/.codex/skills
+          ln -sfn ${config.vars.nixDir}/config/agentic-harness/codex ${config.home.homeDirectory}/.codex
         ''
       );
       gemini = lib.mkIf config.modules.ai.enable (
         lib.mkAfter ''
-          mkdir -p ${config.home.homeDirectory}/.gemini
-          ln -sfn ${config.home.homeDirectory}/.agents/AGENTS.md ${config.home.homeDirectory}/.gemini/GEMINI.md
-        ''
-      );
-      antigravity = lib.mkIf config.modules.ai.enable (
-        lib.mkAfter ''
-          mkdir -p ${config.home.homeDirectory}/.gemini/antigravity
-          ln -sfn ${config.home.homeDirectory}/.agents/AGENTS.md ${config.home.homeDirectory}/.gemini/antigravity/AGENTS.md
-          ln -sfn ${config.home.homeDirectory}/.agents/skills ${config.home.homeDirectory}/.gemini/antigravity/skills
-          ln -sfn ${config.vars.nixDir}/config/agentic-harness/antigravity/mcp_config.json ${config.home.homeDirectory}/.gemini/antigravity/mcp_config.json
+          ln -sfn ${config.vars.nixDir}/config/agentic-harness/gemini ${config.home.homeDirectory}/.gemini
         ''
       );
       harness-bin = lib.mkIf config.modules.ai.enable (

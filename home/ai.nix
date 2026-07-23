@@ -20,6 +20,8 @@ in
       claude-code 
       antigravity-cli 
       pi
+      agent-browser
+      pkgs.libsixel # required by pi for image rendering
     ];
   };
 }

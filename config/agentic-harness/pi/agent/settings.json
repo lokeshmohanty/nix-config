@@ -8,7 +8,18 @@
     "npm:pi-web-access",
     "npm:@zosmaai/pi-llm-wiki",
     "npm:pi-codex-goal",
-    "npm:pi-observational-memory"
+    "npm:pi-observational-memory",
+    "npm:pi-agent-browser-native",
+    "npm:pi-rich-renderer",
+    "npm:pi-image-tools"
   ],
+  "richRenderer": {
+    "imageScale": 0.5,
+    "cacheTtlMs": 604800000
+  },
+  "terminal": {
+    "showImages": true,
+    "showTerminalProgress": true
+  },
   "theme": "dark"
 }
