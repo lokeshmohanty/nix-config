@@ -1,6 +1,6 @@
 # Harness Documentation — Index
 
-*Reference for any agent working on or with Lokesh's agent harness. Last synced: 2026-07-18.*
+*Reference for any agent working on or with Lokesh's agent harness. Last synced: 2026-07-24.*
 
 The harness is **AGENTS.md-first**: every harness (Claude Code, pi, Codex, Gemini)
 reads the same files; `CLAUDE.md` and `.claude` are compatibility symlinks. Canonical
@@ -13,6 +13,7 @@ config lives in `~/.nix/config/agentic-harness/` and is committed in the `~/.nix
 | [hooks.md](hooks.md) | You are adding/changing a hook, or wondering why one fires. Current hook inventory. |
 | [tools.md](tools.md) | You need GitNexus, gortex, context7, or wonder which code-intelligence tool applies. |
 | [project-template.md](project-template.md) | You are scaffolding or auditing a project's harness (what every repo must have). |
+| [delegation.md](delegation.md) | You want tasks handled by skill-aware subagents — the shared fleet, `harness-skill-pick`, and per-harness (Claude/pi) wiring. |
 
 Related skills: `harness-ops` (make changes here), `docs-sync` (project docs/ upkeep).
 

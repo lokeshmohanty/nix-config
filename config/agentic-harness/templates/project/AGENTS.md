@@ -15,9 +15,13 @@ TODO: one paragraph — purpose, stack, entry points.
 | `docs/` | full documentation — answer questions from here first |
 | `.agents/skills/` | project skills + memories (invoke on demand) |
 
-## Project skills
+## Project skills & subagents
 
-*(none yet — create with the `harness-ops` skill when durable knowledge accumulates)*
+*(none yet — create skills with the `harness-ops` skill when durable knowledge
+accumulates.)* The global delegation protocol applies (`~/.agents/AGENTS.md`):
+tasks are handled by the shared subagent fleet, which auto-picks skills/memories
+via `harness-skill-pick`. Drop project-specific subagent defs in
+`.agents/agents/*.md` to add or override workers for this repo.
 
 ## Binding rules
 

@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+# harness-skill-pick — given a task description, list the harness skills whose
+# purpose best matches it, plus each skill's memory/ files. The single source of
+# truth for "auto-pick skills/memories": Claude subagents call it via Bash, the
+# pi `pick_skills` tool wraps it. Read-only, no deps beyond awk. Fast (<0.2s).
+#
+# Usage: harness-skill-pick "<task keywords / description>"
+#   -n N   max skills to show (default 8)
+#   -a     show all skills regardless of score (the full menu)
+set -uo pipefail
+
+MAX=8
+ALL=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -n) MAX="${2:-8}"; shift 2 ;;
+    -a) ALL=1; shift ;;
+    --) shift; break ;;
+    *) break ;;
+  esac
+done
+QUERY="${*:-}"
+
+# Skill roots, in precedence order (project overrides global on name clash).
+ROOTS=()
+REPO="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+[ -n "$REPO" ] && ROOTS+=("$REPO/.agents/skills")
+[ -z "$REPO" ] && [ -d "$PWD/.agents/skills" ] && ROOTS+=("$PWD/.agents/skills")
+ROOTS+=("$HOME/.agents/skills")
+
+# Collect "path\tname\tdescription" for every SKILL.md found (dedupe by name,
+# first occurrence wins → project before global).
+collect() {
+  local root="$1"
+  [ -d "$root" ] || return 0
+  # Each skill: <root>/<name>/SKILL.md
+  find "$root" -mindepth 2 -maxdepth 2 -name SKILL.md 2>/dev/null | while read -r f; do
+    awk -v path="$f" '
+      BEGIN{ infm=0; dashes=0; indesc=0; desc=""; name="" }
+      /^---[[:space:]]*$/ { dashes++; if(dashes==1){infm=1; next} else {infm=0; exit} }
+      infm==1 {
+        if ($0 ~ /^name:[[:space:]]*/) { n=$0; sub(/^name:[[:space:]]*/,"",n); gsub(/[">]/,"",n); name=n; indesc=0; next }
+        if ($0 ~ /^description:[[:space:]]*/) {
+          d=$0; sub(/^description:[[:space:]]*/,"",d); gsub(/^[>|][[:space:]]*/,"",d);
+          desc=d; indesc=1; next
+        }
+        # continuation of a folded/multi-line description (indented, not a new key)
+        if (indesc==1 && $0 ~ /^[[:space:]]+/) { c=$0; sub(/^[[:space:]]+/,"",c); desc=desc " " c; next }
+        if ($0 ~ /^[A-Za-z_]+:/) { indesc=0 }
+      }
+      END{
+        if(name==""){ ndir=path; sub(/\/SKILL\.md$/,"",ndir); sub(/.*\//,"",ndir); name=ndir }
+        gsub(/[\t]/," ",desc); gsub(/^ +| +$/,"",desc);
+        print name "\t" path "\t" desc
+      }' "$f"
+  done
+}
+
+TMP="$(mktemp 2>/dev/null || echo /tmp/hsp.$$)"
+trap 'rm -f "$TMP"' EXIT
+for r in "${ROOTS[@]}"; do collect "$r"; done \
+  | awk -F'\t' '!seen[$1]++' > "$TMP"
+
+[ -s "$TMP" ] || { echo "harness-skill-pick: no skills found under: ${ROOTS[*]}"; exit 0; }
+
+# Score each skill by how many distinct query tokens (len>=3) appear in its
+# name (weighted x3) or description. Print ranked matches + memory files.
+awk -F'\t' -v query="$QUERY" -v maxn="$MAX" -v showall="$ALL" '
+  BEGIN{
+    q=tolower(query); gsub(/[^a-z0-9 ]/," ",q); nt=split(q,toks," ");
+    ut=0; for(i=1;i<=nt;i++){ t=toks[i]; if(length(t)>=3 && !(t in stop) && !(t in have)){have[t]=1; uniq[++ut]=t} }
+  }
+  {
+    name=$1; path=$2; desc=$3;
+    hay=tolower(name" "name" "name" "desc);
+    score=0;
+    for(i=1;i<=ut;i++){ if(index(hay,uniq[i])>0) score++ }
+    n[NR]=name; p[NR]=path; d[NR]=desc; s[NR]=score; rows=NR;
+  }
+  END{
+    # simple descending sort by score (rows are few)
+    for(a=1;a<=rows;a++) ord[a]=a;
+    for(a=1;a<=rows;a++) for(b=a+1;b<=rows;b++) if(s[ord[b]]>s[ord[a]]){t=ord[a];ord[a]=ord[b];ord[b]=t}
+    if(ut==0){ print "(no query terms given — showing the full skill menu)\n" }
+    shown=0;
+    for(a=1;a<=rows;a++){
+      idx=ord[a];
+      if(showall!=1 && ut>0 && s[idx]==0) continue;
+      shown++; if(showall!=1 && shown>maxn) break;
+      dir=p[idx]; sub(/\/SKILL\.md$/,"",dir);
+      tag=(ut>0? " [match "s[idx]"/"ut"]" : "");
+      print "• " n[idx] tag;
+      if(length(d[idx])>0){ dd=d[idx]; if(length(dd)>240) dd=substr(dd,1,240)"…"; print "    " dd }
+      print "    SKILL.md: " p[idx];
+      cmd="ls "dir"/memory/*.md 2>/dev/null";
+      first=1;
+      while((cmd | getline mf)>0){ if(first){printf "    memory:  "; first=0} else printf ", "; sub(/.*\//,"",mf); printf "%s", mf }
+      close(cmd); if(first==0) print "";
+      print "";
+    }
+    if(shown==0){ print "(no skill description matched those terms — run with -a to see the full menu)" }
+  }' "$TMP"

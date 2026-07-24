@@ -27,6 +27,10 @@ if [ ! -d docs ]; then
   created+=(docs/)
 fi
 if [ ! -d .agents/skills ]; then mkdir -p .agents/skills; created+=(.agents/skills/); fi
+# .agents/agents/ holds project-specific subagent defs (*.md). Read by Claude
+# (via .claude -> .agents) and pi (@tintinweb/pi-subagents). Empty by default —
+# the global fleet (orchestrator/explorer/implementer/reviewer) is inherited.
+if [ ! -d .agents/agents ]; then mkdir -p .agents/agents; touch .agents/agents/.gitkeep; created+=(.agents/agents/); fi
 if [ ! -e .claude ]; then ln -s .agents .claude; created+=(.claude); fi
 
 if [ -d .git ] && ! grep -qs '\.claude/settings\.local\.json' .gitignore 2>/dev/null; then

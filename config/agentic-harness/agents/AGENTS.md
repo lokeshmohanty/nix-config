@@ -17,6 +17,25 @@
 `.agents/skills/<skill>/SKILL.md` + `memory/` (durable knowledge; `.claude` symlinks to `.agents`).
 Missing pieces are scaffolded by the session-start hook or `harness-init`.
 
+## Delegation protocol (default for any non-trivial task)
+
+Assigned tasks are handled by **subagents**, not the main context. The main
+context is an orchestrator: it scopes the task, delegates, and synthesises.
+
+- **Pick knowledge first.** Before acting or delegating, discover which skills
+  and memories apply: run `harness-skill-pick "<keywords>"` (Claude: via Bash;
+  pi: the `pick_skills` tool). It lists matching global + project skills and
+  their `memory/` files. Load those `SKILL.md`s and read the memories — never
+  re-derive what a skill/memory already records.
+- **Delegate to the fleet** (`~/.agents/agents/`, read by both Claude Code and
+  pi via `@tintinweb/pi-subagents`): `orchestrator` (decompose + route a
+  multi-step task), `explorer` (read-only investigation), `implementer` (make
+  the change), `reviewer` (adversarially verify before trusting). Run
+  independent units in parallel; pass each worker the skills/memories you found.
+- **Trivial turns stay inline.** A one-line answer or a mechanical edit does not
+  need a subagent. Delegation is the default for real work, not a tax on chat.
+- Full rationale and per-harness wiring: `~/.agents/docs/delegation.md`.
+
 ## Global skills (invoke on demand)
 
 - `harness-ops` — create/modify skills, memories, hooks, harness config; skill-writing standards. **Use for any harness change.**

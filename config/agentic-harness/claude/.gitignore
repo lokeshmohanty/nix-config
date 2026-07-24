@@ -10,12 +10,12 @@ hooks/
 ide/
 mcp-needs-auth-cache.json
 paste-cache/
+plans/
 plugins/
 projects/
 sessions/
 settings.local.json
 shell-snapshots/
-skills
 tasks/
 telemetry/
 policy-limits.json

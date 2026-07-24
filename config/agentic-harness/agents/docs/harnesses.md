@@ -1,6 +1,10 @@
 # Harnesses — per-harness feature reference
 
-*Purpose: what each installed agent harness supports (context files, skills, hooks, MCP, extensions, config locations) — consult before creating or modifying any harness component. Last verified: 2026-07-18 (live system).*
+*Purpose: what each installed agent harness supports (context files, skills, hooks, MCP, extensions, config locations) — consult before creating or modifying any harness component. Last verified: 2026-07-24 (live system).*
+
+> Task delegation to skill-aware subagents (the shared `~/.agents/agents/` fleet,
+> `harness-skill-pick`, and the Claude/pi wiring) is documented separately in
+> [delegation.md](delegation.md).
 
 ## Summary table
 
@@ -10,7 +14,7 @@
 | Skills | yes — `~/.claude/skills` → `~/.agents/skills` + `<repo>/.claude/skills` | yes — `~/.pi/agent/skills` → `~/.agents/skills`, `--skill` | yes — `~/.codex/skills` → `~/.agents/skills` | yes — `~/.gemini/skills` → `~/.agents/skills` (VERIFY discovery semantics) | yes — `~/.gemini/antigravity/skills` → `~/.agents/skills` |
 | Hooks | yes — JSON in settings files (6 events) | no native hook events (extensions instead) | yes — `config.toml` `[[hooks.*]]` + `hooks.json` | yes — `settings.json` (`SessionStart`/`BeforeTool`/`AfterTool` naming) | no native hooks (VERIFY) |
 | MCP | yes — `~/.claude.json` global, `.mcp.json` per-project | no (VERIFY — nothing configured; extensions cover tool needs) | yes — `[mcp_servers]` in config.toml | yes — `mcpServers` in settings.json | yes — `mcp_config.json` (nix-managed, empty; gortex removed) |
-| Subagents | yes — `agents/*.md` global + per-repo | no | no | no (VERIFY) | no (VERIFY) |
+| Subagents | yes — `agents/*.md` global + per-repo | yes — via `@tintinweb/pi-subagents` (reads `~/.pi/agent/agents` + `.agents/agents`) | no | no (VERIFY) | no (VERIFY) |
 | Plugins / extensions | plugins (`enabledPlugins`, marketplaces) | extensions (`~/.pi/agent/extensions/`, `pi install`) | no | `~/.gemini/extensions/` | plugins via `agy plugin`; IDE extensions in `~/.antigravity` |
 | Config | `~/.claude/settings.json` (+ `.local`, per-project) | `~/.pi/agent/settings.json`, `models.json` | `~/.codex/config.toml` | `~/.gemini/settings.json` | `~/.gemini/antigravity/` (agent home) + `~/.antigravity` (IDE) |
 | Nix-managed? | selective links (`CLAUDE.md`, `skills`, `settings.json`, `rules`); runtime dirs stay real | selective links (`settings.json`, `models.json`, `web-search.json`, `APPEND_SYSTEM.md`, `skills`) | AGENTS.md + skills links only — `config.toml` machine-local (secrets) | GEMINI.md link only | links for AGENTS.md, skills, mcp_config.json |
@@ -33,7 +37,7 @@ Symlink map and full file layout: [layout.md](layout.md).
 **Features:**
 - **Skills** — directories containing `SKILL.md` (+ optional `memory/`, `references/`, `tools/`). Global: `~/.claude/skills` → `~/.agents/skills` (12 skills verified). Per-repo: `<repo>/.claude/skills/`. Plugins also contribute skills (`plugin:skill` namespacing).
 - **Hooks** — events `SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`, `Stop`, `PreCompact`; registered as JSON in any settings file. Inventory and snippets: [hooks.md](hooks.md).
-- **Subagents** — `~/.claude/agents/*.md` (160+ files verified) and `<repo>/.claude/agents/*.md`; markdown with frontmatter (name, description, tools, model).
+- **Subagents** — `~/.claude/agents/*.md` and `<repo>/.claude/agents/*.md`; markdown with frontmatter (name, description, tools, model). `~/.claude/agents` is a committed relative symlink → `../agents/agents` (the shared fleet: orchestrator/explorer/implementer/reviewer). Delegation protocol: [delegation.md](delegation.md).
 - **Slash commands** — `~/.claude/commands/*.md` (currently 20 gortex-* commands) and `<repo>/.claude/commands/*.md`.
 - **MCP servers** — global in `~/.claude.json` under `mcpServers` (verified: `context7`, `ghost`, `gortex`); per-project in `<repo>/.mcp.json`.
 - **Auto memory** — per-project at `~/.claude/projects/<path-slug>/memory/` (`MEMORY.md` + topic files). Verified: e.g. `~/.claude/projects/-home-lokesh-Projects-zenteiq-brahmx-dsdg/memory/`.
@@ -58,7 +62,9 @@ Verified: `pi 0.79.1`, `/nix/store/…-pi-0.79.1/bin/pi`; flake input `llm-agent
 
 **Skills:** `~/.pi/agent/skills` → `~/.agents/skills` — same skill set as Claude Code. Extra: `--skill <path>` to load ad-hoc, `--no-skills`.
 
-**Extensions:** `~/.pi/agent/extensions/` (verified: `gortex/`); `--extension/-e <path>`, `--no-extensions`; managed via `pi install/remove/update/list/config`. Extensions can register flags and tools. No hook events — extensions are the customization mechanism.
+**Extensions:** npm packages listed in `settings.json` `packages` (verified 2026-07-24: `@tintinweb/pi-subagents`, `pi-web-access`, `@zosmaai/pi-llm-wiki`, `pi-codex-goal`, `pi-observational-memory`, `pi-agent-browser-native`, `pi-rich-renderer`, `pi-image-tools`), plus loose dirs under `~/.pi/agent/extensions/`. `--extension/-e <path>`, `--no-extensions`; managed via `pi install/remove/update/list/config`. Extensions register flags, tools, commands, shortcuts, and event handlers (`export default (pi: ExtensionAPI) => { pi.registerTool({...}) }`). No hook events — extensions are the customization mechanism.
+- **`pi-harness-delegate`** (`pi/agent/extensions/pi-harness-delegate/`, ours) — registers the `pick_skills` tool wrapping `harness-skill-pick`. See [delegation.md](delegation.md). (VERIFY loose-dir auto-discovery: `pi list`.)
+- **`@tintinweb/pi-subagents`** — provides the `Agent`/`get_subagent_result`/`steer_subagent` tools and reads the shared fleet from `~/.pi/agent/agents` + `<cwd>/.agents/agents`; skill preloading from `.agents/skills`.
 
 **Other verified flags:** `--prompt-template <path>` / `--no-prompt-templates`, `--theme <path>` / `--no-themes`, `--thinking off..xhigh`, session mgmt (`-c` continue, `-r` resume, `--session`, `--session-id`, `--fork`, `--session-dir`, `--no-session`, `--name`, `--export <html>`), `--print/-p` non-interactive, `--mode text|json|rpc`, `--tools/--exclude-tools/--no-tools`, `--approve/-a` (trust project-local files), `--offline`, `--list-models`.
 

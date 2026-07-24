@@ -1,0 +1,20 @@
+{
+  "name": "pi-harness-delegate",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "index.ts",
+  "description": "Delegation-support extension: pick_skills tool that surfaces the harness skills + memories matching a task, wrapping the shared harness-skill-pick CLI.",
+  "keywords": [
+    "pi-package",
+    "pi",
+    "pi-extension",
+    "skills",
+    "delegation"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "typebox": "*"
+  }
+}

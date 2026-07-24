@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# harness-heal — ensure the cross-tool symlinks that make skills/agents visible
+# to each harness exist. Whole-dir symlinking of ~/.claude and ~/.pi can drop the
+# inner skills/agents sublinks (as happened 2026-07-24, leaving Claude with zero
+# skills). This restores them idempotently. Safe to run every session; <50ms.
+#
+# Canonical sources (git-tracked in ~/.nix):
+#   ~/.agents/skills  and  ~/.agents/agents
+set -uo pipefail
+
+H="${HOME}"
+AGENTS_ROOT="${H}/.nix/config/agentic-harness/agents"
+SKILLS="${AGENTS_ROOT}/skills"
+AGENTS="${AGENTS_ROOT}/agents"
+
+# link TARGET LINK — create LINK -> TARGET only when it is missing or broken.
+# Never rewrites a link that already resolves to TARGET (the committed links are
+# relative; rewriting them to an absolute path would churn git every session).
+link() {
+  local target="$1" link="$2"
+  [ -e "$target" ] || return 0
+  # Already resolves to the intended dir? leave it untouched.
+  if [ -e "$link" ] && [ "$(readlink -f "$link" 2>/dev/null)" = "$(readlink -f "$target" 2>/dev/null)" ]; then
+    return 0
+  fi
+  # Empty real dir → remove so we can link in its place.
+  if [ -d "$link" ] && [ ! -L "$link" ] && [ -z "$(ls -A "$link" 2>/dev/null)" ]; then
+    rmdir "$link" 2>/dev/null || true
+  fi
+  # Non-empty real dir/file that isn't ours: don't clobber.
+  [ -e "$link" ] && [ ! -L "$link" ] && return 0
+  ln -sfn "$target" "$link"
+}
+
+# Claude reads ~/.claude/{skills,agents}; ~/.claude is itself a dir symlink.
+link "$SKILLS" "${H}/.claude/skills"
+link "$AGENTS" "${H}/.claude/agents"
+
+# pi (@tintinweb/pi-subagents) reads ~/.pi/agent/{skills,agents}.
+link "$SKILLS" "${H}/.pi/agent/skills"
+link "$AGENTS" "${H}/.pi/agent/agents"
+
+exit 0

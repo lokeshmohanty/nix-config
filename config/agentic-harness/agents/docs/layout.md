@@ -1,6 +1,14 @@
 # Harness Layout — where everything lives
 
-*Purpose: the single source of truth for the file layout and symlink map. Last verified: 2026-07-18.*
+*Purpose: the single source of truth for the file layout and symlink map. Last verified: 2026-07-24.*
+
+> **Correction (2026-07-24):** the live symlink model is **whole-dir**, not the
+> "selective links" earlier revisions described. `~/.claude`, `~/.pi`, `~/.codex`,
+> `~/.gemini` are each a single symlink into the nix repo; what is *tracked* vs
+> runtime is controlled by a `.gitignore` inside each tool dir (e.g.
+> `claude/.gitignore`, `pi/.gitignore`). Credentials/session/cache files therefore
+> physically live under `~/.nix/config/agentic-harness/<tool>/` but are gitignored.
+> Inner cross-tool links (skills, agents) are committed *relative* symlinks.
 
 ## Canonical tree (git-tracked in `~/.nix`)
 
@@ -24,30 +32,44 @@
 └── README.md
 ```
 
-## Symlink map (created by `~/.nix/home/activations.nix`, `ln -sfn`)
+## Symlink map
 
-| Link | Target | Note |
+Two layers:
+
+**A. Whole-dir links** (created by `~/.nix/home/activations.nix`, `ln -sfn`):
+
+| Link | Target |
+|---|---|
+| `~/.agents` | `…/agentic-harness/agents` |
+| `~/.claude` | `…/agentic-harness/claude` |
+| `~/.pi` | `…/agentic-harness/pi` |
+| `~/.codex` | `…/agentic-harness/codex` |
+| `~/.gemini` | `…/agentic-harness/gemini` |
+| `~/.local/bin/<harness bins>` | `…/agentic-harness/bin/*` |
+
+What is *tracked* inside each tool dir is decided by that dir's `.gitignore`
+(runtime state — credentials, sessions, cache, projects — is gitignored but
+physically present). `AGENTS.md` context files are committed symlinks to
+`../agents/AGENTS.md` (Claude: `claude/CLAUDE.md`; codex/gemini analogous;
+gemini's is `GEMINI.md` by convention).
+
+**B. Inner cross-tool links** — committed *relative* symlinks that make the
+shared `agents/{skills,agents}` visible to each harness (resolve automatically
+via the whole-dir link; no activation step needed):
+
+| Link (in repo) | Target | Consumed by |
 |---|---|---|
-| `~/.agents` | `…/agentic-harness/agents` | whole dir — safe, no runtime writes besides ours |
-| `~/.claude/CLAUDE.md` | `~/.agents/AGENTS.md` | `~/.claude` itself stays a REAL dir (runtime state: projects/, sessions/, credentials) |
-| `~/.claude/skills` | `~/.agents/skills` | |
-| `~/.claude/settings.json` | `…/agentic-harness/claude/settings.json` | secrets never go here |
-| `~/.claude/rules` | `…/agentic-harness/claude/rules` | |
-| `~/.pi/web-search.json` | `…/agentic-harness/pi/web-search.json` | `~/.pi` stays a REAL dir (sessions, auth, trust) |
-| `~/.pi/agent/settings.json` | `…/agentic-harness/pi/agent/settings.json` | runtime updates land in nix repo — intended |
-| `~/.pi/agent/models.json` | `…/agentic-harness/pi/agent/models.json` | |
-| `~/.pi/agent/APPEND_SYSTEM.md` | `~/.agents/AGENTS.md` | |
-| `~/.pi/agent/skills` | `~/.agents/skills` | |
-| `~/.codex/AGENTS.md` | `~/.agents/AGENTS.md` | `~/.codex/config.toml` is machine-local (secrets, trust) — NOT nix-managed |
-| `~/.codex/skills` | `~/.agents/skills` | |
-| `~/.gemini/GEMINI.md` | `~/.agents/AGENTS.md` | filename is GEMINI.md by convention |
-| `~/.gemini/antigravity/AGENTS.md` | `~/.agents/AGENTS.md` | antigravity agent home stays a REAL dir (conversations, knowledge, brain) |
-| `~/.gemini/antigravity/skills` | `~/.agents/skills` | |
-| `~/.gemini/antigravity/mcp_config.json` | `…/agentic-harness/antigravity/mcp_config.json` | |
+| `claude/skills` | `../agents/skills` | Claude Code global skills |
+| `claude/agents` | `../agents/agents` | Claude Code global subagent fleet |
+| `pi/agent/skills` | `../../agents/skills` | pi skills (@tintinweb/pi-subagents) |
+| `pi/agent/agents` | `../../agents/agents` | pi global subagent fleet |
 
-**Never** whole-dir-symlink `~/.claude`, `~/.pi`, `~/.codex`, or `~/.gemini` into the nix repo:
-they hold credentials and runtime state. Selective links only. Use `ln -sfn`
-(never bare `ln -sf` on an existing directory — it drops the link *inside* it).
+`bin/harness-heal` recreates any of these if a whole-dir operation drops them,
+without rewriting good links (no churn). See [delegation.md](delegation.md).
+
+Use `ln -sfn`, never bare `ln -sf` on an existing directory — it drops the link
+*inside* it. Never commit secrets: they stay gitignored inside the tool dirs, or
+in machine-local files (`~/.codex/config.toml`, `pi/agent/auth.json`).
 
 ## Per-project layout (see project-template.md)
 

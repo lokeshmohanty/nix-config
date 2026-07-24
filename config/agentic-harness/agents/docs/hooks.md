@@ -17,7 +17,7 @@
 | SessionStart | `gh-axi` | AXI CLI announcement (GitHub ops) |
 | SessionStart | `chrome-devtools-axi` | AXI CLI announcement (headless Chrome) |
 | SessionStart | `lavish-axi` | AXI CLI announcement |
-| SessionStart | `harness-session-start` | Auto-scaffolds `AGENTS.md`/`STATUS.md`/`docs/`/`.agents` in unharnessed git repos. Script: `~/.nix/config/agentic-harness/bin/harness-session-start` |
+| SessionStart | `harness-session-start` | Runs `harness-heal` first (repairs the cross-tool `skills`/`agents` symlinks), then auto-scaffolds `AGENTS.md`/`STATUS.md`/`docs/`/`.agents` in unharnessed git repos. Script: `~/.nix/config/agentic-harness/bin/harness-session-start` |
 | Stop | `docs-nudge` | Reminds when tracked source changed but `docs/` didn't. Script: `~/.nix/config/agentic-harness/bin/docs-nudge` |
 
 Applied 2026-07-18: the three AXI SessionStart hooks plus `harness-session-start` (SessionStart) and `docs-nudge` (Stop) are registered in the nix-managed settings.json; scripts live in `agentic-harness/bin/` (tested: scaffold, idempotency, one-nudge-per-session).
