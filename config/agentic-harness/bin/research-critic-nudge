@@ -17,24 +17,30 @@ case "${PWD:-}" in
 esac
 
 # Cheap keyword screen over the prompt text (no jq dependency).
+# NOTE (2026-07-24): the pure-presentation triggers (paper/present/report) were
+# removed so authoring work is not auto-nagged. Genuine research-decision keywords
+# still fire; anything narrower is summoned on demand with the `/critic` command
+# (Claude) or `just critic` (pi).
 prompt="$(printf '%s' "$payload" | tr '[:upper:]' '[:lower:]')"
 case "$prompt" in
   *experiment*|*baseline*|*benchmark*|*ablation*|*claim*|*result*|*metric*|\
-  *scenario*|*seed*|*paper*|*iclr*|*spotlight*|*present*|*report*|*novel*|\
+  *scenario*|*seed*|*iclr*|*spotlight*|*novel*|\
   *contribution*|*evaluat*|*sufficient*|*enough*|*conclude*|*shows*|*proves*|\
   *significan*|*compare*|*sota*|*state-of-the-art*|*reviewer*)
     cat <<'EOF'
 [research-gate] This turn touches a research decision. Per Lokesh's standing
-requests, run the chain BEFORE acting on or reporting it:
-  1. `research-theorist` — what existing theory predicts this outcome, or the
-     NOVEL falsifiable hypothesis the experiment will prove/disprove (novelty
-     checked against litgraph + the hypothesis ledger). No hypothesis => not a
-     severe test => send the design back.
-  2. `research-critic` — adversarial ICLR-spotlight review as a subagent; for an
-     experiment plan this is a HARD GATE (no compute until cleared as a severe
-     test whose failure is as informative as its success).
+requests, invoke the `research` skill and run its gate BEFORE acting on or
+reporting the decision:
+  1. theorist (research/references/theorist.md) — what existing theory predicts
+     this outcome, or the NOVEL falsifiable hypothesis the experiment will
+     prove/disprove (novelty checked against the literature graph + the
+     hypothesis ledger). No hypothesis => not a severe test => send it back.
+  2. critic (research/references/critic.md) — adversarial ICLR-spotlight review
+     as a subagent; for an experiment plan this is a HARD GATE (no compute until
+     cleared as a severe test whose failure is as informative as its success).
 Report the hypothesis, the top objections, and their cost to fix. Do not
-suppress an inconvenient critique.
+suppress an inconvenient critique. (To summon this gate yourself at any time:
+`/critic` in Claude, `just critic` in pi.)
 EOF
     ;;
 esac
