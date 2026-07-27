@@ -65,6 +65,12 @@ provides Claude-Code-style subagents. It reads custom agents from
 `pick_skills` tool that wraps `harness-skill-pick` so a pi subagent discovers the
 right skills/memories the same way.
 
+**Since 2026-07-27 the subagent tools are deferred in pi.** `Agent`/`get_subagent_result`/
+`steer_subagent` are registered but inactive at session start (they cost 2,694 tokens
+of schema); the model activates them with `load_tools(["subagents"])`, or you run
+`/load-tools subagents`. `pick_skills` stays always-on, so skill discovery still
+happens before delegation. Rationale and measurements: [pi-context-budget.md](pi-context-budget.md).
+
 Because a project has `.claude → .agents`, its `.agents/agents/` and
 `.agents/skills/` are read by **both** harnesses with no duplication.
 
@@ -84,8 +90,8 @@ and `.agents/skills/`. It never overwrites existing files.
 
 ## VERIFY
 
-- pi auto-discovery of a loose extension dir under `~/.pi/agent/extensions/` is
-  assumed from the gortex precedent but not re-verified for `pi-harness-delegate`.
-  Smoke test: `pi list` should show it; else load with
-  `pi -e ~/.pi/agent/extensions/pi-harness-delegate/index.ts` and, if needed, add
-  it to `~/.pi/agent/settings.json`. Confirm the `pick_skills` tool appears.
+- ~~pi auto-discovery of a loose extension dir under `~/.pi/agent/extensions/`~~
+  **Resolved 2026-07-27:** confirmed working. `pi.getAllTools()` reports
+  `pick_skills` with `sourceInfo.path` = `~/.pi/agent/extensions/pi-harness-delegate/index.ts`
+  with no `settings.json` entry, so loose dirs under `extensions/` are auto-loaded.
+  (`pi list` shows only npm *packages*, not loose dirs — it is the wrong smoke test.)

@@ -22,6 +22,43 @@ description: >
 - Project harness lives in the project repo: `AGENTS.md` + `STATUS.md` + `docs/` +
   `.agents/skills/`. Scaffold with `harness-init` (in `~/.nix/config/agentic-harness/bin/`).
 
+## Context-budget rule (binding, 2026-07-27)
+
+**`AGENTS.md` is the only file that auto-loads. Never write an instruction that
+makes another file load every session.** No harness auto-loads `STATUS.md`; what
+loads it is `AGENTS.md` saying "read this next". Thesis' `STATUS.md` reached 57KB
+(~14k tokens) charged to every task that way.
+
+When writing or editing any `AGENTS.md` (global or project):
+- Point at `STATUS.md` **on demand**, with the conditions that justify the read
+  (current state, recent decisions, open obligations, TODO inbox) and a nudge to
+  `grep` the section instead of reading the file. Banned phrasings: "read
+  `STATUS.md` next", "read after this file", "X + `STATUS.md` are all that loads".
+- **Scoped pointers are good** — *"before acting on the environment grid, read that
+  section"* fires per task, not per session. Prefer them to blanket mandates.
+- The user's inbox is a `# TODO(user added)` section **inside `STATUS.md`**. Never
+  create a separate `TODO.md`.
+- Keep `STATUS.md` under ~10KB; past that split the archive out.
+
+Same rule for tools: schemas are context too. Before adding a package/MCP server
+globally, check what its schemas cost — in pi they were 74% of startup context, now
+deferred via the `lazy-tools` extension. See `~/.agents/docs/pi-context-budget.md`
+for the measurement method (it applies to any harness).
+
+**Applying it:** new repos get it from the templates. For existing repos run
+`harness-init --audit [dir]` (read-only drift report), then `harness-init --migrate
+[dir]` for the mechanical fixes — it merges `TODO.md` into `STATUS.md` verbatim and
+relaxes the exact template sentence, and *prints* any other mandating prose for you
+to edit by hand rather than regexing it. Inside pi, the same thing is
+`/harness-ops audit|migrate [dir|all]`. Contract: `~/.agents/docs/project-template.md`.
+
+When a `STATUS.md` is already oversized, splitting it is a judgement call, not a
+script: move only unambiguously historical blocks into the project's
+`docs/content/design-history/` (verbatim, with a one-line pointer left behind), and
+keep anything that describes what is true *now*. Worked example — Thesis, 2026-07-28:
+848 → 382 lines by moving 4 blocks; verify with a content-line diff that nothing was
+lost, and `zola check` if docs/ is a Zola site.
+
 ## Creating a skill (global or project)
 
 1. Decide scope: useful across projects → `~/.agents/skills/<name>/`; project-specific

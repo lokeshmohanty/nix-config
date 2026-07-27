@@ -1,7 +1,11 @@
 # PROJECT_NAME — Agent Index
 
-> Minimal index. Read `STATUS.md` next for current state. Full documentation in
-> `docs/` (start at `docs/index.md`). Global harness rules: `~/.agents/AGENTS.md`.
+> Minimal index — **this file is the only thing that loads into main context.**
+> `STATUS.md` is **on demand, not by default**: read it (or `grep` just the section
+> you need) only when the task turns on current state — what is running, recent
+> decisions, open obligations, or the TODO inbox. Routine edits, docs questions,
+> and one-off answers do not need it. Full documentation in `docs/` (start at
+> `docs/index.md`). Global harness rules: `~/.agents/AGENTS.md`.
 
 ## What this is
 
@@ -11,7 +15,7 @@ TODO: one paragraph — purpose, stack, entry points.
 
 | path | what |
 |---|---|
-| `STATUS.md` | volatile: current focus, next actions, obligations |
+| `STATUS.md` | volatile: current focus, next actions, obligations, `# TODO(user added)` inbox — **on demand only** |
 | `docs/` | full documentation — answer questions from here first |
 | `.agents/skills/` | project skills + memories (invoke on demand) |
 

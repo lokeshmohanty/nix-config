@@ -1,13 +1,114 @@
 #!/usr/bin/env bash
 # Scaffold the standard agent-harness layout in a project. Idempotent; never overwrites.
-# Usage: harness-init [dir]   (defaults to cwd; operates on the git toplevel if inside a repo)
+# Usage:
+#   harness-init [dir]              scaffold missing pieces (default; never overwrites)
+#   harness-init --audit [dir]      read-only: report drift from the current contract
+#   harness-init --migrate [dir]    apply the safe, mechanical fixes --audit found
+#
+# Contract: ~/.agents/docs/project-template.md
 set -euo pipefail
 
 TPL="$(dirname "$(readlink -f "$0")")/../templates/project"
+
+MODE=scaffold
+case "${1:-}" in
+  --audit)   MODE=audit;   shift ;;
+  --migrate) MODE=migrate; shift ;;
+esac
+
 cd "${1:-.}"
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$ROOT"
 NAME="$(basename "$ROOT")"
+
+# --- STATUS.md discipline (added 2026-07-27) -------------------------------
+# STATUS.md is never auto-loaded by any harness; what loads it is AGENTS.md
+# telling every session to. Repos whose AGENTS.md mandates the read pay for the
+# whole file on every task -- Thesis/STATUS.md reached 57KB (~14k tokens) that
+# way. The contract is now: AGENTS.md points at STATUS.md ON DEMAND, and the
+# user's TODO inbox lives in STATUS.md under "# TODO(user added)", not in a
+# separate TODO.md.
+
+# Phrases that turn "there is a STATUS.md" into "read STATUS.md every session".
+MANDATE_RE='read `?STATUS\.md`? next|read after this file|STATUS\.md.*are all that loads'
+
+audit() {
+  local findings=()
+  [ -e AGENTS.md ] || findings+=("no AGENTS.md - run: harness-init")
+  if [ -f AGENTS.md ] && grep -qiE "$MANDATE_RE" AGENTS.md; then
+    findings+=("AGENTS.md mandates reading STATUS.md every session (line $(grep -niE "$MANDATE_RE" AGENTS.md | head -1 | cut -d: -f1)) - should be on demand")
+  fi
+  if [ -f TODO.md ]; then
+    findings+=("TODO.md exists - merge into STATUS.md under '# TODO(user added)'")
+  fi
+  if [ -f STATUS.md ] && ! grep -q '^# TODO(user added)' STATUS.md; then
+    findings+=("STATUS.md has no '# TODO(user added)' inbox section")
+  fi
+  if [ -f STATUS.md ]; then
+    local sz; sz=$(wc -c < STATUS.md)
+    if [ "$sz" -gt 10240 ]; then
+      findings+=("STATUS.md is ${sz}B (~$((sz/4)) tokens) - consider splitting the archive out")
+    fi
+  fi
+  printf '%s\n' "${findings[@]:-}"
+}
+
+if [ "$MODE" = audit ]; then
+  out="$(audit)"
+  if [ -z "$out" ]; then echo "harness-init --audit: $ROOT conforms"; else
+    echo "harness-init --audit: $ROOT"
+    printf '%s\n' "$out" | sed 's/^/  - /'
+    echo "  fix the mechanical ones with: harness-init --migrate '$ROOT'"
+  fi
+  exit 0
+fi
+
+if [ "$MODE" = migrate ]; then
+  did=()
+  # 1. TODO.md -> STATUS.md "# TODO(user added)" (mechanical, content preserved verbatim).
+  if [ -f TODO.md ] && [ -f STATUS.md ]; then
+    if grep -q '^# TODO(user added)' STATUS.md; then
+      echo "harness-init --migrate: STATUS.md already has the inbox; leaving TODO.md alone (merge by hand)" >&2
+    else
+      body="$(tail -n +2 TODO.md)"   # drop TODO.md's own H1, keep everything else
+      tmp="$(mktemp)"
+      # Insert the inbox immediately before STATUS.md's first "## " section, so the
+      # title block (H1 + subtitle) stays intact and the inbox leads the content.
+      awk -v body="$body" -v today="$(date +%F)" '
+        function emit() {
+          print "# TODO(user added)"; print "";
+          print "*Updates/tasks/queries added by the owner; process only when he says,";
+          print "then act -> record -> clear the item. Was TODO.md; merged " today ".*";
+          print "";
+          if (body != "") { print body; print "" }
+          print "---"; print "";
+          done = 1
+        }
+        !done && /^## / { emit() }
+        { print }
+        END { if (!done) { print ""; emit() } }
+      ' STATUS.md > "$tmp"
+      mv "$tmp" STATUS.md
+      git rm -q TODO.md 2>/dev/null || rm -f TODO.md
+      did+=("merged TODO.md into STATUS.md")
+    fi
+  fi
+  # 2. The exact template sentence is safe to rewrite deterministically.
+  if [ -f AGENTS.md ] && grep -q 'Read `STATUS.md` next for current state.' AGENTS.md; then
+    perl -0pi -e 's/Read `STATUS\.md` next for current state\./`STATUS.md` is on demand, not by default: read it (or grep the section you need) only when the task turns on current state./' AGENTS.md
+    did+=("AGENTS.md: STATUS.md pointer relaxed to on-demand")
+  fi
+  # 3. Anything else is prose that needs judgement -- report, never regex it.
+  if [ -f AGENTS.md ] && grep -qiE "$MANDATE_RE" AGENTS.md; then
+    echo "harness-init --migrate: AGENTS.md still mandates reading STATUS.md; edit these by hand:" >&2
+    grep -niE "$MANDATE_RE" AGENTS.md | sed 's/^/    /' >&2
+  fi
+  if [ "${#did[@]}" -eq 0 ]; then echo "harness-init --migrate: $ROOT - nothing mechanical to do"
+  else echo "harness-init --migrate: $ROOT: ${did[*]}"; fi
+  exit 0
+fi
+
+# --- scaffold (default) ----------------------------------------------------
 created=()
 
 if [ ! -e AGENTS.md ]; then

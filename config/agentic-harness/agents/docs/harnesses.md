@@ -45,16 +45,17 @@ Symlink map and full file layout: [layout.md](layout.md).
 
 ## pi (`~/.pi`) — binary from `numtide/llm-agents.nix`
 
-Verified: `pi 0.79.1`, `/nix/store/…-pi-0.79.1/bin/pi`; flake input `llm-agents.url = "github:numtide/llm-agents.nix"` (`~/.nix/flake.nix:44`). Stale `~/.pi/pi` link removed 2026-07-18.
+Verified: `pi 0.82.0`, `/nix/store/…-pi-0.82.0/bin/pi`; flake input `llm-agents.url = "github:numtide/llm-agents.nix"` (`~/.nix/flake.nix:44`). Stale `~/.pi/pi` link removed 2026-07-18.
 
 **Capability note:** pi runs against a **local 31B model** by default — keep its tasks simple: docs reading, routine edits, question-answering from `docs/` folders. The `docs/` folders across repos are plain markdown *specifically so pi can answer from them without tooling*.
 
 **Config (`~/.pi/agent/`):**
-- `settings.json` (verified): `defaultProvider: vllm-gemma4-31`, `defaultModel: google/gemma-4-31B-it`, `defaultThinkingLevel: medium`, `packages: [pi-web-access]` (from myDA repo).
-- `models.json` (verified) — three vLLM providers, all `api: openai-completions`:
-  - `vllm-gemma4-31` → `google/gemma-4-31B-it` (text+image) — **default, local cluster**
+- `settings.json` (verified 2026-07-27): `defaultThinkingLevel: medium`, 8 npm `packages` (listed under Extensions below). `defaultProvider`/`defaultModel` get hand-edited often — read the file, don't trust a value quoted here.
+- `models.json` (verified 2026-07-27) — four providers, all `api: openai-completions`:
+  - `vllm-gemma4-31` → `google/gemma-4-31B-it` (text+image) — local cluster
   - `vllm-qwen35-122` → `Qwen/Qwen3.5-122B-A10B` (text+image) — local cluster
-  - `vllm-ziq` → `deepseek-ai/DeepSeek-V4-Flash` (text) — remote, `10.169.20.183:8002`
+  - `vllm-deepseek4-flash` → `deepseek-ai/DeepSeek-V4-Flash` (text) — local cluster
+  - `sglang-glm5.2` → `GLM-5.2` (text+image, `maxTokens: 4096`) — `bose:8000`
 - `web-search.json` at `~/.pi/web-search.json` (verified): provider `exa`, enabled.
 - `trust.json`, `auth.json`, `sessions/` also live in `~/.pi/agent/`.
 
@@ -64,7 +65,11 @@ Verified: `pi 0.79.1`, `/nix/store/…-pi-0.79.1/bin/pi`; flake input `llm-agent
 
 **Extensions:** npm packages listed in `settings.json` `packages` (verified 2026-07-24: `@tintinweb/pi-subagents`, `pi-web-access`, `@zosmaai/pi-llm-wiki`, `pi-codex-goal`, `pi-observational-memory`, `pi-agent-browser-native`, `pi-rich-renderer`, `pi-image-tools`), plus loose dirs under `~/.pi/agent/extensions/`. `--extension/-e <path>`, `--no-extensions`; managed via `pi install/remove/update/list/config`. Extensions register flags, tools, commands, shortcuts, and event handlers (`export default (pi: ExtensionAPI) => { pi.registerTool({...}) }`). No hook events — extensions are the customization mechanism.
 - **`pi-harness-delegate`** (`pi/agent/extensions/pi-harness-delegate/`, ours) — registers the `pick_skills` tool wrapping `harness-skill-pick`. See [delegation.md](delegation.md). (VERIFY loose-dir auto-discovery: `pi list`.)
-- **`@tintinweb/pi-subagents`** — provides the `Agent`/`get_subagent_result`/`steer_subagent` tools and reads the shared fleet from `~/.pi/agent/agents` + `<cwd>/.agents/agents`; skill preloading from `.agents/skills`.
+- **`@tintinweb/pi-subagents`** — provides the `Agent`/`get_subagent_result`/`steer_subagent` tools and reads the shared fleet from `~/.pi/agent/agents` + `<cwd>/.agents/agents`; skill preloading from `.agents/skills`. **Deferred** — see `lazy-tools`.
+- **`lazy-tools`** (`pi/agent/extensions/lazy-tools/`, ours) — see [pi-context-budget.md](pi-context-budget.md). Keeps the heavy packages installed but *inactive* at session start, so their schemas stay out of the system prompt; the model calls `load_tools(groups)` (or you run `/load-tools <group>`) to activate a group for the rest of the session. Groups: `subagents`, `browser`, `wiki`, `web`, `goal`, `memory`.
+- **`harness-ops`** (`pi/agent/extensions/harness-ops/`, ours) — `/harness-ops audit|migrate [dir|all]`, a thin wrapper over `harness-init --audit/--migrate` so the project-harness contract can be enforced from inside pi. `all` sweeps every harnessed repo under `~/Projects`, `~/Documents/Research`, and `~/.nix`. Reports go through `pi.sendMessage({display:true})` so the model sees them too and can fix the mandating prose that `--migrate` deliberately refuses to rewrite. Contract: [project-template.md](project-template.md).
+
+**Command handlers do not render return values.** Use `ctx.ui.notify(text, "info")` for short output or `pi.sendMessage({..., display:true}, {triggerTurn:false})` for multi-line content that the model should also see. (`pi.appendEntry()` is TUI-only and needs a registered entry renderer.) Action methods like `pi.getCommands()`/`pi.setActiveTools()` throw if called during extension load — call them from `session_start` or later.
 
 **Other verified flags:** `--prompt-template <path>` / `--no-prompt-templates`, `--theme <path>` / `--no-themes`, `--thinking off..xhigh`, session mgmt (`-c` continue, `-r` resume, `--session`, `--session-id`, `--fork`, `--session-dir`, `--no-session`, `--name`, `--export <html>`), `--print/-p` non-interactive, `--mode text|json|rpc`, `--tools/--exclude-tools/--no-tools`, `--approve/-a` (trust project-local files), `--offline`, `--list-models`.
 
