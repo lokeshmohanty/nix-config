@@ -21,6 +21,7 @@
     (3) In a Claude session, confirm the fleet appears as spawnable agents.
 - **Harness v2 rollout (2026-07-18):** restructured — canonical tree at `~/.nix/config/agentic-harness/`, AGENTS.md-first with CLAUDE.md symlinks, docs/-per-project, aggressive plugin prune. See `docs/layout.md`. Pending: `home-manager switch` to re-affirm activation symlinks (they were also applied manually).
 - **Graph tools:** gortex scoped to zenteiq code repos only (dsdg, prime-rl, verifiers) via per-repo `.claude/settings.local.json` + `.mcp.json`; global hooks removed. graphify removed. GitNexus used on demand via `npx gitnexus@latest` (docs-sync skill).
+- **MCP cleanup (2026-07-27):** `~/.claude.json` global `mcpServers` is now **context7 only**. Removed stale `gitnexus` (dead binary → ENOENT everywhere) and global `gortex` (duplicated the per-repo scoping); added `enabledMcpjsonServers: ["gortex"]` to prime-rl + verifiers so their per-repo `.mcp.json` auto-approves. Backup: `~/.claude.json.bak-2026-07-27`.
 - **pi:** local Gemma-4-31B (vllm), reads AGENTS.md + APPEND_SYSTEM.md symlink; use for docs-reading and routine tasks.
 - **Backup of pre-v2 state:** `~/.harness-backup-2026-07-18/` (safe to delete once v2 is stable).
 

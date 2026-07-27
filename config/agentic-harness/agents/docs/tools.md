@@ -16,6 +16,7 @@
 
 - Zero-server code-graph engine. **NOT a git-history tool despite the name.**
 - Verified current npm version: **1.6.9** (`npm view gitnexus version`). Not installed globally — invoked via npx.
+- **Never wire it as a persistent MCP server.** A stale global `gitnexus` entry in `~/.claude.json` (pointing at a removed `~/.nix-profile/bin/gitnexus`) threw ENOENT in every session until removed 2026-07-27. npx-on-demand is the only supported path.
 - `npx gitnexus@latest analyze` indexes a repo into `.gitnexus/` — an embedded Cypher-queryable DB. `.gitnexus/` is **gitignored**.
 - Generates: markdown context files, per-area skills, and an MCP server exposing ~17 tools (VERIFY exact count per version).
 - Fully local and deterministic — no LLM, no server, no API key. 14 supported languages (VERIFY list per version).
@@ -25,6 +26,8 @@
 
 - Deep code graph + 90+ analyzers + safe-edit/review verbs, exposed as MCP server + CLI + hooks.
 - **SCOPED to zenteiq repos only as of 2026-07-18**: `brahmx/dsdg`, `prime-rl`, `verifiers` (hooks live in each repo's `.claude/settings.local.json` — see [hooks.md](hooks.md)). Do not wire it into other repos.
+- Config lives **per-repo**: `.mcp.json` (server) + `.claude/settings.local.json` (`enabledMcpjsonServers: ["gortex"]` + hooks). The contradicting global `mcpServers.gortex` entry in `~/.claude.json` was removed 2026-07-27 — it started the daemon in every project and reported INACTIVE outside the three repos. Do not re-add it globally.
+- When it says "run `gortex track <dir>`" in an untracked repo, **ignore it** — that message is generic, not a recommendation for this harness.
 - Daemon must be running for hooks/MCP to answer; otherwise tools are inert (MCP reports "INACTIVE" for untracked dirs).
 - State: ~600MB verified (312M `~/.gortex` + 281M `~/.local/share/gortex`).
 - Key verbs: `query`, `review`, `analyze`, `edit`, `wiki`, `wakeup`, `context` (plus `track`, `hook`, `mcp`).
