@@ -14,13 +14,21 @@
 
 | Event | Hook | What it does |
 |---|---|---|
-| SessionStart | `gh-axi` | AXI CLI announcement (GitHub ops) |
-| SessionStart | `chrome-devtools-axi` | AXI CLI announcement (headless Chrome) |
-| SessionStart | `lavish-axi` | AXI CLI announcement |
-| SessionStart | `harness-session-start` | Runs `harness-heal` first (repairs the cross-tool `skills`/`agents` symlinks), then auto-scaffolds `AGENTS.md`/`STATUS.md`/`docs/`/`.agents` in unharnessed git repos. Script: `~/.nix/config/agentic-harness/bin/harness-session-start` |
+| SessionStart | `harness-session-start` | Auto-scaffolds `AGENTS.md`/`STATUS.md`/`docs/`/`.agents` in unharnessed git repos. Script: `~/.nix/config/agentic-harness/bin/harness-session-start` |
 | Stop | `docs-nudge` | Reminds when tracked source changed but `docs/` didn't. Script: `~/.nix/config/agentic-harness/bin/docs-nudge` |
 
-Applied 2026-07-18: the three AXI SessionStart hooks plus `harness-session-start` (SessionStart) and `docs-nudge` (Stop) are registered in the nix-managed settings.json; scripts live in `agentic-harness/bin/` (tested: scaffold, idempotency, one-nudge-per-session).
+Applied 2026-07-18: `harness-session-start` (SessionStart) and `docs-nudge` (Stop) are registered in the nix-managed settings.json; scripts live in `agentic-harness/bin/` (tested: scaffold, idempotency, one-nudge-per-session).
+
+### AXI SessionStart hooks — REMOVED 2026-07-27
+
+The three AXI announcement hooks (`gh-axi`, `chrome-devtools-axi`, `lavish-axi`) were removed from **both** the Claude `settings.json` and Codex `~/.codex/hooks.json` on 2026-07-27. Two reasons:
+
+1. They had been failing since installation. They were registered by each tool's `setup hooks` subcommand, which assumes a global `npm install -g`; on NixOS that never persisted, so all three fired against an empty PATH and errored on every session start.
+2. Even working, they were unconditional context injections in every repo. `lavish-axi`'s announcement alone is ~2k tokens of playbooks and design guidance; `gh-axi` and `chrome-devtools-axi` are ~5 lines each.
+
+**Replacement:** the CLIs are now installed declaratively on PATH via the `axi-tools` nix package (`~/.nix/pkgs/axi-tools`, wired through `pkgs/default.nix` → `home/ai.nix`), and the `gh-axi` / `chrome-devtools-axi` / `lavish-axi` skills trigger on demand. Each skill's SKILL.md was rewritten the same day to call the on-PATH binary directly (not `npx`) and to tell the agent to run the bare command once to orient — which is what the hook used to supply, but only when relevant.
+
+**Do not re-run `<tool> setup hooks`.** It reinstalls these hooks. If a tool is ever missing, fix the nix package instead; version-bump steps are in the header of `~/.nix/pkgs/axi-tools/default.nix`.
 
 ### Thesis repo (`~/Documents/Research/LiteratureSurvey/.claude/settings.json` → `.agents/settings.json`)
 
@@ -42,7 +50,7 @@ Events in each: `SessionStart`, `UserPromptSubmit`, `PreToolUse` (matcher `Read|
 
 ### Codex — `~/.codex/hooks.json`
 
-Carries the same three AXI SessionStart hooks (`gh-axi`, `chrome-devtools-axi`, `lavish-axi`) in Claude-style JSON (verified). Gortex hooks removed from `config.toml` 2026-07-18; stale `[hooks.state]` trust hashes for them remain (harmless).
+Emptied to `{"hooks": {}}` on 2026-07-27 — it carried only the three AXI SessionStart hooks (see the removal note above). Note this file is **not** nix-managed: it is a live file in `~/.codex/`, unlike the Claude settings. Gortex hooks removed from `config.toml` 2026-07-18; stale `[hooks.state]` trust hashes for them remain (harmless).
 
 ### Gemini — `~/.gemini/settings.json`
 

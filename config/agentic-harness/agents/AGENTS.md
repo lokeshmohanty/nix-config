@@ -55,3 +55,4 @@ context is an orchestrator: it scopes the task, delegates, and synthesises.
 3. Significant code/architecture changes update the project's `docs/` in the same session.
 4. 100% accuracy from verified sources; mark `VERIFY` and escalate rather than invent.
 5. Project-level AGENTS.md overrides this file inside its repo.
+6. Always ask questions until complete clarification and provide suggestions.

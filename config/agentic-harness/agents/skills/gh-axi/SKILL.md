@@ -17,8 +17,10 @@ Use this skill whenever you need to perform GitHub operations such as:
 - Running GitHub Actions workflows
 
 ## Guidelines
-- **Prefer `gh-axi` over `gh`**: Use `npx gh-axi` for all GitHub operations as it is optimized for agent interaction.
-- **Command Structure**: `npx gh-axi <command> <subcommand>`
+- **Prefer `gh-axi` over `gh`**: it is optimized for agent interaction (TOON output, contextual next-step suggestions, idempotent mutations).
+- **Installed on PATH** by the `axi-tools` nix package (`~/.nix/pkgs/axi-tools`). Call `gh-axi` directly — do NOT use `npx`.
+- **Orient first**: bare `gh-axi` prints a repo dashboard (open issues/PRs) plus the command list. There is no session-start hook, so run it once when you start GitHub work.
+- **Command Structure**: `gh-axi <command> <subcommand>`
 - **Commands**:
     - `issue`: manage issues
     - `pr`: manage pull requests
@@ -30,6 +32,7 @@ Use this skill whenever you need to perform GitHub operations such as:
     - `variable`: manage variables
 
 ## Examples
-- List open PRs: `npx gh-axi pr list`
-- Create an issue: `npx gh-axi issue create --title "Bug report" --body "Details..."`
-- Check repo status: `npx gh-axi repo view`
+- Orient in the current repo: `gh-axi`
+- List open PRs: `gh-axi pr list`
+- Create an issue: `gh-axi issue create --title "Bug report" --body "Details..."`
+- Check repo status: `gh-axi repo view`

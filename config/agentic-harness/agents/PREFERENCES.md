@@ -2,8 +2,8 @@
 
 ## Who
 
-- Lokesh Mohanty — PhD researcher (life-long learning for planning in autonomous systems; thesis workspace at `~/Documents/Research/LiteratureSurvey`) and engineer at Zenteiq (`~/Projects/zenteiq`, work email parani@zenteiq.com).
-- Solo on proofs and research judgment; agents propose, validators gate, Lokesh judges.
+- Lokesh Mohanty — PhD researcher (life-long learning for planning in autonomous systems; thesis workspace at `~/Documents/Research/Thesis`) and engineer at Zenteiq (`~/Projects/zenteiq`, work email `lokeshm@iisc.ac.in`, `lokeshmohanty@zenteiq.com`).
+- Solo on research judgment; agents propose, validators gate, Lokesh judges.
 
 ## Environment (NixOS)
 
