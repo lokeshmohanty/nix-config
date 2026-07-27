@@ -7,9 +7,19 @@
  * group on demand; pi applies the additive change before the next model request
  * (docs: extensions.md "Dynamic Tool Loading").
  *
+ * `/load-tools` with no arguments opens a SettingsList toggle in the TUI, which
+ * can also turn groups back OFF. Removal is only forbidden inside a loader tool's
+ * execution (that is what pi uses as the deferred-load signal) — from a command
+ * handler an arbitrary active set is fine, same as the session_start park below.
+ *
+ * Toggles are per-session by design: session_start always re-parks every group,
+ * so a new session is guaranteed to start lean.
+ *
  * API surface follows pi-harness-delegate/index.ts (verified against pi 0.82.0).
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import { getSettingsListTheme } from "@earendil-works/pi-coding-agent";
+import { Container, type SettingItem, SettingsList, Text } from "@earendil-works/pi-tui";
 import { Type } from "typebox";
 
 /** group -> { match: substring of tool sourceInfo.path, blurb: shown to the model } */
@@ -50,6 +60,23 @@ export default function (pi: ExtensionAPI) {
 			.getAllTools()
 			.filter((t: any) => matches.some((m) => (t.sourceInfo?.path ?? "").includes(m)))
 			.map((t: any) => t.name);
+	};
+
+	/** A group is on when it owns at least one tool and all of them are active. */
+	const isOn = (group: string, active: string[]): boolean => {
+		const names = namesFor([group]);
+		return names.length > 0 && names.every((n) => active.includes(n));
+	};
+
+	/**
+	 * Set the active set so exactly `on` is loaded. Non-lazy tools are untouched.
+	 * Only safe outside loader-tool execution — see the header note.
+	 */
+	const applyGroups = (on: Iterable<string>) => {
+		const lazy = new Set(namesFor(GROUP_NAMES));
+		const wanted = new Set(namesFor([...on]));
+		const base = pi.getActiveTools().filter((n) => !lazy.has(n));
+		pi.setActiveTools([...new Set([...base, ...wanted])]);
 	};
 
 	// Park every lazy group once the session (and all packages) have loaded.
@@ -110,30 +137,81 @@ export default function (pi: ExtensionAPI) {
 		},
 	});
 
-	// Manual escape hatch: /load-tools browser wiki   (no args = show status)
+	/** Interactive on/off list over the groups. Applies each change immediately. */
+	const openToggleUI = async (ctx: any) => {
+		const on = new Set(GROUP_NAMES.filter((g) => isOn(g, pi.getActiveTools())));
+
+		await ctx.ui.custom((tui: any, theme: any, _kb: any, done: (v?: unknown) => void) => {
+			const items: SettingItem[] = GROUP_NAMES.map((g) => ({
+				id: g,
+				label: `${g} — ${GROUPS[g].blurb}`,
+				currentValue: on.has(g) ? "on" : "off",
+				values: ["on", "off"],
+			}));
+
+			const container = new Container();
+			container.addChild(new Text(theme.fg("accent", theme.bold("Deferred Tool Groups")), 1, 1));
+
+			const list = new SettingsList(
+				items,
+				Math.min(items.length + 2, 15),
+				getSettingsListTheme(),
+				(id: string, value: string) => {
+					if (value === "on") on.add(id);
+					else on.delete(id);
+					applyGroups(on);
+				},
+				() => done(undefined),
+			);
+			container.addChild(list);
+
+			return {
+				render: (width: number) => container.render(width),
+				invalidate: () => container.invalidate(),
+				handleInput: (data: string) => {
+					list.handleInput?.(data);
+					tui.requestRender();
+				},
+			};
+		});
+
+		const loaded = GROUP_NAMES.filter((g) => on.has(g));
+		ctx?.ui?.notify?.(
+			loaded.length ? `Loaded groups: ${loaded.join(", ")}` : "All tool groups parked.",
+			"info",
+		);
+	};
+
+	// Manual escape hatch: /load-tools browser wiki
+	// No args: toggle list in the TUI, plain status text everywhere else.
 	// Output goes through ctx.ui.notify — pi does not render a handler's return value.
 	pi.registerCommand("load-tools", {
-		description: "Activate deferred tool groups: " + GROUP_NAMES.join(", "),
+		description: "Toggle deferred tool groups: " + GROUP_NAMES.join(", "),
 		getArgumentCompletions: (prefix: string) =>
 			GROUP_NAMES.filter((g) => g.startsWith(prefix)).map((g) => ({
 				value: g,
 				label: `${g} — ${GROUPS[g].blurb}`,
 			})) as any,
 		handler: async (args: string, ctx: any) => {
-			const active = pi.getActiveTools();
 			const requested = (args ?? "").split(/[\s,]+/).filter((g) => g in GROUPS);
+
 			if (requested.length === 0) {
-				const status = GROUP_NAMES.map((g) => {
-					const names = namesFor([g]);
-					const on = names.length > 0 && names.every((n) => active.includes(n));
-					return `  ${on ? "on " : "off"} ${g} — ${GROUPS[g].blurb}`;
-				}).join("\n");
+				if (ctx.mode === "tui") {
+					await openToggleUI(ctx);
+					return;
+				}
+				const active = pi.getActiveTools();
+				const status = GROUP_NAMES.map(
+					(g) => `  ${isOn(g, active) ? "on " : "off"} ${g} — ${GROUPS[g].blurb}`,
+				).join("\n");
 				ctx?.ui?.notify?.(
 					`Deferred tool groups:\n${status}\n\nUsage: /load-tools <group...>`,
 					"info",
 				);
 				return;
 			}
+
+			const active = pi.getActiveTools();
 			const added = namesFor(requested).filter((n) => !active.includes(n));
 			pi.setActiveTools([...new Set([...active, ...added])]);
 			ctx?.ui?.notify?.(

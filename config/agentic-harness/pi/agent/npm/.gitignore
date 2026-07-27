@@ -1,2 +1,8 @@
 *
 !.gitignore
+# package.json is tracked so extension deps that pi does NOT install for us are
+# reproducible on a fresh machine. pi manages the `packages` entries from
+# settings.json itself; @earendil-works/pi-tui is a plain library import used by
+# lazy-tools / lazy-skills, and pi deadlocks silently without it — see
+# ~/.agents/docs/pi-context-budget.md ("Traps").
+!package.json

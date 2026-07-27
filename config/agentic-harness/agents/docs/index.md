@@ -14,7 +14,7 @@ config lives in `~/.nix/config/agentic-harness/` and is committed in the `~/.nix
 | [tools.md](tools.md) | You need GitNexus, gortex, context7, or wonder which code-intelligence tool applies. |
 | [project-template.md](project-template.md) | You are scaffolding or auditing a project's harness (what every repo must have). |
 | [delegation.md](delegation.md) | You want tasks handled by skill-aware subagents — the shared fleet, `harness-skill-pick`, and per-harness (Claude/pi) wiring. |
-| [pi-context-budget.md](pi-context-budget.md) | pi sessions start bloated or feel slow. What startup context costs, how to measure it, and the `lazy-tools` deferred-loading extension. |
+| [pi-context-budget.md](pi-context-budget.md) | pi sessions start bloated or feel slow. What startup context costs, how to measure it, the `lazy-tools` / `lazy-skills` deferred-loading extensions, and the pi extension-API traps they hit. |
 
 Related skills: `harness-ops` (make changes here), `docs-sync` (project docs/ upkeep).
 
