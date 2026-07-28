@@ -6,7 +6,6 @@
   "packages": [
     "npm:@tintinweb/pi-subagents",
     "npm:pi-web-access",
-    "npm:@zosmaai/pi-llm-wiki",
     "npm:pi-codex-goal",
     "npm:pi-observational-memory",
     "npm:pi-agent-browser-native",

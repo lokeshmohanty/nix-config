@@ -5,7 +5,6 @@
     "@earendil-works/pi-ai": "^0.80.3",
     "@earendil-works/pi-tui": "^0.82.1",
     "@tintinweb/pi-subagents": "^0.14.2",
-    "@zosmaai/pi-llm-wiki": "^0.10.4",
     "pi-agent-browser-native": "^0.2.71",
     "pi-codex-goal": "^0.1.38",
     "pi-image-tools": "^1.4.0",

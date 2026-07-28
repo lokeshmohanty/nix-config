@@ -11,6 +11,7 @@
 | Current library/framework docs | context7 (`npx ctx7@latest`) |
 | Papers / literature | litgraph (own repo, `litgraph-ops` skill) |
 | Everything else | plain `docs/` markdown — the llm-wiki pattern |
+| Resolve or audit `[[links]]` between skill memories | `harness-memory-links` (see `harness-ops`) |
 
 ## GitNexus (`abhigyanpatwari/GitNexus`)
 
@@ -47,6 +48,10 @@
   - **MCP:** `context7` server registered in Claude (`~/.claude.json`), Codex (`[mcp_servers.context7]`), and Gemini (`mcpServers.context7`) — HTTPS endpoint with API key.
 
 ## The llm-wiki pattern (docs/-first philosophy)
+
+> The *pattern* (Karpathy's) is what this section describes. The `@zosmaai/pi-llm-wiki`
+> *package* was removed 2026-07-28 — it duplicated `memory/` and `docs/` and went
+> unused. See [pi-context-budget.md](pi-context-budget.md#removed-zosmaaipi-llm-wiki-2026-07-28).
 
 Hand- or agent-curated markdown is the primary knowledge store; graph tools only **seed structural reference**, they never replace curation:
 

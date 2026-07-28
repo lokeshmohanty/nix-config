@@ -32,10 +32,6 @@ const GROUPS: Record<string, { match: string; blurb: string }> = {
 		match: "pi-agent-browser-native",
 		blurb: "drive a real browser: navigate, click, type, screenshot",
 	},
-	wiki: {
-		match: "@zosmaai/pi-llm-wiki",
-		blurb: "LLM wiki: search/ingest/capture durable notes and insights",
-	},
 	web: {
 		match: "pi-web-access",
 		blurb: "web search and fetching page content from URLs",

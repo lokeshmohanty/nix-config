@@ -39,7 +39,7 @@ worries about were the small part. Per package (leave-one-out, perfectly additiv
 | Package | Tokens |
 |---|---|
 | `pi-agent-browser-native` | 2,822 |
-| `@zosmaai/pi-llm-wiki` | 2,744 |
+| `@zosmaai/pi-llm-wiki` | 2,744 (removed 2026-07-28, see below) |
 | `@tintinweb/pi-subagents` | 2,694 |
 | `pi-web-access` | 1,578 |
 | `pi-codex-goal` | 742 |
@@ -56,7 +56,7 @@ prompt, and registers one small `load_tools(groups)` loader that re-activates a
 group additively. pi records the additive change and exposes the new definitions
 before the next model request (`extensions.md` → "Dynamic Tool Loading").
 
-Groups → package: `subagents`, `browser`, `wiki`, `web`, `goal`, `memory`.
+Groups → package: `subagents`, `browser`, `web`, `goal`, `memory`.
 `/load-tools <group...>` activates manually. `/load-tools` with no args opens a
 `SettingsList` toggle in the TUI (Enter/Space flips a row, Esc closes) that can also
 turn a group back **off**; outside the TUI it prints on/off status instead.
@@ -65,6 +65,13 @@ Turning a group off is a *subtraction* from the active set. That is only forbidd
 inside a loader tool's own execution — pi uses "purely additive" as the
 deferred-load signal — so the toggle does it from the command handler, the same
 place `session_start` parks everything.
+
+**Result:** 17,796 → **7,961** in `Thesis/` (−55%); 4,616 in a bare directory.
+Removing the packages outright would give 7,989 — i.e. lazy-tools costs ~750 tokens
+of loader and buys back every capability on demand.
+
+Verified working on the weak 31B model: given a delegation task it called
+`load_tools(["subagents"])` at 8,782 tokens, then used `Agent` correctly at 11,280.
 
 ## The fix: `lazy-skills`
 
@@ -91,21 +98,33 @@ Both extensions reset on `session_start` — toggles are per-session, so a new
 session always starts lean. That is deliberate; persisting them would let startup
 context silently grow back.
 
-**Result:** 17,796 → **7,961** in `Thesis/` (−55%); 4,616 in a bare directory.
-Removing the packages outright would give 7,989 — i.e. lazy-tools costs ~750 tokens
-of loader and buys back every capability on demand.
+## Removed: `@zosmaai/pi-llm-wiki` (2026-07-28)
 
-Verified working on the weak 31B model: given a delegation task it called
-`load_tools(["subagents"])` at 8,782 tokens, then used `Agent` correctly at 11,280.
+Dropped from `settings.json` `packages` and uninstalled. **Not** for tokens —
+`lazy-tools` had already deferred its 2,744-token schema block, and an ablation
+measured 4,530 with it vs 4,551 without (noise). It was removed because it was a
+*second source of truth* competing with skill `memory/` and `docs/`, which the
+harness anti-rules forbid, and because it was unused: `~/.llm-wiki` held only
+`config.json` + `WIKI_SCHEMA.md`, and the single real wiki (the website repo) had
+3 events all inside 7 seconds on 2026-07-22.
+
+Its one non-redundant capability — ingesting external sources (URLs, PDFs) into
+interlinked pages — is the thing to reconsider if literature ingestion ever needs
+tooling. The two `.llm-wiki/` dirs were left on disk; the format is plain Obsidian
+markdown, so nothing is lost. Reinstall: `pi install npm:@zosmaai/pi-llm-wiki`.
+
+What was kept is the *linking* idea, moved into the memory system where the durable
+knowledge already lives — see `harness-memory-links` in the `harness-ops` skill.
 
 ## Caveats
 
 - **Native deferred loading is Anthropic-4.5+/OpenAI-gpt-5.4+ only.** Local vLLM
   providers take the documented fallback path: the tools simply join the active
   list, invalidating the prompt prefix. Harmless locally, no caching to lose.
-- **Deferring tools does not disable an extension's non-tool behaviour.** `llm-wiki`
-  still prints its session notice and still runs per-turn recall; `observational-memory`
-  still hooks events. Only their tool schemas leave the prompt.
+- **Deferring tools does not disable an extension's non-tool behaviour.**
+  `observational-memory` still hooks events even with its tools parked. Only tool
+  schemas leave the prompt — which is why an unused package is still worth removing
+  outright rather than just deferring.
 - **Baseline is not the whole story.** In one real session a single `read` of
   `literature/data/triage_ledger.yaml` injected ~7k tokens — more than any package
   costs. Trimming startup context does not fix careless reads.

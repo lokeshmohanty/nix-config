@@ -83,6 +83,25 @@ lost, and `zola check` if docs/ is a Zola site.
   skill should exist. Project-wide volatile state → `STATUS.md` instead.
 - Format: short markdown, dated facts, absolute dates, links to files by path.
 
+### Linking memories
+
+Link related memories with `[[name]]` instead of restating them — one fact lives in
+one memory, everything else points at it. This is the anti-rule ("never create a
+second source of truth") made mechanical.
+
+- `[[name]]` resolves in the owning skill's `memory/` first, then sibling skills in
+  the same project, then global skills. `[[../../other-skill/memory/name]]`,
+  `[[name|alias]]` and `[[name.md]]` all work; ambiguity is reported, never guessed.
+- A `[[link]]` to a memory that does not exist yet is fine — it marks something
+  worth writing. It will show up as broken until you write it, which is the point.
+- **Resolve and audit the graph with `harness-memory-links`:**
+  - `harness-memory-links` — graph summary + every broken link
+  - `harness-memory-links --of <skill>/<memory>` — that memory's outgoing links
+    (with real paths to read next), its backlinks, and its broken links
+  - `harness-memory-links --check` — broken links only, exit 1 if any
+- Run `--check` after renaming or deleting any memory; a rename silently orphans
+  every `[[link]]` pointing at the old name.
+
 ## Modifying hooks / extensions / plugins / settings
 
 1. Read `~/.agents/docs/hooks.md` and `~/.agents/docs/harnesses.md` for what each
