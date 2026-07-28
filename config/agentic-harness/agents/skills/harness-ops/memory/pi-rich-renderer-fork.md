@@ -57,6 +57,24 @@ list continuation lines, and table rows as LaTeX source.
 This is the symptom originally reported as "base64 instead of images" and first
 written off as a copy artifact — it is real, and this is its cause.
 
+**4. Refusing to render in lists/tables renders almost nothing.** The first
+attempt at (3) simply left list/table math as source. That is too aggressive:
+models write math-heavy answers as glossary bullets and comparison tables. A real
+"Maxwell's equations" reply contained 22 inline formulas, **0 display blocks**, and
+0 free-standing math lines — every formula sat in a list or table, so nothing
+rendered at all.
+
+The fix is kitty **Unicode placeholders** (`U=1`): transmit the PNG once
+out-of-band on its own top-level line (pi-tui passes image lines through
+unwrapped), then place it with one `U+10EEEE` character per cell carrying
+row/column diacritics, coloured with the image id. The inline run is ~60x smaller
+than the raw escape and contains no base64, so re-wrapping can never spill —
+worst case a wrapped line splits the image. Inline math is scaled to one cell tall
+(`inlineColumns()`), which is what an inline formula should look like anyway.
+
+Escape hatch: `richRenderer.inlinePlaceholders: false` falls back to LaTeX source
+for inline math, for terminals that speak the kitty protocol but not placeholders.
+
 ## Testing it
 
 The pure functions (`computeImageBox`, `looksLikeMath`, `splitMarkdown`) are

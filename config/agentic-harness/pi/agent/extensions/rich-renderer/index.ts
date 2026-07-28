@@ -74,7 +74,7 @@ type AssistantMessage = {
 
 type RenderSegment =
 	| { type: "markdown"; markdown: string }
-	| { type: "image"; kind: "math"; source: string; png?: string; error?: string };
+	| { type: "image"; kind: "math"; source: string; inline?: boolean; png?: string; error?: string };
 
 type LatexBlock = { tex: string; wrapDisplay: boolean };
 
@@ -83,6 +83,7 @@ type RGB = { r: number; g: number; b: number };
 type RendererConfig = {
 	imageScale: number;
 	cacheTtlMs: number;
+	inlinePlaceholders: boolean;
 };
 
 export default function (pi: ExtensionAPI) {
@@ -118,7 +119,7 @@ export default function (pi: ExtensionAPI) {
 			message: {
 				...message,
 				[ORIGINAL_CONTENT_FIELD]: message.content,
-				content: [{ type: "text", text: renderSegmentsAsText(segments, ctx.ui.theme, terminalWidth(ctx), config.imageScale) }],
+				content: [{ type: "text", text: renderSegmentsAsText(segments, ctx.ui.theme, terminalWidth(ctx), config) }],
 			},
 		};
 	});
@@ -146,6 +147,10 @@ async function getConfig(): Promise<RendererConfig> {
 	return {
 		imageScale: readPositiveNumber(config.imageScale, DEFAULT_IMAGE_SCALE),
 		cacheTtlMs: readNonNegativeNumber(config.cacheTtlMs ?? config.cacheTtl, DEFAULT_CACHE_TTL_MS),
+		// Set false if the terminal speaks the kitty protocol but not Unicode
+		// placeholders: inline math then stays as readable LaTeX source rather
+		// than rendering as stray accented dots.
+		inlinePlaceholders: config.inlinePlaceholders !== false,
 	};
 }
 
@@ -167,12 +172,35 @@ function readNonNegativeNumber(value: unknown, fallback: number): number {
 	return Number.isFinite(number) && number >= 0 ? number : fallback;
 }
 
-function renderSegmentsAsText(segments: RenderSegment[], theme: Theme, width: number, imageScale: number): string {
-	return segments.map((segment) => {
+function renderSegmentsAsText(segments: RenderSegment[], theme: Theme, width: number, config: RendererConfig): string {
+	const { imageScale } = config;
+	const transmits: string[] = [];
+	const usePlaceholders = config.inlinePlaceholders && getCapabilities().images === "kitty";
+
+	const body = segments.map((segment) => {
 		if (segment.type === "markdown") return segment.markdown;
 		if (!segment.png) return segment.source;
+
+		if (segment.inline) {
+			// Inside a list item or table cell: a raw escape would be word-wrapped
+			// and spill base64, so place the image with Unicode placeholders and
+			// keep the payload out of the flowing text entirely.
+			if (!usePlaceholders) return segment.source;
+			const dimensions = getImageDimensions(segment.png, PNG_MIME);
+			if (!dimensions) return segment.source;
+			const id = allocatePlaceholderId();
+			const columns = inlineColumns(dimensions.widthPx, dimensions.heightPx, getCellDimensions());
+			transmits.push(encodeTransmit(segment.png, id, columns, 1));
+			return encodePlaceholderRow(id, 0, columns);
+		}
+
 		return `\n${new RenderedImage(segment, theme, imageScale).render(width).join("\n")}\n`;
 	}).join("").trim();
+
+	// Transmissions draw nothing, but must reach the terminal before the
+	// placeholders that reference them. They sit alone in a leading paragraph,
+	// which pi-tui recognises as an image line and passes through unwrapped.
+	return transmits.length ? `${transmits.join("")}\n\n${body}` : body;
 }
 
 function terminalWidth(ctx: any): number {
@@ -213,17 +241,17 @@ const MATH_TOKEN = /[\\^_=<>+\-*{}|]/;
 const BARE_SYMBOL = /^[A-Za-z][A-Za-z0-9]?$/;
 
 /**
- * FIX 3: character ranges where an image escape must never be placed.
+ * FIX 3: character ranges where a raw image escape must never be placed.
  *
  * pi-tui's Markdown renders a top-level image line verbatim, but `renderList()`
  * re-wraps item content to `itemWidth` first — which splits the escape's single
  * enormous base64 "word" across several lines. Only the first keeps the \x1b_G
  * prefix, so the terminal draws a partial image and prints the remaining chunks
  * as visible base64. Table cells survive without spilling but blow out the row
- * layout. Both are structural: a line-oriented renderer cannot place a
- * multi-cell image inside a wrapped list item or a table grid.
+ * layout.
  *
- * Math inside these ranges therefore stays as LaTeX source.
+ * Math here is rendered with Unicode placeholders instead (see FIX 4), which
+ * carry no base64 in the wrapped text and so cannot spill.
  */
 function structuredRanges(markdown: string): Array<[number, number]> {
 	const ranges: Array<[number, number]> = [];
@@ -292,8 +320,8 @@ export function splitMarkdown(markdown: string): RenderSegment[] {
 		if (match.index > cursor) pushMarkdown(markdown.slice(cursor, match.index));
 		const source = match[0];
 		const isCode = source.startsWith("```") || source.startsWith("~~~") || source.startsWith("`");
-		if (isCode || isBlocked(match.index) || !looksLikeMath(parseLatexBlock(source).tex)) pushMarkdown(source);
-		else segments.push({ type: "image", kind: "math", source });
+		if (isCode || !looksLikeMath(parseLatexBlock(source).tex)) pushMarkdown(source);
+		else segments.push({ type: "image", kind: "math", source, inline: isBlocked(match.index) });
 		cursor = match.index + source.length;
 	}
 	if (cursor < markdown.length) pushMarkdown(markdown.slice(cursor));
@@ -387,6 +415,88 @@ function byte(value: string): number {
 function compactError(error: unknown): string {
 	const err = error as { stderr?: unknown; stdout?: unknown; message?: unknown };
 	return String(err.stderr || err.stdout || err.message || error).split("\n").slice(0, 2).join(" ") || "render failed";
+}
+
+// --- FIX 4: Unicode placeholders for math inside wrapped text ---------------
+//
+// A raw kitty escape cannot survive inside a list item or table cell, because
+// the renderer word-wraps its huge base64 payload (FIX 3). Kitty's Unicode
+// placeholder mode splits the job in two:
+//
+//   1. transmit the PNG once, out of band, with U=1 — nothing is drawn, and the
+//      escape sits alone on a top-level line where pi-tui leaves image lines
+//      unwrapped;
+//   2. place it with one U+10EEEE character per cell, each carrying diacritics
+//      that encode its row and column, coloured with the image id.
+//
+// Only the short placeholder run lives in the wrapped text, so no amount of
+// re-wrapping can spill base64. Worst case a wrapped line splits the image.
+
+/** Kitty's row/column diacritics: index i encodes row/column i. */
+const DIACRITICS = [
+	0x0305, 0x030d, 0x030e, 0x0310, 0x0312, 0x033d, 0x033e, 0x033f, 0x0346, 0x034a,
+	0x034b, 0x034c, 0x0350, 0x0351, 0x0352, 0x0357, 0x035b, 0x0363, 0x0364, 0x0365,
+	0x0366, 0x0367, 0x0368, 0x0369, 0x036a, 0x036b, 0x036c, 0x036d, 0x036e, 0x036f,
+	0x0483, 0x0484, 0x0485, 0x0486, 0x0487, 0x0592, 0x0593, 0x0594, 0x0595, 0x0597,
+	0x0598, 0x0599, 0x059c, 0x059d, 0x059e, 0x059f, 0x05a0, 0x05a1, 0x05a8, 0x05a9,
+	0x05ab, 0x05ac, 0x05af, 0x05c4, 0x0610, 0x0611, 0x0612, 0x0613, 0x0614, 0x0615,
+	0x0616, 0x0617, 0x0657, 0x0658, 0x0659, 0x065a, 0x065b, 0x065d, 0x065e, 0x06d6,
+	0x06d7, 0x06d8, 0x06d9, 0x06da, 0x06db, 0x06dc, 0x06df, 0x06e0, 0x06e1, 0x06e2,
+	0x06e4, 0x06e7, 0x06e8, 0x06eb, 0x06ec, 0x0730, 0x0732, 0x0733, 0x0735, 0x0736,
+	0x073a, 0x073d, 0x073f, 0x0740, 0x0741, 0x0743, 0x0745, 0x0747, 0x0749, 0x074a,
+];
+const PLACEHOLDER_CHAR = String.fromCodePoint(0x10eeee);
+/** Ids stay inside 24 bits so the foreground colour alone identifies the image. */
+const MAX_PLACEHOLDER_ID = 0xffffff;
+let nextPlaceholderId = 0;
+
+function allocatePlaceholderId(): number {
+	nextPlaceholderId = (nextPlaceholderId % MAX_PLACEHOLDER_ID) + 1;
+	return nextPlaceholderId;
+}
+
+/** Transmit-only escape (U=1): defines the image without drawing anything. */
+export function encodeTransmit(base64Data: string, id: number, columns: number, rows: number): string {
+	const params = ["a=T", "f=100", "q=2", "U=1", `i=${id}`, `c=${columns}`, `r=${rows}`];
+	const CHUNK_SIZE = 4096;
+	if (base64Data.length <= CHUNK_SIZE) return `\x1b_G${params.join(",")};${base64Data}\x1b\\`;
+	const chunks: string[] = [];
+	let offset = 0;
+	let isFirst = true;
+	while (offset < base64Data.length) {
+		const chunk = base64Data.slice(offset, offset + CHUNK_SIZE);
+		const isLast = offset + CHUNK_SIZE >= base64Data.length;
+		if (isFirst) {
+			chunks.push(`\x1b_G${params.join(",")},m=1;${chunk}\x1b\\`);
+			isFirst = false;
+		} else {
+			chunks.push(`\x1b_Gm=${isLast ? 0 : 1};${chunk}\x1b\\`);
+		}
+		offset += CHUNK_SIZE;
+	}
+	return chunks.join("");
+}
+
+/** One line of placeholder cells addressing row `row` of image `id`. */
+export function encodePlaceholderRow(id: number, row: number, columns: number): string {
+	const r = (id >> 16) & 0xff;
+	const g = (id >> 8) & 0xff;
+	const b = id & 0xff;
+	let out = `\x1b[38;2;${r};${g};${b}m`;
+	for (let column = 0; column < columns; column++) {
+		out += PLACEHOLDER_CHAR + String.fromCodePoint(DIACRITICS[row]) + String.fromCodePoint(DIACRITICS[column]);
+	}
+	return `${out}\x1b[0m`;
+}
+
+/**
+ * Inline math is placed on a single text row, so the image is scaled to one
+ * cell tall — which is what an inline formula should look like next to text.
+ */
+export function inlineColumns(widthPx: number, heightPx: number, cell: { widthPx: number; heightPx: number }): number {
+	const scale = cell.heightPx / heightPx;
+	const columns = Math.round((widthPx * scale) / cell.widthPx);
+	return Math.max(1, Math.min(columns, DIACRITICS.length));
 }
 
 // --- FIX 1: aspect-correct geometry ----------------------------------------
