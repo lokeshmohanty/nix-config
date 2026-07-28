@@ -94,13 +94,21 @@ second source of truth") made mechanical.
   `[[name|alias]]` and `[[name.md]]` all work; ambiguity is reported, never guessed.
 - A `[[link]]` to a memory that does not exist yet is fine — it marks something
   worth writing. It will show up as broken until you write it, which is the point.
+- **Reference another memory as `[[name]]`, never as a path.** A backticked
+  `research/memory/verdicts.md` rots on a skill rename exactly like a link does,
+  but nothing checks it. Paths to *non-memory* files (`STATUS.md`, a `.typ`, a
+  repo doc) stay as plain paths — the convention is for memory→memory only.
 - **Resolve and audit the graph with `harness-memory-links`:**
-  - `harness-memory-links` — graph summary + every broken link
+  - `harness-memory-links` — graph summary, every broken link, and every
+    plain-path reference that should be a `[[link]]` (with the exact replacement)
   - `harness-memory-links --of <skill>/<memory>` — that memory's outgoing links
     (with real paths to read next), its backlinks, and its broken links
   - `harness-memory-links --check` — broken links only, exit 1 if any
 - Run `--check` after renaming or deleting any memory; a rename silently orphans
   every `[[link]]` pointing at the old name.
+- **A green check only proves the target exists, not that it is the right one.**
+  When repointing a link, confirm the target by content — the memory that
+  actually defines the thing being referenced.
 
 ## Modifying hooks / extensions / plugins / settings
 

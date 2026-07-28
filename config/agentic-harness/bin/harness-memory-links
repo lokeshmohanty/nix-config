@@ -120,6 +120,7 @@ awk -F'\t' -v mode="$MODE" -v ref="$REF" '
           if (t==0) { nbroken++; brokenSrc[nbroken]=i; brokenTok[nbroken]=tok }
           else { backl[t] = (t in backl) ? backl[t] " " nedge : nedge }
         }
+        scanPlain(i, line)
       }
       close(path[i])
     }
@@ -128,6 +129,46 @@ awk -F'\t' -v mode="$MODE" -v ref="$REF" '
     if (mode=="all")     { emitAll();    exit 0 }
     if (mode=="detail")  { emitDetail(); exit 0 }
     emitSummary()
+  }
+
+  # Plain-path references to memories — `research/memory/verdicts.md` or a
+  # backticked `verdicts.md`. These rot exactly like [[links]] on a skill rename
+  # but are invisible to the link scan, so find them and say so.
+  #
+  # A backticked bare name counts ONLY if it resolves to a real memory: repo
+  # files like `STATUS.md` or `ICLR_PLAN.md` must never be reported.
+  # A qualified <skill>/memory/<name>.md is unambiguously meant to be a memory,
+  # so when it does not resolve it is broken, not merely unlinked.
+  function scanPlain(i, line,   rest, ref, bare, sk, nm, t) {
+    rest=line
+    # Match the WHOLE path, including any leading directories such as
+    # `.agents/skills/`. Matching only the <skill>/memory/... tail would make the
+    # suggested replacement drop a prefix and leave a dangling backtick behind.
+    while (match(rest, /(\.?[A-Za-z0-9._-]+\/)*[A-Za-z0-9_-]+\/memory\/[A-Za-z0-9._-]+\.md/)) {
+      ref=substr(rest, RSTART, RLENGTH)
+      rest=substr(rest, RSTART+RLENGTH)
+      sk=ref; sub(/\/memory\/[^\/]*$/,"",sk); sub(/^.*\//,"",sk)   # component before /memory/
+      nm=ref; sub(/^.*\/memory\//,"",nm); sub(/\.md$/,"",nm)
+      t = ((sk "/" nm) in byKey) ? byKey[sk "/" nm] : 0
+      if (t>0) addUnlinked(i, ref, t)
+      else { nbroken++; brokenSrc[nbroken]=i; brokenTok[nbroken]=ref }
+    }
+    rest=line
+    while (match(rest, /`[A-Za-z0-9._-]+\.md`/)) {
+      ref=substr(rest, RSTART+1, RLENGTH-2)
+      rest=substr(rest, RSTART+RLENGTH)
+      bare=ref; sub(/\.md$/,"",bare)
+      t=resolve(i, bare)
+      if (t>0) addUnlinked(i, ref, t)         # silent when it is not a memory
+    }
+  }
+
+  # The suggested replacement must resolve back to THIS target. A bare [[name]]
+  # resolves same-skill-first, so a cross-skill target needs the path form —
+  # otherwise the suggestion silently points at a same-named sibling memory.
+  function addUnlinked(i, ref, t) {
+    nunl++; unlSrc[nunl]=i; unlRef[nunl]=ref
+    unlTo[nunl] = (skill[t]==skill[i]) ? name[t] : "../../" skill[t] "/memory/" name[t]
   }
 
   # Resolve [[tok]] seen in memory row i. Returns a row id, 0 if broken,
@@ -183,7 +224,14 @@ awk -F'\t' -v mode="$MODE" -v ref="$REF" '
     print "links: " nedge " (" resolved " resolved, " nbroken " broken)"
     if (nbroken==0) { print "broken: 0 broken links" }
     else emitBroken(1)
+    emitUnlinked()
     print "help[1]: harness-memory-links --of <skill>/<memory> for one memory"
+  }
+
+  function emitUnlinked(   u) {
+    if (nunl==0) { print "unlinked: 0 plain-path references to memories"; return }
+    print "unlinked[" nunl "]{source,ref,suggest}:"
+    for (u=1; u<=nunl; u++) print "  " label(unlSrc[u]) ",`" unlRef[u] "`,[[" unlTo[u] "]]"
   }
 
   function nroots(   i, c) { c=0; for (i=1;i<=rows;i++) if (!(scope[i] in cnt)) { cnt[scope[i]]=1; c++ } return c }
