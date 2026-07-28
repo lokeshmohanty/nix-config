@@ -121,6 +121,13 @@ second source of truth") made mechanical.
 4. Update the relevant page in `~/.agents/docs/` in the same change.
 5. Commit `~/.nix`.
 
+## Memory
+
+- `memory/pi-rich-renderer-fork.md` — why `pi/agent/extensions/rich-renderer/` is a
+  vendored fork of the npm package, the two upstream bugs it fixes (kitty `c`/`r`
+  aspect collapse, math matcher deleting prose), and how to test it under
+  `node --experimental-strip-types`.
+
 ## Anti-rules
 
 - Never inline skill/memory content into AGENTS.md (global or project) — index only.

@@ -1,0 +1,22 @@
+{
+  "name": "rich-renderer",
+  "version": "0.1.0-fork.1",
+  "private": true,
+  "type": "module",
+  "main": "index.ts",
+  "description": "Vendored fork of pi-rich-renderer 0.1.0 (MIT). Renders LaTeX in assistant replies as terminal images. Fixes upstream's aspect-ratio collapse (c x r box scaled without preserving aspect) and its over-eager math matcher (nix ${...} interpolations and unbalanced $$ swallowing prose).",
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "pi",
+    "latex",
+    "markdown",
+    "terminal",
+    "math"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*"
+  }
+}

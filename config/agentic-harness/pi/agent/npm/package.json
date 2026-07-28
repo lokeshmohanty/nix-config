@@ -9,7 +9,6 @@
     "pi-codex-goal": "^0.1.38",
     "pi-image-tools": "^1.4.0",
     "pi-observational-memory": "^3.0.3",
-    "pi-rich-renderer": "^0.1.0",
     "pi-web-access": "^0.13.0"
   }
 }
