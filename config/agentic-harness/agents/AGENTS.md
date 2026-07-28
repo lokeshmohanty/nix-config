@@ -47,6 +47,7 @@ context is an orchestrator: it scopes the task, delegates, and synthesises.
 - `axi` (+ `gh-axi`, `chrome-devtools-axi`, `lavish-axi`) — agent-facing CLI standards and tools.
 - `context7-mcp` — current library/framework docs.
 - `terraform-skill` — Terraform/IaC work.
+- `ui` — visual/front-end conventions: type roles, font stacks, webfont loading.
 
 ## Binding rules
 
