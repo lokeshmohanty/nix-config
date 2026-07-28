@@ -1,5 +1,6 @@
 agent/auth.json
 agent/sessions/
 agent/trust.json
+agent/models-store.json
 cache/
 
