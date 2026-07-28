@@ -22,14 +22,14 @@
         }
       ]
     },
-    "vllm-ziq": {
-      "baseUrl": "http://10.169.20.183:8002/v1",
+    "gw-glm-5.2": {
+      "baseUrl": "http://34.93.215.13/v1",
       "api": "openai-completions",
-      "apiKey": "none",
+      "apiKey": "gw-idMKBlwAA6aR0dV5u-HP5M76--41UqAvZmA31EWPI8E",
       "models": [
         {
-          "id": "deepseek-ai/DeepSeek-V4-Flash",
-          "input": [ "text" ]
+          "id": "zai-org/GLM-5.2",
+          "input": [ "text", "image" ]
         }
       ]
     }

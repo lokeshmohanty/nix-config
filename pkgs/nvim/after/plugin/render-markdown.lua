@@ -2,16 +2,18 @@
 -- ==== RENDER-MARKDOWN
 -- =================================================
 vim.keymap.set("n", "<localleader>p", "<cmd>MarkdownPreviewToggle<CR>", { desc = "preview" })
+vim.g.mkdp_filetypes = { "markdown", "mdx" }
 vim.api.nvim_create_autocmd("FileType", {
-	pattern = { "markdown", "codecompanion" },
-	callback = function()
-		vim.g.mkdp_auto_close = 0
-		require("render-markdown").setup({
-			heading = {
-				icons = { "󰎤 ", "󰎧 ", "󰎪 ", "󰎭 ", "󰎱 ", "󰎳 " },
-			},
-		})
-	end,
+  pattern = { "markdown", "mdx", "codecompanion" },
+  callback = function()
+    vim.g.mkdp_auto_close = 0
+    require("render-markdown").setup({
+      file_types = { "markdown", "mdx", "codecompanion" },
+      heading = {
+        icons = { "󰎤 ", "󰎧 ", "󰎪 ", "󰎭 ", "󰎱 ", "󰎳 " },
+      },
+    })
+  end,
 })
 
 -- require("img-clip.nvim").setup({

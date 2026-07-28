@@ -15,7 +15,7 @@ servers.ts_ls = {}
 servers.yamlls = {}
 servers.hydra_lsp = {}
 servers.tailwindcss = {}
-servers.zk = {}
+servers.zk = { filetypes = { 'markdown', 'mdx' } } -- lspconfig defaults to markdown only
 servers.nushell = {}
 servers.nginx_language_server = {}
 servers.gh_actions_ls = {}

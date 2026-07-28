@@ -1,6 +1,6 @@
 return {
   "zk",
-  ft = "markdown",
+  ft = { "markdown", "mdx" },
   after = function()
     vim.cmd.packadd("zk-nvim")
     require("zk").setup({
@@ -9,7 +9,7 @@ return {
         config = {
           name = "zk",
           cmd = { "zk", "lsp" },
-          filetypes = { "markdown" },
+          filetypes = { "markdown", "mdx" },
         },
         auto_attach = { enabled = true, },
       },

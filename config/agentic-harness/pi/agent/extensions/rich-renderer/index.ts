@@ -44,6 +44,7 @@ import {
 	getCellDimensions,
 	getImageDimensions,
 	Image,
+	setCapabilities,
 	Text,
 	type Component,
 } from "@earendil-works/pi-tui";
@@ -84,10 +85,12 @@ type RendererConfig = {
 	imageScale: number;
 	cacheTtlMs: number;
 	inlinePlaceholders: boolean;
+	imageProtocol?: "kitty" | "iterm2";
 };
 
 export default function (pi: ExtensionAPI) {
 	void cleanupCache();
+	void applyImageProtocolOverride();
 
 	pi.on("context", (event: any) => {
 		const messages = event.messages.map((message: any) => {
@@ -125,6 +128,19 @@ export default function (pi: ExtensionAPI) {
 	});
 }
 
+/**
+ * Honour `richRenderer.imageProtocol`. This overrides pi's env-var detection for
+ * the whole TUI, not just this extension — which is the point: if the terminal
+ * can draw images, pi should use them everywhere.
+ */
+async function applyImageProtocolOverride(): Promise<void> {
+	const { imageProtocol } = await getConfig();
+	if (!imageProtocol) return;
+	const caps = getCapabilities();
+	if (caps.images === imageProtocol) return;
+	setCapabilities({ ...caps, images: imageProtocol });
+}
+
 async function cleanupCache(): Promise<void> {
 	const { cacheTtlMs } = await getConfig();
 	if (cacheTtlMs <= 0) return;
@@ -151,6 +167,13 @@ async function getConfig(): Promise<RendererConfig> {
 		// placeholders: inline math then stays as readable LaTeX source rather
 		// than rendering as stray accented dots.
 		inlinePlaceholders: config.inlinePlaceholders !== false,
+		// Force a graphics protocol when the terminal supports one but does not
+		// advertise it. pi detects images purely from environment variables
+		// (KITTY_WINDOW_ID, TERM_PROGRAM, GHOSTTY_RESOURCES_DIR, TERM); launch pi
+		// somewhere those are not set — a plain TERM=xterm-256color, a bare
+		// login shell, some multiplexers — and it reports no image support, so
+		// every formula degrades to "[Image: image/png WxH]".
+		imageProtocol: config.imageProtocol === "kitty" || config.imageProtocol === "iterm2" ? config.imageProtocol : undefined,
 	};
 }
 

@@ -30,6 +30,7 @@ local latex_patterns = { 'latex/**/*.lua', 'latex/**/*.json', '**/latex.json' }
 local lang_patterns = {
   tex = latex_patterns, plaintex = latex_patterns,
   markdown_inline = { 'markdown.lua' },
+  mdx = { 'markdown.lua' },
 }
 ms.setup({
   snippets = {

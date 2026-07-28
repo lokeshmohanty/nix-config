@@ -1,7 +1,7 @@
 {
   "lastChangelogVersion": "0.82.0",
-  "defaultProvider": "vllm-gemma4-31",
-  "defaultModel": "google/gemma-4-31B-it",
+  "defaultProvider": "gw-glm-5.2",
+  "defaultModel": "zai-org/GLM-5.2",
   "defaultThinkingLevel": "medium",
   "packages": [
     "npm:@tintinweb/pi-subagents",
