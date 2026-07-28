@@ -75,6 +75,24 @@ worst case a wrapped line splits the image. Inline math is scaled to one cell ta
 Escape hatch: `richRenderer.inlinePlaceholders: false` falls back to LaTeX source
 for inline math, for terminals that speak the kitty protocol but not placeholders.
 
+## "[Image: image/png WxH]" instead of a formula — not a renderer bug
+
+pi decides image support **purely from environment variables**
+(`KITTY_WINDOW_ID`, `TERM_PROGRAM`, `GHOSTTY_RESOURCES_DIR`, `TERM` containing
+ghostty/kitty, `ITERM_SESSION_ID`, …). Launch pi where none are set — a plain
+`TERM=xterm-256color`, a bare login shell, a terminal that does not advertise
+itself — and `detectCapabilities()` returns `images: null`. Every image then
+degrades to pi-tui's `imageFallback()` text, `[Image: image/png 150x69]`.
+
+Diagnose by which artefact appears, they are three different failures:
+- `[Image: image/png WxH]` → capability detection said no images (this section)
+- raw base64 → an escape was word-wrapped (defect 3)
+- squashed/illegible formula → geometry (defect 1)
+
+Fix: `richRenderer.imageProtocol: "kitty"` forces the protocol via
+`setCapabilities()` at extension load, overriding detection for the whole TUI.
+Only set it for a terminal that really does support the protocol.
+
 ## Testing it
 
 The pure functions (`computeImageBox`, `looksLikeMath`, `splitMarkdown`) are
