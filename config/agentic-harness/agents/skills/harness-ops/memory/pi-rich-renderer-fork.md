@@ -40,6 +40,23 @@ through `looksLikeMath()`: length cap, no blank lines, no path-like content, no
 4-plus-word prose runs, and a positive requirement that something reads as maths.
 That last gate matters — without it `$5 and $10` renders "5 and " as a formula.
 
+**3. Image escapes inside list items spill raw base64.** pi-tui's `Markdown`
+renders a top-level image line verbatim, but `renderList()` re-wraps item content
+to `itemWidth` **first** — splitting the escape's single enormous base64 "word"
+across several lines. Only the first line keeps the `\x1b_G` prefix, so the
+terminal draws a partial image and prints the remaining chunks as visible base64.
+Table cells do not spill but blow out the row grid.
+
+Verified by rendering the same escape in five positions (pi-tui 0.82.1, width 120):
+standalone block, inline with single newlines, mid-sentence, inside a `-` item,
+inside a table cell — **only the list item spilled** (4 stray base64 lines). This
+is structural: a line-oriented renderer cannot place a multi-cell image inside a
+wrapped list item. `structuredRanges()` therefore leaves math inside list items,
+list continuation lines, and table rows as LaTeX source.
+
+This is the symptom originally reported as "base64 instead of images" and first
+written off as a copy artifact — it is real, and this is its cause.
+
 ## Testing it
 
 The pure functions (`computeImageBox`, `looksLikeMath`, `splitMarkdown`) are
@@ -49,11 +66,14 @@ if** the file stays strip-only-clean: no TS parameter properties, and
 `@earendil-works/pi-coding-agent`, which is not installed. Resolve pi-tui by
 symlinking `node_modules -> ~/.pi/agent/npm/node_modules` next to the test.
 
-## Not explained
+## Ruled out along the way
 
-The original report also showed raw base64 on screen. That was never reproduced:
-ghostty consumes every escape variant (chunked, `q=2`, `C=1`, explicit `c`/`r`),
-pi-tui's `Markdown` preserves a 12,959-char escape line intact, and the
-no-capability fallback prints `[Image: ...]`, never base64. Probably an artifact of
-copying the transcript out of the terminal. If it recurs, that is a fresh
-investigation, not this fix.
+Ghostty itself is fine: it consumes every escape variant (4-chunk transmission,
+`q=2`, `C=1`, explicit `c`/`r`) — confirmed by drawing seven variants side by side.
+pi's `detectCapabilities()` is also right to report `images: "kitty"` for
+`TERM_PROGRAM=ghostty`. Do not chase the terminal or the protocol; the three bugs
+above are all in the extension.
+
+`pi --print` cannot validate geometry: `terminalWidth()` returns ~3 with no TUI, so
+both upstream and the fork emit `c=1,r=1`. Verify geometry with the unit test or a
+real interactive session.

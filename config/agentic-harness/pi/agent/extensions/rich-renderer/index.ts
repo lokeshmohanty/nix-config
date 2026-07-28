@@ -212,6 +212,41 @@ const MATH_TOKEN = /[\\^_=<>+\-*{}|]/;
 /** A lone symbol such as `$x$` or `$k2$`, which carries no operator. */
 const BARE_SYMBOL = /^[A-Za-z][A-Za-z0-9]?$/;
 
+/**
+ * FIX 3: character ranges where an image escape must never be placed.
+ *
+ * pi-tui's Markdown renders a top-level image line verbatim, but `renderList()`
+ * re-wraps item content to `itemWidth` first — which splits the escape's single
+ * enormous base64 "word" across several lines. Only the first keeps the \x1b_G
+ * prefix, so the terminal draws a partial image and prints the remaining chunks
+ * as visible base64. Table cells survive without spilling but blow out the row
+ * layout. Both are structural: a line-oriented renderer cannot place a
+ * multi-cell image inside a wrapped list item or a table grid.
+ *
+ * Math inside these ranges therefore stays as LaTeX source.
+ */
+function structuredRanges(markdown: string): Array<[number, number]> {
+	const ranges: Array<[number, number]> = [];
+	let offset = 0;
+	let inList = false;
+	for (const line of markdown.split("\n")) {
+		const start = offset;
+		const end = offset + line.length;
+		offset = end + 1;
+
+		const isBlank = !line.trim();
+		const isListItem = /^\s*([-*+]|\d+[.)])\s/.test(line);
+		const isTableRow = /^\s*\|/.test(line);
+		const isIndented = /^\s+\S/.test(line);
+
+		if (isListItem) inList = true;
+		else if (!isBlank && !isIndented) inList = false;
+
+		if (isListItem || isTableRow || (inList && !isBlank)) ranges.push([start, end]);
+	}
+	return ranges;
+}
+
 function shouldRender(markdown: string): boolean {
 	return splitMarkdown(markdown).some((segment) => segment.type === "image");
 }
@@ -243,6 +278,8 @@ export function splitMarkdown(markdown: string): RenderSegment[] {
 	const regex =
 		/(```[\s\S]*?```|~~~[\s\S]*?~~~|`[^`\n]+`|\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\\begin\{(?:equation|align|gather|multline|flalign|alignat)\*?\}[\s\S]*?\\end\{(?:equation|align|gather|multline|flalign|alignat)\*?\}|(?<!\\)\$(?!\{)[^\n$]+(?<!\\)\$)/g;
 	let match: RegExpExecArray | null;
+	const blocked = structuredRanges(markdown);
+	const isBlocked = (index: number) => blocked.some(([start, end]) => index >= start && index < end);
 
 	const pushMarkdown = (text: string) => {
 		if (!text) return;
@@ -255,7 +292,7 @@ export function splitMarkdown(markdown: string): RenderSegment[] {
 		if (match.index > cursor) pushMarkdown(markdown.slice(cursor, match.index));
 		const source = match[0];
 		const isCode = source.startsWith("```") || source.startsWith("~~~") || source.startsWith("`");
-		if (isCode || !looksLikeMath(parseLatexBlock(source).tex)) pushMarkdown(source);
+		if (isCode || isBlocked(match.index) || !looksLikeMath(parseLatexBlock(source).tex)) pushMarkdown(source);
 		else segments.push({ type: "image", kind: "math", source });
 		cursor = match.index + source.length;
 	}
