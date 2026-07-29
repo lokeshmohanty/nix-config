@@ -12,7 +12,7 @@
     "npm:pi-image-tools"
   ],
   "richRenderer": {
-    "imageScale": 0.5,
+    "imageScale": 1.0,
     "cacheTtlMs": 604800000
   },
   "terminal": {

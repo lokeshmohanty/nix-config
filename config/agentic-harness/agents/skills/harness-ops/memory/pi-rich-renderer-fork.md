@@ -93,7 +93,60 @@ Fix: `richRenderer.imageProtocol: "kitty"` forces the protocol via
 `setCapabilities()` at extension load, overriding detection for the whole TUI.
 Only set it for a terminal that really does support the protocol.
 
+## FIX 5/6/7 — placement, reserved rows, image ids (2026-07-29)
+
+Three defects found by rendering a reply that mixes inline and display math. All
+three are in the extension; kitty draws every escape correctly (3/3, above).
+
+**5. A raw escape must never share a line with prose.** `encodeKitty()` draws at
+the cursor and deliberately does not advance it, so any text after it on the same
+line is printed *on top of the image*. Wrapping the escape in bare `\n` does not
+help: markdown treats a single newline as a soft break, and the escape plus the
+rest of the sentence come back as one line. Blank lines on both sides fix it.
+So "block" now means **the formula owns its whole line** — `isStandaloneMath()` —
+or carries display delimiters (`$$…$$`, `\[…\]`, `\begin{equation}`), which claim
+one: `isDisplayDelimited()`. Everything else flows as placeholders, which occupy
+real cells and cannot be overprinted. Display delimiters are promoted even
+mid-sentence, because an integral squeezed into the single row inline placement
+allows is illegible.
+
+**6. Reserved rows do not survive markdown.** The blank lines that reserve an
+image's height are collapsed — markdown emits at most one. A five-row block was
+therefore drawn over by the next paragraph. Invisible while `imageScale` defaulted
+to 0.5 and blocks were two rows; obvious once it became 1.0.
+`getKittyImageReservedRows()` counts following lines of **zero visible width**, so
+`reserveRows()` emits `"\n\n\x1b[0m"` per two rows: a bare colour reset is
+non-empty (markdown keeps the line) and zero-width (pi-tui counts it). Consecutive
+reset lines get soft-joined back into one, hence the interleaved blank. Measured
+for 1–20 rows: always enough, overshoots by at most two blank rows.
+
+**7. Placeholder ids must not start at 1.** The terminal stores images per window
+by id, so a counter restarting at 1 in every process makes the next pi session
+overwrite the previous one's images — a formula already drawn in a table cell was
+seen changing into a formula from the following run. Seeded randomly now.
+
+**8. Formulas render in parallel now**, deduplicated, four at a time — it was a
+serial `await` in the segment loop. Measured cold on sudarshan: 12 distinct
+formulas take 4.9s (latex is CPU-bound, so the win over serial is modest), 0.01s
+once cached.
+
+Also: one transmission per distinct PNG per message (a formula repeated three
+times sent three copies of the base64), and `\PreviewBorder` is 0pt everywhere —
+padding is dead space inside the image, and markdown's blank line around a block
+is spacing enough.
+
+`richRenderer.imageScale` should stay at **1.0**: one image pixel row per cell
+pixel row at `LATEX_DPI`. Below that, thin strokes — integral signs, fraction
+bars, subscripts — break up under downsampling.
+
 ## Testing it
+
+`index.test.ts` sits beside `index.ts` and covers all of the above. It needs
+pi-tui on the resolution path, which the extension dir does not have — copy both
+files somewhere with a `node_modules` symlink to `~/.pi/agent/npm/node_modules`
+and run `node --experimental-strip-types index.test.ts`.
+
+## Testing the pure functions
 
 The pure functions (`computeImageBox`, `looksLikeMath`, `splitMarkdown`) are
 exported for exactly this. They run under `node --experimental-strip-types` **only

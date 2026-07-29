@@ -22,6 +22,26 @@
 //   inline math. The guard only ever REJECTS, so the worst case is that a genuine
 //   formula stays as plain LaTeX source.
 //
+//   FIX 5 (placement, 2026-07-29): a formula sharing a line with prose was still
+//   emitted as a raw escape wrapped in bare newlines. pi-tui's Markdown treats a
+//   single newline as a soft break, so the escape and the rest of the sentence came
+//   back as ONE line (verified against pi-tui 0.82.1) — the terminal drew the image
+//   at the cursor, which encodeKitty() deliberately does not advance, and then
+//   printed the sentence on top of it. Block escapes are now separated by blank
+//   lines, and "block" means the formula owns its whole line; everything else flows
+//   as Unicode placeholders, which occupy real cells and cannot be overprinted.
+//
+//   FIX 6 (row reservation, 2026-07-29): the blank lines that reserve an image's
+//   height do not survive markdown, which collapses consecutive blanks — so a tall
+//   block was drawn over by the next paragraph. Harmless while imageScale defaulted
+//   to 0.5 and blocks were two rows; obvious at 1.0. reserveRows() emits lines that
+//   are non-empty (so markdown keeps them) but zero-width (so pi-tui counts them).
+//
+//   FIX 7 (image ids, 2026-07-29): placeholder ids counted from 1 in every process,
+//   so a second pi session in the same window overwrote the first session's images
+//   — a table cell was seen changing into a formula from the next run. Seeded
+//   randomly instead.
+//
 // Everything else is upstream's design and is deliberately unchanged: rendering
 // shells out to latex + dvipng, PNGs are cached under ~/.pi/cache/rich-renderer,
 // and the `context` hook restores the original markdown so the model never sees
@@ -58,7 +78,14 @@ const TIMEOUT_MS = Number(process.env.PI_RICH_RENDER_TIMEOUT_MS ?? 15000);
 const MAX_BUFFER = 16 * 1024 * 1024;
 const PNG_MIME = "image/png";
 const LATEX_DPI = Number(process.env.PI_RICH_RENDER_LATEX_DPI ?? 180);
-const DEFAULT_IMAGE_SCALE = 0.5;
+/**
+ * 1.0 renders a display block at its natural size: one image pixel row per cell
+ * pixel row at LATEX_DPI. Below that the glyphs are downsampled and thin strokes
+ * (integral signs, fraction bars, subscripts) break up.
+ */
+const DEFAULT_IMAGE_SCALE = 1.0;
+/** Left margin for a display block. Empty: blocks align with the prose. */
+const BLOCK_INDENT = "";
 const DEFAULT_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const MAX_ROWS = 40;
 const MAX_COLUMNS = 100;
@@ -199,31 +226,65 @@ function renderSegmentsAsText(segments: RenderSegment[], theme: Theme, width: nu
 	const { imageScale } = config;
 	const transmits: string[] = [];
 	const usePlaceholders = config.inlinePlaceholders && getCapabilities().images === "kitty";
+	// FIX 5: one transmission per distinct PNG, not per occurrence. A message that
+	// repeats the same formula six times used to send six copies of the base64.
+	const transmitted = new Map<string, { id: number; columns: number }>();
 
 	const body = segments.map((segment) => {
 		if (segment.type === "markdown") return segment.markdown;
 		if (!segment.png) return segment.source;
 
 		if (segment.inline) {
-			// Inside a list item or table cell: a raw escape would be word-wrapped
-			// and spill base64, so place the image with Unicode placeholders and
-			// keep the payload out of the flowing text entirely.
+			// Flowing text — mid-sentence, or inside a list item or table cell. A raw
+			// escape here is drawn at the cursor and then overprinted by whatever text
+			// follows on the same line (and inside a list it also spills base64), so
+			// place the image with Unicode placeholders, which occupy real cells.
 			if (!usePlaceholders) return segment.source;
+			const cached = transmitted.get(segment.png);
+			if (cached) return encodePlaceholderRow(cached.id, 0, cached.columns);
 			const dimensions = getImageDimensions(segment.png, PNG_MIME);
 			if (!dimensions) return segment.source;
 			const id = allocatePlaceholderId();
 			const columns = inlineColumns(dimensions.widthPx, dimensions.heightPx, getCellDimensions());
+			transmitted.set(segment.png, { id, columns });
 			transmits.push(encodeTransmit(segment.png, id, columns, 1));
 			return encodePlaceholderRow(id, 0, columns);
 		}
 
-		return `\n${new RenderedImage(segment, theme, imageScale).render(width).join("\n")}\n`;
+		// FIX 5: a display block needs BLANK lines around it, not bare newlines.
+		// pi-tui's Markdown treats a single newline as a soft break and keeps the
+		// escape in the same paragraph as the surrounding prose — verified: the
+		// escape and the following sentence came back as one line, so the terminal
+		// drew the image and then printed the sentence over it.
+		//
+		// Only the first line carries the escape; the rest are spacer rows reserving
+		// the image's height. pi-tui's isImageLine() matches the escape anywhere in
+		// the line, so the indent does not cost the line its image handling.
+		const lines = new RenderedImage(segment, theme, imageScale).render(width - BLOCK_INDENT.length);
+		return `\n\n${BLOCK_INDENT}${lines[0]}\n${reserveRows(lines.length - 1)}\n\n`;
 	}).join("").trim();
 
 	// Transmissions draw nothing, but must reach the terminal before the
 	// placeholders that reference them. They sit alone in a leading paragraph,
 	// which pi-tui recognises as an image line and passes through unwrapped.
 	return transmits.length ? `${transmits.join("")}\n\n${body}` : body;
+}
+
+/**
+ * FIX 6: markdown collapses consecutive blank lines, so the blank spacer rows an
+ * image needs to reserve its height never survive to the renderer — a five-row
+ * formula got one blank line and the next paragraph was drawn on top of it. This
+ * was invisible while `imageScale` defaulted to 0.5 and every block was two rows.
+ *
+ * pi-tui's getKittyImageReservedRows() counts following lines of ZERO VISIBLE
+ * WIDTH, which a bare colour reset satisfies while still being a non-empty line
+ * that markdown will not collapse. The unit is blank-then-reset: consecutive
+ * reset lines are soft-joined back into one line, so they must stay separated.
+ * Measured against pi-tui 0.82.1 for 1..20 rows, this reserves the full height
+ * every time, overshooting by at most two rows of harmless whitespace.
+ */
+export function reserveRows(rows: number): string {
+	return "\n\n\x1b[0m".repeat(Math.ceil(Math.max(0, rows) / 2));
 }
 
 function terminalWidth(ctx: any): number {
@@ -298,14 +359,56 @@ function structuredRanges(markdown: string): Array<[number, number]> {
 	return ranges;
 }
 
+/**
+ * FIX 5: a formula may be rendered as a real image escape only when it owns its
+ * line. Anything sharing a line with text must flow inline as placeholders.
+ *
+ * An escape is drawn at the cursor and does not advance it (moveCursor: false),
+ * so text emitted afterwards on the same line lands on top of the image. Bare
+ * newlines around the escape do not save it: markdown joins a paragraph's soft
+ * breaks back into one line before the terminal ever sees it.
+ */
+/**
+ * `$$…$$`, `\[…\]` and the equation environments are *display* math: they mean
+ * "put this on its own line", so they are rendered as blocks even when the model
+ * writes them mid-sentence. Squeezing an integral with limits into the one cell
+ * row that inline placement allows makes it illegible.
+ */
+export function isDisplayDelimited(source: string): boolean {
+	const trimmed = source.trim();
+	return trimmed.startsWith("$$") || trimmed.startsWith("\\[") || trimmed.startsWith("\\begin{");
+}
+
+export function isStandaloneMath(markdown: string, start: number, end: number): boolean {
+	const lineStart = markdown.lastIndexOf("\n", Math.max(0, start - 1)) + 1;
+	const nextBreak = markdown.indexOf("\n", end);
+	const lineEnd = nextBreak === -1 ? markdown.length : nextBreak;
+	return !markdown.slice(lineStart, start).trim() && !markdown.slice(end, lineEnd).trim();
+}
+
 function shouldRender(markdown: string): boolean {
 	return splitMarkdown(markdown).some((segment) => segment.type === "image");
 }
+
+/** Concurrent latex runs. Each render has its own temp dir, so they cannot clash. */
+const RENDER_CONCURRENCY = 4;
 
 async function buildSegments(markdown: string, theme: Theme): Promise<RenderSegment[]> {
 	const raw = splitMarkdown(markdown);
 	const foreground = dvipngForeground(theme);
 	const out: RenderSegment[] = [];
+
+	// FIX 8: render the formulas up front, deduplicated and in parallel. This used
+	// to be a serial await inside the loop: a real "Maxwell's equations" reply had
+	// 22 formulas, and at ~0.5s per latex+dvipng pair that is a ten-second stall
+	// before any of the message appears.
+	const sources = [...new Set(raw.filter((segment) => segment.type === "image").map((segment) => segment.source))];
+	const renders = new Map<string, { png?: string; error?: string }>();
+	for (let i = 0; i < sources.length; i += RENDER_CONCURRENCY) {
+		const batch = sources.slice(i, i + RENDER_CONCURRENCY);
+		const results = await Promise.all(batch.map((source) => renderLatex(source, foreground)));
+		batch.forEach((source, index) => renders.set(source, results[index]));
+	}
 
 	for (const segment of raw) {
 		if (segment.type === "markdown") {
@@ -314,7 +417,7 @@ async function buildSegments(markdown: string, theme: Theme): Promise<RenderSegm
 			else out.push(segment);
 			continue;
 		}
-		out.push({ ...segment, ...(await renderLatex(segment.source, foreground)) });
+		out.push({ ...segment, ...renders.get(segment.source) });
 	}
 
 	return out.filter((segment) => segment.type !== "markdown" || segment.markdown.trim().length > 0);
@@ -344,7 +447,14 @@ export function splitMarkdown(markdown: string): RenderSegment[] {
 		const source = match[0];
 		const isCode = source.startsWith("```") || source.startsWith("~~~") || source.startsWith("`");
 		if (isCode || !looksLikeMath(parseLatexBlock(source).tex)) pushMarkdown(source);
-		else segments.push({ type: "image", kind: "math", source, inline: isBlocked(match.index) });
+		else {
+			// Block rendering needs a formula that owns its line — or display
+			// delimiters, which claim one — and a line that is not inside a list or
+			// table, where renderList() re-wraps the content and spills base64.
+			const wantsBlock = isDisplayDelimited(source) || isStandaloneMath(markdown, match.index, match.index + source.length);
+			const standalone = wantsBlock && !isBlocked(match.index);
+			segments.push({ type: "image", kind: "math", source, inline: !standalone });
+		}
 		cursor = match.index + source.length;
 	}
 	if (cursor < markdown.length) pushMarkdown(markdown.slice(cursor));
@@ -353,7 +463,7 @@ export function splitMarkdown(markdown: string): RenderSegment[] {
 
 async function renderLatex(source: string, foreground: string): Promise<{ png?: string; error?: string }> {
 	const block = parseLatexBlock(source);
-	const key = createHash("sha256").update("latex-v1\0").update(JSON.stringify({ block, foreground, dpi: LATEX_DPI })).digest("hex");
+	const key = createHash("sha256").update("latex-v3\0").update(JSON.stringify({ block, foreground, dpi: LATEX_DPI })).digest("hex");
 	const pngPath = join(CACHE_DIR, `${key}.png`);
 	await mkdir(CACHE_DIR, { recursive: true });
 	if (existsSync(pngPath)) return { png: (await readFile(pngPath)).toString("base64") };
@@ -387,10 +497,15 @@ function parseLatexBlock(source: string): LatexBlock {
 
 function latexDocument(block: LatexBlock): string {
 	const body = block.wrapDisplay ? `\\(\\displaystyle ${block.tex}\\)` : block.tex;
+	// No border, inline or display. Every point of it is dead space inside the
+	// image: inline math is scaled to one cell tall, so padding is height stolen
+	// from the glyphs, and a display block is sized from its own pixel height, so
+	// padding just inflates the rows reserved around the formula. The blank line
+	// that markdown puts above and below a block is spacing enough.
 	return String.raw`\documentclass[12pt]{article}
 \usepackage[active,tightpage]{preview}
 \usepackage{amsmath,amssymb,mathtools,bm}
-\setlength\PreviewBorder{2pt}
+\setlength\PreviewBorder{0pt}
 \pagestyle{empty}
 \begin{document}
 \begin{preview}
@@ -471,7 +586,15 @@ const DIACRITICS = [
 const PLACEHOLDER_CHAR = String.fromCodePoint(0x10eeee);
 /** Ids stay inside 24 bits so the foreground colour alone identifies the image. */
 const MAX_PLACEHOLDER_ID = 0xffffff;
-let nextPlaceholderId = 0;
+/**
+ * FIX 7: seed randomly, never from 0. The terminal keeps transmitted images per
+ * window, keyed by id — so a counter that restarts at 1 in every pi process makes
+ * the second session overwrite the first session's images. Observed directly: a
+ * formula already drawn in a table cell changed into a different formula when the
+ * next process transmitted its own id 1. Ids are only ever compared for equality,
+ * so a random start costs nothing.
+ */
+let nextPlaceholderId = Math.floor(Math.random() * MAX_PLACEHOLDER_ID);
 
 function allocatePlaceholderId(): number {
 	nextPlaceholderId = (nextPlaceholderId % MAX_PLACEHOLDER_ID) + 1;
