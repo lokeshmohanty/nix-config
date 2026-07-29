@@ -15,12 +15,11 @@ in
   config = lib.mkIf config.modules.ai.enable {
     home.packages = with agents; [
       # harness
-      qwen-code
-      gemini-cli
       codex 
       claude-code 
       antigravity-cli 
       pi
+      nanocoder
       agent-browser
       pkgs.libsixel # required by pi for image rendering
 

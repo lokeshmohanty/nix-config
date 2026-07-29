@@ -42,6 +42,16 @@
 //   — a table cell was seen changing into a formula from the next run. Seeded
 //   randomly instead.
 //
+//   FIX 9 (inline size, 2026-07-29): inline math is placed on ONE cell row, so the
+//   image's own pixel height alone decides how big the glyphs come out — a tight
+//   crop of `x` (13px tall) was blown up 2x, while a bracketed fraction or an
+//   integral with limits (55-87px) was shrunk to a third of the text size and
+//   became unreadable. Two changes: inline formulas render in TEXT style behind a
+//   `\strut`, which pins every image to the same ~1-baselineskip reference (so they
+//   all come out at roughly terminal-text size, and \int/\sum/\frac stop growing
+//   full-height bars and stacked limits); and anything still too tall for one row —
+//   matrices, cases — gets its own line instead of being squeezed.
+//
 // Everything else is upstream's design and is deliberately unchanged: rendering
 // shells out to latex + dvipng, PNGs are cached under ~/.pi/cache/rich-renderer,
 // and the `context` hook restores the original markdown so the model never sees
@@ -89,6 +99,23 @@ const BLOCK_INDENT = "";
 const DEFAULT_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const MAX_ROWS = 40;
 const MAX_COLUMNS = 100;
+/**
+ * FIX 9: height of the `\strut` every inline formula carries, in pixels at
+ * LATEX_DPI — one `\baselineskip` of a 12pt article (14.5pt). Inline images are
+ * scaled to exactly one cell row, so this is the reference that makes them all
+ * come out the same size on screen no matter what the formula contains.
+ */
+const INLINE_STRUT_PX = (14.5 / 72) * LATEX_DPI;
+/**
+ * How many struts — near enough, how many text rows — an inline formula may
+ * naturally stand before it is given its own line instead of being squeezed into
+ * one. Measured at LATEX_DPI: a plain formula, a simple fraction and a `\sqrt`
+ * all come out at 1.0 (the strut dominates), `\int_0^1 f(x)dx` at 1.13, a
+ * `\left(\frac{p}{q}\right)` at 1.5, a 2x2 matrix at 2.0. The default keeps
+ * everything but genuinely two-dimensional constructs in the text flow; lower it
+ * (`richRenderer.inlineMaxRows: 1.3`) to break bracketed fractions out as well.
+ */
+const DEFAULT_INLINE_MAX_ROWS = 1.7;
 /** Longest span we will ever hand to latex. Anything longer is swallowed prose. */
 const MAX_TEX_CHARS = 400;
 
@@ -102,7 +129,10 @@ type AssistantMessage = {
 
 type RenderSegment =
 	| { type: "markdown"; markdown: string }
-	| { type: "image"; kind: "math" | "dot"; source: string; inline?: boolean; png?: string; error?: string };
+	// `blocked`: the segment sits inside a list item or table row, where a raw
+	// image escape gets word-wrapped and spills base64 (FIX 3). Such a segment can
+	// never be given its own line, however tall it renders.
+	| { type: "image"; kind: "math" | "dot"; source: string; inline?: boolean; blocked?: boolean; png?: string; error?: string };
 
 type LatexBlock = { tex: string; wrapDisplay: boolean };
 
@@ -110,6 +140,7 @@ type RGB = { r: number; g: number; b: number };
 
 type RendererConfig = {
 	imageScale: number;
+	inlineMaxRows: number;
 	cacheTtlMs: number;
 	inlinePlaceholders: boolean;
 	imageProtocol?: "kitty" | "iterm2";
@@ -213,6 +244,7 @@ async function getConfig(): Promise<RendererConfig> {
 	const config = { ...globalSettings?.richRenderer, ...projectSettings?.richRenderer };
 	return {
 		imageScale: readPositiveNumber(config.imageScale, DEFAULT_IMAGE_SCALE),
+		inlineMaxRows: readPositiveNumber(config.inlineMaxRows, DEFAULT_INLINE_MAX_ROWS),
 		cacheTtlMs: readNonNegativeNumber(config.cacheTtlMs ?? config.cacheTtl, DEFAULT_CACHE_TTL_MS),
 		// Set false if the terminal speaks the kitty protocol but not Unicode
 		// placeholders: inline math then stays as readable LaTeX source rather
@@ -254,6 +286,20 @@ function renderSegmentsAsText(segments: RenderSegment[], theme: Theme, width: nu
 	// repeats the same formula six times used to send six copies of the base64.
 	const transmitted = new Map<string, { id: number; columns: number }>();
 
+	// FIX 5: a display block needs BLANK lines around it, not bare newlines.
+	// pi-tui's Markdown treats a single newline as a soft break and keeps the
+	// escape in the same paragraph as the surrounding prose — verified: the escape
+	// and the following sentence came back as one line, so the terminal drew the
+	// image and then printed the sentence over it.
+	//
+	// Only the first line carries the escape; the rest are spacer rows reserving the
+	// image's height. pi-tui's isImageLine() matches the escape anywhere in the
+	// line, so the indent does not cost the line its image handling.
+	const asBlock = (segment: Extract<RenderSegment, { type: "image" }>) => {
+		const lines = new RenderedImage(segment, theme, imageScale).render(width - BLOCK_INDENT.length);
+		return `\n\n${BLOCK_INDENT}${lines[0]}\n${reserveRows(lines.length - 1)}\n\n`;
+	};
+
 	const body = segments.map((segment) => {
 		if (segment.type === "markdown") return segment.markdown;
 		if (!segment.png) return segment.source;
@@ -268,6 +314,11 @@ function renderSegmentsAsText(segments: RenderSegment[], theme: Theme, width: nu
 			if (cached) return encodePlaceholderRow(cached.id, 0, cached.columns);
 			const dimensions = getImageDimensions(segment.png, PNG_MIME);
 			if (!dimensions) return segment.source;
+			// FIX 9: one cell row cannot hold a two-dimensional formula. Squeezing it
+			// there is what made inline matrices and bracketed fractions unreadable, so
+			// give it a line of its own — or, where a raw escape would spill base64,
+			// leave the LaTeX source, which at least reads.
+			if (dimensions.heightPx > config.inlineMaxRows * INLINE_STRUT_PX) return segment.blocked ? segment.source : asBlock(segment);
 			const id = allocatePlaceholderId();
 			const columns = inlineColumns(dimensions.widthPx, dimensions.heightPx, getCellDimensions());
 			transmitted.set(segment.png, { id, columns });
@@ -275,17 +326,7 @@ function renderSegmentsAsText(segments: RenderSegment[], theme: Theme, width: nu
 			return encodePlaceholderRow(id, 0, columns);
 		}
 
-		// FIX 5: a display block needs BLANK lines around it, not bare newlines.
-		// pi-tui's Markdown treats a single newline as a soft break and keeps the
-		// escape in the same paragraph as the surrounding prose — verified: the
-		// escape and the following sentence came back as one line, so the terminal
-		// drew the image and then printed the sentence over it.
-		//
-		// Only the first line carries the escape; the rest are spacer rows reserving
-		// the image's height. pi-tui's isImageLine() matches the escape anywhere in
-		// the line, so the indent does not cost the line its image handling.
-		const lines = new RenderedImage(segment, theme, imageScale).render(width - BLOCK_INDENT.length);
-		return `\n\n${BLOCK_INDENT}${lines[0]}\n${reserveRows(lines.length - 1)}\n\n`;
+		return asBlock(segment);
 	}).join("").trim();
 
 	// Transmissions draw nothing, but must reach the terminal before the
@@ -450,7 +491,7 @@ async function prewarm(markdown: string, theme?: Theme): Promise<void> {
 	const foreground = dvipngForeground(theme);
 	for (const segment of splitMarkdown(markdown)) {
 		if (segment.type !== "image") continue;
-		const key = `${segment.kind}\0${segment.source}`;
+		const key = renderKey(segment);
 		if (prewarmed.has(key)) continue;
 		prewarmed.add(key);
 		void renderSource(segment, foreground).catch(() => undefined);
@@ -467,7 +508,7 @@ async function buildSegments(markdown: string, theme: Theme): Promise<RenderSegm
 	// 22 formulas, and at ~0.5s per latex+dvipng pair that is a ten-second stall
 	// before any of the message appears.
 	const pending = new Map<string, Extract<RenderSegment, { type: "image" }>>();
-	for (const segment of raw) if (segment.type === "image") pending.set(`${segment.kind}\0${segment.source}`, segment);
+	for (const segment of raw) if (segment.type === "image") pending.set(renderKey(segment), segment);
 	const wanted = [...pending.entries()];
 	const renders = new Map<string, { png?: string; error?: string }>();
 	for (let i = 0; i < wanted.length; i += RENDER_CONCURRENCY) {
@@ -483,7 +524,7 @@ async function buildSegments(markdown: string, theme: Theme): Promise<RenderSegm
 			else out.push(segment);
 			continue;
 		}
-		out.push({ ...segment, ...renders.get(`${segment.kind}\0${segment.source}`) });
+		out.push({ ...segment, ...renders.get(renderKey(segment)) });
 	}
 
 	return out.filter((segment) => segment.type !== "markdown" || segment.markdown.trim().length > 0);
@@ -498,8 +539,8 @@ export function splitMarkdown(markdown: string): RenderSegment[] {
 	const regex =
 		/(```[\s\S]*?```|~~~[\s\S]*?~~~|`[^`\n]+`|\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\\begin\{(?:equation|align|gather|multline|flalign|alignat)\*?\}[\s\S]*?\\end\{(?:equation|align|gather|multline|flalign|alignat)\*?\}|(?<!\\)\$(?!\{)[^\n$]+(?<!\\)\$)/g;
 	let match: RegExpExecArray | null;
-	const blocked = structuredRanges(markdown);
-	const isBlocked = (index: number) => blocked.some(([start, end]) => index >= start && index < end);
+	const blockedRanges = structuredRanges(markdown);
+	const isBlocked = (index: number) => blockedRanges.some(([start, end]) => index >= start && index < end);
 
 	const pushMarkdown = (text: string) => {
 		if (!text) return;
@@ -520,8 +561,8 @@ export function splitMarkdown(markdown: string): RenderSegment[] {
 			// delimiters, which claim one — and a line that is not inside a list or
 			// table, where renderList() re-wraps the content and spills base64.
 			const wantsBlock = isDisplayDelimited(source) || isStandaloneMath(markdown, match.index, match.index + source.length);
-			const standalone = wantsBlock && !isBlocked(match.index);
-			segments.push({ type: "image", kind: "math", source, inline: !standalone });
+			const blocked = isBlocked(match.index);
+			segments.push({ type: "image", kind: "math", source, inline: !(wantsBlock && !blocked), blocked });
 		}
 		cursor = match.index + source.length;
 	}
@@ -540,7 +581,17 @@ export function parseGraphFence(source: string): string | undefined {
 }
 
 function renderSource(segment: Extract<RenderSegment, { type: "image" }>, foreground: string): Promise<{ png?: string; error?: string }> {
-	return segment.kind === "dot" ? renderDot(segment.source, foreground) : renderLatex(segment.source, foreground);
+	return segment.kind === "dot" ? renderDot(segment.source, foreground) : renderLatex(segment.source, foreground, !!segment.inline);
+}
+
+/**
+ * Cache/dedup key for a segment. FIX 9 made the same source render differently
+ * inline (text style, strutted) and as a block (display style), so placement has
+ * to be part of the key — otherwise a formula that appears both ways in one
+ * message gets whichever image was rendered first.
+ */
+function renderKey(segment: Extract<RenderSegment, { type: "image" }>): string {
+	return `${segment.kind}\0${segment.inline ? "inline" : "block"}\0${segment.source}`;
 }
 
 /**
@@ -575,16 +626,16 @@ async function renderDot(source: string, foreground: string): Promise<{ png?: st
 	}
 }
 
-async function renderLatex(source: string, foreground: string): Promise<{ png?: string; error?: string }> {
+async function renderLatex(source: string, foreground: string, inline: boolean): Promise<{ png?: string; error?: string }> {
 	const block = parseLatexBlock(source);
-	const key = createHash("sha256").update("latex-v4\0").update(JSON.stringify({ block, foreground, dpi: LATEX_DPI })).digest("hex");
+	const key = createHash("sha256").update("latex-v5\0").update(JSON.stringify({ block, inline, foreground, dpi: LATEX_DPI })).digest("hex");
 	const pngPath = join(CACHE_DIR, `${key}.png`);
 	await mkdir(CACHE_DIR, { recursive: true });
 	if (existsSync(pngPath)) return { png: (await readFile(pngPath)).toString("base64") };
 
 	const dir = await mkdtemp(join(tmpdir(), "pi-rich-latex-"));
 	try {
-		await writeFile(join(dir, "input.tex"), latexDocument(block), "utf8");
+		await writeFile(join(dir, "input.tex"), latexDocument(block, inline), "utf8");
 		await execFileAsync("latex", ["-interaction=nonstopmode", "input.tex"], { cwd: dir, timeout: TIMEOUT_MS, maxBuffer: MAX_BUFFER });
 		await execFileAsync("dvipng", ["-T", "tight", "-D", String(LATEX_DPI), "-bg", "Transparent", "-fg", foreground, "--truecolor", "-o", "output.png", "input.dvi"], {
 			cwd: dir,
@@ -609,8 +660,19 @@ function parseLatexBlock(source: string): LatexBlock {
 	return { tex: trimmed, wrapDisplay: false };
 }
 
-function latexDocument(block: LatexBlock): string {
-	const body = block.wrapDisplay ? `\\(\\displaystyle ${block.tex}\\)` : block.tex;
+function latexDocument(block: LatexBlock, inline: boolean): string {
+	// FIX 9: an inline formula is drawn into exactly one cell row, so its on-screen
+	// size is cellHeight / imageHeight — the tight ink crop, and nothing else,
+	// decides how big it looks. `\strut` (zero width, one \baselineskip tall, and
+	// counted by tightpage even though it lays down no ink — verified) pins that
+	// denominator, so `$x$` is no longer magnified 2x and a `\frac` is no longer
+	// shrunk to fit; both land at about the size of the surrounding text, sitting on
+	// the strut's baseline so they line up with it too. Text style rather than
+	// \displaystyle for the same reason: \displaystyle stacks the limits of \int and
+	// \sum above and below and draws full-height fraction bars, which is 40-60% more
+	// height to give away. An environment (align, gather) brings its own display
+	// context and is never wrapped.
+	const body = block.wrapDisplay ? (inline ? `\\strut\\(${block.tex}\\)` : `\\(\\displaystyle ${block.tex}\\)`) : block.tex;
 	// No border, inline or display. Every point of it is dead space inside the
 	// image: inline math is scaled to one cell tall, so padding is height stolen
 	// from the glyphs, and a display block is sized from its own pixel height, so
@@ -764,8 +826,11 @@ export function encodePlaceholderRow(id: number, row: number, columns: number): 
 }
 
 /**
- * Inline math is placed on a single text row, so the image is scaled to one
- * cell tall — which is what an inline formula should look like next to text.
+ * Inline math is placed on a single text row, so the image is scaled to one cell
+ * tall and the columns follow from its true aspect. What keeps the glyphs at a
+ * sane size is the `\strut` in latexDocument(), which makes every inline image
+ * about one baselineskip tall whatever the formula is (FIX 9); without it the
+ * scale factor is whatever the ink crop happened to be.
  */
 export function inlineColumns(widthPx: number, heightPx: number, cell: { widthPx: number; heightPx: number }): number {
 	const scale = cell.heightPx / heightPx;

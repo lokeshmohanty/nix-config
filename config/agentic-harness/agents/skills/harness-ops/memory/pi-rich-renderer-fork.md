@@ -139,6 +139,52 @@ is spacing enough.
 pixel row at `LATEX_DPI`. Below that, thin strokes — integral signs, fraction
 bars, subscripts — break up under downsampling.
 
+## FIX 9 — inline formulas were sized by their ink crop (2026-07-29)
+
+Reported as "inline formulae with brackets, integrals and fractions are very small
+and hence not visible". Inline math is placed on **one cell row**, so the image's
+own pixel height is the *only* thing setting its on-screen size: the terminal
+scales the PNG to the cell, so size = cellHeight / imageHeight. With a tight ink
+crop that denominator is whatever the formula happened to contain, and it ran the
+wrong way in both directions — `$x$` (13px) was magnified 2x into a 3-cell letter,
+while `$\displaystyle\sum_{i=1}^n a_i$` (87px) was shrunk to a third of the text
+size. Anything with a bracket, an integral or a fraction was in the second group.
+
+Two changes, both in `latexDocument()`:
+
+- **`\strut` in front of inline math.** Zero width, one `\baselineskip` tall, and —
+  verified — counted by `preview`'s tightpage even though it lays down no ink, so
+  `-T tight` keeps it. Every inline PNG is therefore ≥37px at `LATEX_DPI` 180 and
+  the common ones are *exactly* 37: measured `x`, `x+1`, `\frac{a}{b}`,
+  `\sqrt{x+1}`, `\sum_{i=1}^n a_i` all 37px. They come out at the same size as
+  each other and at roughly terminal-text size, sitting on the strut's baseline so
+  they line up with the prose as well.
+- **Text style, not `\displaystyle`, for inline placement.** `\displaystyle` stacks
+  `\int`/`\sum` limits above and below and draws full-height fraction bars: `\sum`
+  87px→33, `\int` 73→41, `\frac` 55→32, `\left(\frac{p}{q}\right)` 73→55. That
+  height was being paid for by shrinking the glyphs. Environments (`align`,
+  `gather`) bring their own display context and are still never wrapped.
+
+Rendering now depends on *placement*, so the same source renders twice if it
+appears both inline and as a block — `renderKey()` puts inline/block in the cache
+and dedup key, and the on-disk key is `latex-v5`. Block rendering is unchanged:
+`$$…$$` and standalone `$…$` lines still get `\displaystyle` and no strut.
+
+**Two-dimensional formulas get their own line.** A matrix or a `cases` cannot be
+legible in one row whatever the reference height, so an inline image taller than
+`richRenderer.inlineMaxRows` struts (default **1.7**, i.e. ~1.7 text rows) is
+emitted as a block instead — the same paragraph-splitting treatment `$$…$$` has
+had since FIX 5. Inside a list item or table row a raw escape would spill base64
+(defect 3), so there it falls back to LaTeX source instead; `splitMarkdown()`
+records that in the new `blocked` flag on the segment. Natural heights in struts:
+plain/fraction/sqrt 1.0, `\int` with limits 1.13, `\left(\frac{p}{q}\right)` 1.5,
+2x2 matrix 2.0 — so the default breaks out matrices only. Lower it to 1.3 to break
+out bracketed fractions too.
+
+Measure a candidate before changing the threshold; do not guess. Render
+`\strut\(TEX\)` through the same latex + `dvipng -T tight -D 180` pair and divide
+the PNG height by 36.25 (= 14.5pt `\baselineskip` at 180 DPI).
+
 ## Beyond math (2026-07-29)
 
 - **`/math [on|off]`** toggles rendering for the session — bare `/math` flips it.
