@@ -102,7 +102,7 @@ type AssistantMessage = {
 
 type RenderSegment =
 	| { type: "markdown"; markdown: string }
-	| { type: "image"; kind: "math"; source: string; inline?: boolean; png?: string; error?: string };
+	| { type: "image"; kind: "math" | "dot"; source: string; inline?: boolean; png?: string; error?: string };
 
 type LatexBlock = { tex: string; wrapDisplay: boolean };
 
@@ -115,9 +115,36 @@ type RendererConfig = {
 	imageProtocol?: "kitty" | "iterm2";
 };
 
+/** `/math off` puts the transcript back to LaTeX source, e.g. to copy a formula. */
+let renderingEnabled = true;
+
 export default function (pi: ExtensionAPI) {
 	void cleanupCache();
 	void applyImageProtocolOverride();
+
+	pi.registerCommand("math", {
+		description: "Toggle LaTeX/diagram rendering for this session (on|off)",
+		handler: async (args: string, ctx: any) => {
+			const argument = (args ?? "").trim().toLowerCase();
+			renderingEnabled = argument === "on" ? true : argument === "off" ? false : !renderingEnabled;
+			ctx.ui.notify(
+				renderingEnabled
+					? "rich-renderer: rendering formulas and diagrams as images"
+					: "rich-renderer: rendering off — replies keep their LaTeX source",
+				"info",
+			);
+		},
+	});
+
+	// Streaming pre-warm: formulas are rendered when the message finishes, so a
+	// cold cache stalls the whole reply behind latex (~0.4s each). The text is
+	// already streaming in, and a formula is complete as soon as its closing
+	// delimiter arrives — so render it then. By message_end the cache is warm and
+	// the swap is instant.
+	pi.on("message_update" as any, (event: any, ctx: any) => {
+		if (!renderingEnabled) return;
+		void prewarm(messageText(event.message), ctx?.ui?.theme);
+	});
 
 	pi.on("context", (event: any) => {
 		const messages = event.messages.map((message: any) => {
@@ -131,15 +158,12 @@ export default function (pi: ExtensionAPI) {
 
 	pi.on("message_end" as any, async (event: any, ctx: any) => {
 		const message = event.message as unknown as AssistantMessage;
+		if (!renderingEnabled) return;
 		if (message.role !== "assistant") return;
 		if (message.stopReason && !["stop", "length"].includes(message.stopReason)) return;
 		if ((message as any)[ORIGINAL_CONTENT_FIELD]) return;
 
-		const markdown = message.content
-			.filter((part): part is TextContent => part.type === "text" && typeof part.text === "string")
-			.map((part) => part.text)
-			.join("\n\n")
-			.trim();
+		const markdown = messageText(message);
 		if (!markdown || !shouldRender(markdown)) return;
 
 		const [segments, config] = await Promise.all([buildSegments(markdown, ctx.ui.theme), getConfig()]);
@@ -392,6 +416,46 @@ function shouldRender(markdown: string): boolean {
 
 /** Concurrent latex runs. Each render has its own temp dir, so they cannot clash. */
 const RENDER_CONCURRENCY = 4;
+/** Re-scan a streaming message only after this much new text has arrived. */
+const PREWARM_STEP = 48;
+
+function messageText(message: any): string {
+	return (message?.content ?? [])
+		.filter((part: any) => part?.type === "text" && typeof part.text === "string")
+		.map((part: any) => part.text)
+		.join("\n\n")
+		.trim();
+}
+
+/**
+ * Render every *complete* formula in a partially streamed message, so the cache
+ * is warm by the time message_end swaps the content. Fire-and-forget: failures
+ * are irrelevant here, message_end renders again (and hits the cache) anyway.
+ *
+ * `message_update` fires per token, so this is throttled by text length and
+ * remembers what it has already started — otherwise a long reply would rescan
+ * itself hundreds of times.
+ */
+const prewarmed = new Set<string>();
+let prewarmMark = 0;
+
+async function prewarm(markdown: string, theme?: Theme): Promise<void> {
+	// A shorter text than last time means a new message started; without this the
+	// throttle would stay parked at the previous message's length.
+	if (markdown.length < prewarmMark) prewarmMark = 0;
+	if (markdown.length < prewarmMark + PREWARM_STEP) return;
+	prewarmMark = markdown.length;
+	// The theme is part of the cache key (it sets the glyph colour), so prewarming
+	// with anything else would fill the cache with entries message_end never reads.
+	const foreground = dvipngForeground(theme);
+	for (const segment of splitMarkdown(markdown)) {
+		if (segment.type !== "image") continue;
+		const key = `${segment.kind}\0${segment.source}`;
+		if (prewarmed.has(key)) continue;
+		prewarmed.add(key);
+		void renderSource(segment, foreground).catch(() => undefined);
+	}
+}
 
 async function buildSegments(markdown: string, theme: Theme): Promise<RenderSegment[]> {
 	const raw = splitMarkdown(markdown);
@@ -402,12 +466,14 @@ async function buildSegments(markdown: string, theme: Theme): Promise<RenderSegm
 	// to be a serial await inside the loop: a real "Maxwell's equations" reply had
 	// 22 formulas, and at ~0.5s per latex+dvipng pair that is a ten-second stall
 	// before any of the message appears.
-	const sources = [...new Set(raw.filter((segment) => segment.type === "image").map((segment) => segment.source))];
+	const pending = new Map<string, Extract<RenderSegment, { type: "image" }>>();
+	for (const segment of raw) if (segment.type === "image") pending.set(`${segment.kind}\0${segment.source}`, segment);
+	const wanted = [...pending.entries()];
 	const renders = new Map<string, { png?: string; error?: string }>();
-	for (let i = 0; i < sources.length; i += RENDER_CONCURRENCY) {
-		const batch = sources.slice(i, i + RENDER_CONCURRENCY);
-		const results = await Promise.all(batch.map((source) => renderLatex(source, foreground)));
-		batch.forEach((source, index) => renders.set(source, results[index]));
+	for (let i = 0; i < wanted.length; i += RENDER_CONCURRENCY) {
+		const batch = wanted.slice(i, i + RENDER_CONCURRENCY);
+		const results = await Promise.all(batch.map(([, segment]) => renderSource(segment, foreground)));
+		batch.forEach(([key], index) => renders.set(key, results[index]));
 	}
 
 	for (const segment of raw) {
@@ -417,7 +483,7 @@ async function buildSegments(markdown: string, theme: Theme): Promise<RenderSegm
 			else out.push(segment);
 			continue;
 		}
-		out.push({ ...segment, ...renders.get(segment.source) });
+		out.push({ ...segment, ...renders.get(`${segment.kind}\0${segment.source}`) });
 	}
 
 	return out.filter((segment) => segment.type !== "markdown" || segment.markdown.trim().length > 0);
@@ -446,7 +512,9 @@ export function splitMarkdown(markdown: string): RenderSegment[] {
 		if (match.index > cursor) pushMarkdown(markdown.slice(cursor, match.index));
 		const source = match[0];
 		const isCode = source.startsWith("```") || source.startsWith("~~~") || source.startsWith("`");
-		if (isCode || !looksLikeMath(parseLatexBlock(source).tex)) pushMarkdown(source);
+		const graph = isCode ? parseGraphFence(source) : undefined;
+		if (graph) segments.push({ type: "image", kind: "dot", source: graph, inline: false });
+		else if (isCode || !looksLikeMath(parseLatexBlock(source).tex)) pushMarkdown(source);
 		else {
 			// Block rendering needs a formula that owns its line — or display
 			// delimiters, which claim one — and a line that is not inside a list or
@@ -461,9 +529,55 @@ export function splitMarkdown(markdown: string): RenderSegment[] {
 	return segments;
 }
 
+/**
+ * A ```dot / ```graphviz fence, unwrapped to its graph source. Mermaid would fit
+ * here too, but `mmdc` pulls in a headless browser, so only graphviz is wired up.
+ */
+export function parseGraphFence(source: string): string | undefined {
+	const match = /^(?:```|~~~)[ \t]*(dot|graphviz)[ \t]*\r?\n([\s\S]*?)(?:```|~~~)$/.exec(source.trim());
+	const body = match?.[2]?.trim();
+	return body ? body : undefined;
+}
+
+function renderSource(segment: Extract<RenderSegment, { type: "image" }>, foreground: string): Promise<{ png?: string; error?: string }> {
+	return segment.kind === "dot" ? renderDot(segment.source, foreground) : renderLatex(segment.source, foreground);
+}
+
+/**
+ * Graphviz honours no theme, so the ink is forced to the terminal's text colour
+ * on a transparent background — otherwise the default black is invisible on a
+ * dark theme.
+ */
+async function renderDot(source: string, foreground: string): Promise<{ png?: string; error?: string }> {
+	const ink = rgbToHex(parseDvipngForeground(foreground));
+	const key = createHash("sha256").update("dot-v1\0").update(JSON.stringify({ source, ink, dpi: LATEX_DPI })).digest("hex");
+	const pngPath = join(CACHE_DIR, `${key}.png`);
+	await mkdir(CACHE_DIR, { recursive: true });
+	if (existsSync(pngPath)) return { png: (await readFile(pngPath)).toString("base64") };
+
+	const dir = await mkdtemp(join(tmpdir(), "pi-rich-dot-"));
+	try {
+		await writeFile(join(dir, "input.dot"), source, "utf8");
+		await execFileAsync(
+			"dot",
+			["-Tpng", `-Gdpi=${LATEX_DPI / 2}`, "-Gbgcolor=transparent", `-Gfontcolor=${ink}`, `-Gcolor=${ink}`,
+				`-Nfontcolor=${ink}`, `-Ncolor=${ink}`, `-Efontcolor=${ink}`, `-Ecolor=${ink}`,
+				"-o", "output.png", "input.dot"],
+			{ cwd: dir, timeout: TIMEOUT_MS, maxBuffer: MAX_BUFFER },
+		);
+		const png = await readFile(join(dir, "output.png"));
+		await writeFile(pngPath, png);
+		return { png: png.toString("base64") };
+	} catch (error) {
+		return { error: compactError(error) };
+	} finally {
+		await rm(dir, { recursive: true, force: true }).catch(() => {});
+	}
+}
+
 async function renderLatex(source: string, foreground: string): Promise<{ png?: string; error?: string }> {
 	const block = parseLatexBlock(source);
-	const key = createHash("sha256").update("latex-v3\0").update(JSON.stringify({ block, foreground, dpi: LATEX_DPI })).digest("hex");
+	const key = createHash("sha256").update("latex-v4\0").update(JSON.stringify({ block, foreground, dpi: LATEX_DPI })).digest("hex");
 	const pngPath = join(CACHE_DIR, `${key}.png`);
 	await mkdir(CACHE_DIR, { recursive: true });
 	if (existsSync(pngPath)) return { png: (await readFile(pngPath)).toString("base64") };
@@ -505,6 +619,7 @@ function latexDocument(block: LatexBlock): string {
 	return String.raw`\documentclass[12pt]{article}
 \usepackage[active,tightpage]{preview}
 \usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage[version=4]{mhchem}
 \setlength\PreviewBorder{0pt}
 \pagestyle{empty}
 \begin{document}
@@ -515,9 +630,22 @@ ${body}
 `;
 }
 
-function dvipngForeground(theme: Theme): string {
-	const rgb = ansiToRgb(theme.getFgAnsi("text")) ?? { r: 230, g: 237, b: 243 };
+function dvipngForeground(theme?: Theme): string {
+	const rgb = (theme ? ansiToRgb(theme.getFgAnsi("text")) : undefined) ?? DEFAULT_INK;
 	return `rgb ${rgb.r / 255} ${rgb.g / 255} ${rgb.b / 255}`;
+}
+
+const DEFAULT_INK: RGB = { r: 230, g: 237, b: 243 };
+
+/** Read back the `rgb r g b` string dvipng takes, so other tools can share it. */
+function parseDvipngForeground(foreground: string): RGB {
+	const parts = foreground.split(/\s+/).slice(1).map(Number);
+	if (parts.length !== 3 || parts.some((value) => !Number.isFinite(value))) return DEFAULT_INK;
+	return { r: Math.round(parts[0] * 255), g: Math.round(parts[1] * 255), b: Math.round(parts[2] * 255) };
+}
+
+function rgbToHex({ r, g, b }: RGB): string {
+	return `#${[r, g, b].map((value) => value.toString(16).padStart(2, "0")).join("")}`;
 }
 
 function ansiToRgb(ansi: string): RGB | undefined {

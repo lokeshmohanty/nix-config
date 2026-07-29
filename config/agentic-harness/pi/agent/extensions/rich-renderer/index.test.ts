@@ -10,7 +10,7 @@
 // The file must stay strip-only-clean: no TS parameter properties, and
 // `import type` rather than `import { type ... }`.
 import { Markdown, setCapabilities, getCapabilities, setCellDimensions } from "@earendil-works/pi-tui";
-import extension, { splitMarkdown, isStandaloneMath, isDisplayDelimited, reserveRows } from "./index.ts";
+import extension, { splitMarkdown, isStandaloneMath, isDisplayDelimited, reserveRows, parseGraphFence } from "./index.ts";
 
 setCapabilities({ ...getCapabilities(), images: "kitty" });
 setCellDimensions({ widthPx: 10, heightPx: 20 });
@@ -60,7 +60,7 @@ for (const rows of [1, 2, 3, 5, 8, 12, 20]) {
 
 // --- FIX 5/7: one transmission per distinct formula ------------------------
 const handlers: Record<string, Function> = {};
-extension({ on: (name: string, fn: Function) => { handlers[name] = fn; } } as any);
+extension({ on: (name: string, fn: Function) => { handlers[name] = fn; }, registerCommand: () => {} } as any);
 const rendered = await handlers["message_end"](
 	{ message: { role: "assistant", content: [{ type: "text", text: "First $x^2$, then $x^2$, and again $x^2$." }], stopReason: "stop" } },
 	{ ui: { theme, terminal: { columns: 100 } } },
@@ -68,6 +68,13 @@ const rendered = await handlers["message_end"](
 const text: string = rendered?.message?.content?.[0]?.text ?? "";
 check("three identical formulas transmit once", (text.match(/\x1b_Ga=T/g) ?? []).length, 1);
 check("placeholder cells are emitted", text.includes(String.fromCodePoint(0x10eeee)), true);
+
+// --- graphviz fences ------------------------------------------------------
+check("dot fence is recognised", parseGraphFence("```dot\ndigraph { a -> b }\n```"), "digraph { a -> b }");
+check("graphviz fence is recognised", parseGraphFence("```graphviz\ngraph { x }\n```"), "graph { x }");
+check("other fences are left alone", parseGraphFence("```python\nprint(1)\n```"), undefined);
+check("a dot fence becomes a block image", splitMarkdown("text\n\n```dot\ndigraph { a -> b }\n```\n\nmore")
+  .filter((s) => s.type === "image").map((s) => [(s as any).kind, (s as any).inline]), [["dot", false]]);
 
 console.log(failures ? `\n${failures} FAILED` : "\nall passed");
 process.exit(failures ? 1 : 0);

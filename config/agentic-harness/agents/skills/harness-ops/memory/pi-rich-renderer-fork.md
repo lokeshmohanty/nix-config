@@ -139,6 +139,33 @@ is spacing enough.
 pixel row at `LATEX_DPI`. Below that, thin strokes — integral signs, fraction
 bars, subscripts — break up under downsampling.
 
+## Beyond math (2026-07-29)
+
+- **`/math [on|off]`** toggles rendering for the session — bare `/math` flips it.
+  Off means replies keep their LaTeX source, which is what you want when copying a
+  formula out. Verified live: the command fires and the next reply stays as source.
+- **Streaming pre-warm.** `message_update` fires per token; the handler renders
+  every *complete* formula as it arrives, so `message_end` finds a warm cache
+  instead of stalling the whole reply behind latex. Throttled to one rescan per 48
+  new characters and deduplicated per source. It must take the theme from the
+  event's `ctx` — the theme is part of the cache key, so prewarming with a
+  different one fills the cache with entries `message_end` never reads.
+- **Chemistry** via `mhchem` in the preamble: `$\ce{CH4 + 2O2 -> CO2 + 2H2O}$`
+  renders. Free — texlive-full already ships the package.
+- **Graphviz** ` ```dot ` / ` ```graphviz ` fences render through `dot -Tpng`,
+  with node/edge/font colours forced to the theme's text colour on a transparent
+  background (graphviz defaults to black, invisible on a dark theme). Mermaid is
+  **not** wired up: `mmdc` needs a headless browser.
+
+Behaviour change worth knowing: in a terminal *without* kitty graphics, inline math
+now degrades to readable LaTeX source rather than pi-tui's `[Image: image/png WxH]`
+text, because such math is an inline segment now. Display blocks still use the
+`Image` fallback.
+
+Considered and dropped: warming the cache on session resume. Restored messages keep
+their *rendered* content in the session file, `message_end` does not re-fire for
+them, so there is nothing to warm.
+
 ## Testing it
 
 `index.test.ts` sits beside `index.ts` and covers all of the above. It needs
