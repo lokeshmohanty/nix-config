@@ -125,8 +125,9 @@ second source of truth") made mechanical.
 
 - `memory/pi-rich-renderer-fork.md` — why `pi/agent/extensions/rich-renderer/` is a
   vendored fork of the npm package, the two upstream bugs it fixes (kitty `c`/`r`
-  aspect collapse, math matcher deleting prose), and how to test it under
-  `node --experimental-strip-types`.
+  aspect collapse, math matcher deleting prose), how to test it under
+  `node --experimental-strip-types`, and which terminals render its output
+  reliably (kitty yes; ghostty drops placeholders in mixed streams).
 
 ## Anti-rules
 

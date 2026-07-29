@@ -76,11 +76,11 @@
     },
     "cpu": {
         "format": "{usage}% ",
-				"on-click": "footclient htop"
+				"on-click": "kitty --single-instance htop"
     },
     "memory": {
         "format": "{}% ",
-				"on-click": "footclient btm"
+				"on-click": "kitty --single-instance btm"
     },
     "temperature": {
         // "thermal-zone": 2,

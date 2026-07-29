@@ -102,10 +102,33 @@ if** the file stays strip-only-clean: no TS parameter properties, and
 `@earendil-works/pi-coding-agent`, which is not installed. Resolve pi-tui by
 symlinking `node_modules -> ~/.pi/agent/npm/node_modules` next to the test.
 
+## Ghostty drops placeholders in mixed streams (measured 2026-07-29)
+
+Ghostty 1.3.1 is **not** reliable for this extension's output. Rendering identical
+escape bytes in ghostty and kitty 0.46.2, three runs each, on sudarshan:
+
+| case | ghostty | kitty |
+|---|---|---|
+| direct placement `a=T,c=20,r=3` | 3/3 | 3/3 |
+| placeholders only (4 shapes, 1–3 rows, line-start and mid-line) | 3/3 | 3/3 |
+| direct placement **+** placeholders in one stream | 1/3 | 3/3 |
+
+In the mixed case ghostty silently dropped one placeholder placement per run — a
+different one each run, so it is a race, not an unsupported shape. `q=2` suppresses
+the error response, so the formula is simply absent. That mixed stream is exactly
+what this extension emits: display math as a direct placement, inline math as
+placeholders. Diagnose it as a fourth artefact alongside the three below —
+*intermittently missing* images, with no fallback text and no base64.
+
+Use kitty for pi. If ghostty must be used, `richRenderer.inlinePlaceholders: false`
+avoids the mixing at the cost of LaTeX source for inline math.
+
 ## Ruled out along the way
 
-Ghostty itself is fine: it consumes every escape variant (4-chunk transmission,
+Ghostty consumes every *direct placement* escape variant (4-chunk transmission,
 `q=2`, `C=1`, explicit `c`/`r`) — confirmed by drawing seven variants side by side.
+That is what "ghostty is fine" was based on; it does not extend to placeholders
+mixed with direct placements (see the section above).
 pi's `detectCapabilities()` is also right to report `images: "kitty"` for
 `TERM_PROGRAM=ghostty`. Do not chase the terminal or the protocol; the three bugs
 above are all in the extension.

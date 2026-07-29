@@ -6,7 +6,8 @@
     {
       modules.gui = {
         browser.enable = lib.mkDefault config.modules.gui.enable;
-        foot.enable = lib.mkDefault config.modules.gui.enable;
+        # kitty is the default terminal; foot stays available but off by default
+        foot.enable = lib.mkDefault false;
         kitty.enable = lib.mkDefault config.modules.gui.enable;
         ghostty.enable = lib.mkDefault config.modules.gui.enable;
         rofi.enable = lib.mkDefault config.modules.gui.enable;
