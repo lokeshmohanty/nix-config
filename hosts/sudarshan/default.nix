@@ -20,7 +20,7 @@
       {
         imports = [
           ../../home
-          # ./email.nix
+          ./email.nix
         ];
 
         modules = {

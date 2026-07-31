@@ -1,5 +1,10 @@
 {
-  "provider": "exa",
+  "allowBrowserCookies": true,
+  "chromeProfile": "Default",
+  "searchRouting": {
+    "providers": ["anysearch", "gemini"],
+    "fallbackOn": ["transient", "quota", "network"]
+  },
   "webSearch": {
     "enabled": true
   }
