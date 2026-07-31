@@ -56,7 +56,7 @@ prompt, and registers one small `load_tools(groups)` loader that re-activates a
 group additively. pi records the additive change and exposes the new definitions
 before the next model request (`extensions.md` → "Dynamic Tool Loading").
 
-Groups → package: `subagents`, `browser`, `web`, `goal`, `memory`.
+Groups → package: `subagents`, `browser`, `web`, `goal`, `memory`, `lens` (pi-lens), `bg` (pi-patty-bg-tasks). The first five were the original set; `lens` and `bg` were added 2026-07-31 when pi-lens and pi-patty-bg-tasks were installed as Priority-1 packages. The four other Priority-1 packages (`@ayulab/pi-rewind`, `@gotgenes/pi-permission-system`, `@narumitw/pi-plan-mode`, `pi-loop-police`) are always-on — they register event hooks and safety gates with negligible schema cost, so they are not deferred.
 `/load-tools <group...>` activates manually. `/load-tools` with no args opens a
 `SettingsList` toggle in the TUI (Enter/Space flips a row, Esc closes) that can also
 turn a group back **off**; outside the TUI it prints on/off status instead.

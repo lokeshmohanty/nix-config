@@ -44,6 +44,14 @@ const GROUPS: Record<string, { match: string; blurb: string }> = {
 		match: "pi-observational-memory",
 		blurb: "recall observations from earlier sessions",
 	},
+	lens: {
+		match: "pi-lens",
+		blurb: "LSP diagnostics, go-to-definition, references, ast-grep, linters",
+	},
+	bg: {
+		match: "pi-patty-bg-tasks",
+		blurb: "background/long-running bash: start, poll, tail, kill",
+	},
 };
 
 const GROUP_NAMES = Object.keys(GROUPS);

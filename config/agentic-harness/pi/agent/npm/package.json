@@ -2,13 +2,19 @@
   "name": "pi-extensions",
   "private": true,
   "dependencies": {
+    "@ayulab/pi-rewind": "^0.4.6",
     "@earendil-works/pi-ai": "^0.80.3",
     "@earendil-works/pi-tui": "^0.82.1",
+    "@gotgenes/pi-permission-system": "^24.0.0",
+    "@narumitw/pi-plan-mode": "^0.40.1",
     "@tintinweb/pi-subagents": "^0.14.2",
     "pi-agent-browser-native": "^0.2.71",
     "pi-codex-goal": "^0.1.39",
     "pi-image-tools": "^1.4.0",
+    "pi-lens": "^3.8.73",
+    "pi-loop-police": "^1.14.0",
     "pi-observational-memory": "^3.0.3",
-    "pi-web-access": "^0.15.0"
+    "pi-patty-bg-tasks": "^1.1.6",
+    "pi-web-access": "^0.17.0"
   }
 }

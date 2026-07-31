@@ -1,6 +1,6 @@
 # Harnesses — per-harness feature reference
 
-*Purpose: what each installed agent harness supports (context files, skills, hooks, MCP, extensions, config locations) — consult before creating or modifying any harness component. Last verified: 2026-07-24 (live system).*
+*Purpose: what each installed agent harness supports (context files, skills, hooks, MCP, extensions, config locations) — consult before creating or modifying any harness component. Last verified: 2026-07-31 (live system; pi section updated with 6 new Priority-1 packages).*
 
 > Task delegation to skill-aware subagents (the shared `~/.agents/agents/` fleet,
 > `harness-skill-pick`, and the Claude/pi wiring) is documented separately in
@@ -50,12 +50,11 @@ Verified: `pi 0.82.0`, `/nix/store/…-pi-0.82.0/bin/pi`; flake input `llm-agent
 **Capability note:** pi runs against a **local 31B model** by default — keep its tasks simple: docs reading, routine edits, question-answering from `docs/` folders. The `docs/` folders across repos are plain markdown *specifically so pi can answer from them without tooling*.
 
 **Config (`~/.pi/agent/`):**
-- `settings.json` (verified 2026-07-27): `defaultThinkingLevel: medium`, 8 npm `packages` (listed under Extensions below). `defaultProvider`/`defaultModel` get hand-edited often — read the file, don't trust a value quoted here.
-- `models.json` (verified 2026-07-27) — four providers, all `api: openai-completions`:
+- `settings.json` (verified 2026-07-31): `defaultThinkingLevel: medium`, `defaultProvider: router-glm5.2`, `defaultModel: GLM-5.2`, 12 npm `packages` (listed under Extensions below). `defaultProvider`/`defaultModel` get hand-edited often — read the file, don't trust a value quoted here.
+- `models.json` (verified 2026-07-31) — three providers, all `api: openai-completions`:
   - `vllm-gemma4-31` → `google/gemma-4-31B-it` (text+image) — local cluster
-  - `vllm-qwen35-122` → `Qwen/Qwen3.5-122B-A10B` (text+image) — local cluster
-  - `vllm-deepseek4-flash` → `deepseek-ai/DeepSeek-V4-Flash` (text) — local cluster
-  - `sglang-glm5.2` → `GLM-5.2` (text+image, `maxTokens: 4096`) — `bose:8000`
+  - `router-glm5.2` → `GLM-5.2` (text, thinking) — default provider
+  - `gw-glm-5.2` → `zai-org/GLM-5.2` (text+image) — Z.ai gateway
 - `web-search.json` at `~/.pi/web-search.json` (verified): provider `exa`, enabled.
 - `trust.json`, `auth.json`, `sessions/` also live in `~/.pi/agent/`.
 
@@ -63,10 +62,27 @@ Verified: `pi 0.82.0`, `/nix/store/…-pi-0.82.0/bin/pi`; flake input `llm-agent
 
 **Skills:** `~/.pi/agent/skills` → `~/.agents/skills` — same skill set as Claude Code. Extra: `--skill <path>` to load ad-hoc, `--no-skills`.
 
-**Extensions:** npm packages listed in `settings.json` `packages` (verified 2026-07-29: `@tintinweb/pi-subagents`, `pi-web-access`, `pi-codex-goal`, `pi-observational-memory`, `pi-agent-browser-native`, `pi-image-tools`), plus loose dirs under `~/.pi/agent/extensions/`. `--extension/-e <path>`, `--no-extensions`; managed via `pi install/remove/update/list/config`. Extensions register flags, tools, commands, shortcuts, and event handlers (`export default (pi: ExtensionAPI) => { pi.registerTool({...}) }`). No hook events — extensions are the customization mechanism.
+**Extensions:** 12 npm packages listed in `settings.json` `packages` (verified 2026-07-31), plus 5 loose dirs under `~/.pi/agent/extensions/` (ours). `--extension/-e <path>`, `--no-extensions`; managed via `pi install/remove/update/list/config`. Extensions register flags, tools, commands, shortcuts, and event handlers (`export default (pi: ExtensionAPI) => { pi.registerTool({...}) }`). No hook events — extensions are the customization mechanism.
+
+**Always-on npm packages** (loaded at session start, low schema cost):
+- `@tintinweb/pi-subagents` — `Agent`/`get_subagent_result`/`steer_subagent` tools, reads shared fleet from `~/.pi/agent/agents` + `<cwd>/.agents/agents`; skill preloading from `.agents/skills`. **Deferred** by lazy-tools — see below.
+- `pi-web-access` — `web_search`/`source_check`/`fetch_content`/`get_search_content` tools. **Deferred** by lazy-tools.
+- `pi-codex-goal` — `get_goal`/`create_goal`/`update_goal` tools (goal/plan tracking). **Deferred** by lazy-tools.
+- `pi-observational-memory` — `recall` tool (recover source context behind compacted memory). **Deferred** by lazy-tools.
+- `pi-agent-browser-native` — `agent_browser` tool (real browser automation). **Deferred** by lazy-tools.
+- `pi-image-tools` — image attachment helpers. **Deferred** by lazy-tools.
+- `@ayulab/pi-rewind` — git checkpoint/restore: creates before/after commit checkpoints per turn, `/rewind` opens a TUI checkpoint selector (restore code, conversation, or both), `/checkpoint` manages storage. `safeCheckout` blocks rewind if uncommitted changes exist outside checkpoint history. Fails closed on dirty workspace.
+- `@gotgenes/pi-permission-system` — allow/ask/deny permission gates at tool-call time. Config at `~/.pi/agent/extensions/pi-permission-system/config.json` (global) or `<cwd>/.pi/extensions/pi-permission-system/config.json` (project, requires project trust). Cross-cutting `path` surface protects `.env`/`~/.ssh/*`/`*.pem`/`*.key` from all path-aware tools; `bash` surface gates `sudo`/`rm -rf /`/`mkfs`/`dd of=/dev/`. Fails closed on internal errors. Hides disallowed tools before agent start (filters from `getActive()`, preserves lazy-tools parking). Default policy is allow-all; our config layers path/bash denies.
+- `@narumitw/pi-plan-mode` — `/plan` flag toggles Plan mode (read-only: `read`/`grep`/`find`/`ls`/`get_subagent_result` only) vs Build mode (all tools). Decomposition enforced as a mode, not just a skill convention.
+- `pi-loop-police` — detects and interrupts infinite thinking-block and tool-call loops (autonomy safety net). No config needed.
+
+**Deferred npm packages** (heavy schemas, loaded on demand via lazy-tools):
+- `pi-lens` — LSP-backed precision tools: diagnostics, go-to-definition, references, ast-grep, linters. **Deferred** — `load_tools({groups:["lens"]})` or `/load-tools lens`.
+- `pi-patty-bg-tasks` — background/long-running bash: start, poll, tail, kill. **Deferred** — `load_tools({groups:["bg"]})` or `/load-tools bg`.
+
+**Loose-dir extensions** (ours, under `~/.pi/agent/extensions/`):
 - **`pi-harness-delegate`** (`pi/agent/extensions/pi-harness-delegate/`, ours) — registers the `pick_skills` tool wrapping `harness-skill-pick`. See [delegation.md](delegation.md). (VERIFY loose-dir auto-discovery: `pi list`.)
-- **`@tintinweb/pi-subagents`** — provides the `Agent`/`get_subagent_result`/`steer_subagent` tools and reads the shared fleet from `~/.pi/agent/agents` + `<cwd>/.agents/agents`; skill preloading from `.agents/skills`. **Deferred** — see `lazy-tools`.
-- **`lazy-tools`** (`pi/agent/extensions/lazy-tools/`, ours) — see [pi-context-budget.md](pi-context-budget.md). Keeps the heavy packages installed but *inactive* at session start, so their schemas stay out of the system prompt; the model calls `load_tools(groups)` (or you run `/load-tools <group>`) to activate a group for the rest of the session. Groups: `subagents`, `browser`, `web`, `goal`, `memory`. Bare `/load-tools` opens a TUI toggle that also turns groups back off.
+- **`lazy-tools`** (`pi/agent/extensions/lazy-tools/`, ours) — see [pi-context-budget.md](pi-context-budget.md). Keeps the heavy packages installed but *inactive* at session start, so their schemas stay out of the system prompt; the model calls `load_tools(groups)` (or you run `/load-tools <group>`) to activate a group for the rest of the session. Groups: `subagents`, `browser`, `web`, `goal`, `memory`, `lens` (pi-lens), `bg` (pi-patty-bg-tasks). Bare `/load-tools` opens a TUI toggle that also turns groups back off.
 - **`lazy-skills`** (`pi/agent/extensions/lazy-skills/`, ours) — same idea for the skills listing, which is ~46% of the system prompt. Keeps the `PINNED` core described and parks the rest by name only in `<parked_skills>`; the model calls `load_skills(names)` to get a parked skill's description + location, or you run `/skills` for a TUI toggle (`/skills <name...>` to load by name). Parked skills stay fully usable via `/skill:<name>`. See [pi-context-budget.md](pi-context-budget.md).
 - **`rich-renderer`** (`pi/agent/extensions/rich-renderer/`, ours) — vendored fork of the `pi-rich-renderer` npm package (removed from `packages`: running both renders every message twice). Renders LaTeX in assistant replies as terminal images via `latex` + `dvipng`. Display math becomes a real kitty escape on its own line; inline math flows as Unicode placeholders, rendered in text style behind a `\strut` so every inline formula comes out at roughly terminal-text size (anything taller than `richRenderer.inlineMaxRows` — matrices, `cases` — is given its own line instead of being squeezed into one). Also renders `\ce{}` chemistry (mhchem) and ` ```dot `/` ```graphviz ` fences via `dot`. `/math [on|off]` toggles rendering for the session. Needs a terminal that speaks the kitty graphics protocol — **kitty, not ghostty**. Fixes, traps and the `index.test.ts` invocation: `harness-ops` memory `pi-rich-renderer-fork`.
 - **`harness-ops`** (`pi/agent/extensions/harness-ops/`, ours) — `/harness-ops audit|migrate [dir|all]`, a thin wrapper over `harness-init --audit/--migrate` so the project-harness contract can be enforced from inside pi. `all` sweeps every harnessed repo under `~/Projects`, `~/Documents/Research`, and `~/.nix`. Reports go through `pi.sendMessage({display:true})` so the model sees them too and can fix the mandating prose that `--migrate` deliberately refuses to rewrite. Contract: [project-template.md](project-template.md).
