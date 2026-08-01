@@ -4,10 +4,16 @@
 # 2026-07-22). Emits a one-line reminder when the prompt looks like a research
 # decision; silent otherwise so it never taxes mechanical turns.
 #
+# 2026-08-01: once the keyword screen fires, the reminder itself is written by a
+# pi subagent (`pi-nudge`) that sees only the prompt — so it can name the actual
+# decision being made instead of reciting the gate. The screen stays a bash case
+# statement, so the no-op path is unchanged and still <1s.
+#
 # Contract: stdin = JSON event payload; stdout = context injected for the model.
 # Must stay <1s on the no-op path.
 set -uo pipefail
 
+BIN="$(cd "$(dirname "$0")" && pwd)"
 payload="$(cat 2>/dev/null || true)"
 
 # Only for the thesis repo.
@@ -27,7 +33,7 @@ case "$prompt" in
   *scenario*|*seed*|*iclr*|*spotlight*|*novel*|\
   *contribution*|*evaluat*|*sufficient*|*enough*|*conclude*|*shows*|*proves*|\
   *significan*|*compare*|*sota*|*state-of-the-art*|*reviewer*)
-    cat <<'EOF'
+    fallback="$(cat <<'EOF'
 [research-gate] This turn touches a research decision. Per Lokesh's standing
 requests, invoke the `research` skill and run its gate BEFORE acting on or
 reporting the decision:
@@ -42,6 +48,34 @@ Report the hypothesis, the top objections, and their cost to fix. Do not
 suppress an inconvenient critique. (To summon this gate yourself at any time:
 `/critic` in Claude, `just critic` in pi.)
 EOF
+)"
+    # Only the prompt is handed over — no repo state, no session, no skills.
+    ctx="$(mktemp "${TMPDIR:-/tmp}/research-critic-ctx.XXXXXX")"
+    trap 'rm -f "$ctx"' EXIT
+    printf '%s' "$payload" | head -c 8000 >"$ctx"
+
+    # UserPromptSubmit blocks the turn from starting, so this one is kept on a
+    # tighter budget than the Stop nudges: a slow gate reminder is worse than a
+    # generic one.
+    PI_NUDGE_TIMEOUT="${PI_NUDGE_TIMEOUT:-25}" \
+    PI_NUDGE_TASK='You are the research-gate hook for Lokesh'"'"'s thesis repo. The JSON payload
+below contains the prompt he just submitted. A keyword screen flagged it as
+possibly a research decision.
+
+If it really is one — a claim, an experiment plan, a baseline/ablation choice,
+an evaluation, a conclusion drawn from results — reply with at most 5 lines
+telling the agent to run the research gate BEFORE acting: theorist first (what
+existing theory predicts, or the novel falsifiable hypothesis, novelty-checked
+against the literature graph and hypothesis ledger; no hypothesis means no
+severe test), then critic (adversarial ICLR-spotlight review; a HARD GATE for an
+experiment plan — no compute until cleared). Name the specific decision in his
+prompt so the reminder is about his actual question, and say what the hypothesis
+would have to be. Never tell him to suppress an inconvenient critique.
+
+If the keyword matched something mechanical — editing prose, fixing a build,
+renaming a file, a formatting or tooling question that merely contains a
+research word — reply with exactly: SILENT' \
+      "$BIN/pi-nudge" research-gate - "$ctx" <<<"$fallback"
     ;;
 esac
 exit 0

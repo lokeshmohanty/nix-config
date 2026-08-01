@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# Run a hook's judgement in a pi subagent instead of emitting a canned string.
+#
+# Standing request (2026-08-01): hooks and nudges are handled by a pi subagent,
+# given only the context relevant to that hook. Claude's own context is not
+# spent deciding whether a nudge applies, and the nudge can say something
+# specific about *this* session instead of repeating boilerplate.
+#
+# The split that makes this affordable:
+#   * the calling hook keeps its deterministic screen (cwd, git state, markers,
+#     one-per-session guard) — cheap, no model involved, no-op path untouched;
+#   * pi is invoked only once the hook has already decided to fire.
+#
+# Usage:
+#   pi-nudge <name> <fallback-file|-> [context-file...]
+#     <name>          hook name, used in the output prefix and the log
+#     <fallback-file> text printed verbatim if pi is unavailable, errors, or
+#                     times out; "-" means read the fallback from stdin
+#     [context-file]  files pasted into the prompt as the *only* context
+#
+# The task prompt itself is read from PI_NUDGE_TASK (required).
+#
+# Contract: prints the nudge to stdout; exits 0 always. The caller decides
+# whether to exit 2 (Stop/PreToolUse) or 0 (UserPromptSubmit) with the text.
+set -uo pipefail
+
+name="${1:-hook}"
+fallback_file="${2:--}"
+shift 2 || true
+
+: "${PI_NUDGE_TASK:?pi-nudge: PI_NUDGE_TASK must be set}"
+
+fallback="$(if [ "$fallback_file" = "-" ]; then cat; else cat "$fallback_file" 2>/dev/null; fi)"
+
+emit_fallback() {
+  printf '%s\n' "$fallback"
+  exit 0
+}
+
+command -v pi >/dev/null 2>&1 || emit_fallback
+
+# Assemble the prompt: the task, then the context files, and nothing else. No
+# AGENTS.md, no skills, no session history — that is the point of the wrapper.
+prompt="$PI_NUDGE_TASK"
+for f in "$@"; do
+  [ -r "$f" ] || continue
+  prompt+="
+
+--- context: $f ---
+$(head -c 20000 "$f" 2>/dev/null)"
+done
+
+# Tool-free, session-free, context-file-free, skill-free, thinking off. A nudge
+# is a short judgement over text it has already been handed, so anything more is
+# latency the user pays for at the end of a turn.
+# 60s, because the ziq GLM router's latency on a nudge-sized prompt is variable
+# (measured 13s / 20s / >45s on identical shapes, 2026-08-01) and a spurious
+# fallback loses the specific nudge. The registered hook timeout must exceed
+# this; see agents/docs/hooks.md.
+out="$(
+  PI_NUDGE_TASK= timeout "${PI_NUDGE_TIMEOUT:-60}" \
+    pi -p -nc -ns -nt --no-session --thinking off \
+       ${PI_NUDGE_MODEL:+--model "$PI_NUDGE_MODEL"} \
+       "$prompt" 2>/dev/null
+)" || out=""
+
+# A refusal to nudge is a valid answer: pi says SILENT when the screen fired but
+# nothing is actually worth saying, and then the hook stays quiet.
+trimmed="$(printf '%s' "$out" | tr -d '\r' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+case "$trimmed" in
+  "") emit_fallback ;;
+  SILENT|SILENT.*) exit 0 ;;
+esac
+
+printf '%s: %s\n' "$name" "$trimmed"
+exit 0

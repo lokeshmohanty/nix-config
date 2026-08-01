@@ -1,7 +1,14 @@
 # Delegation — auto-routing tasks to skill-aware subagents
 
 *Purpose: how assigned tasks get handled by subagents that auto-pick skills and
-memories, identically under Claude Code and pi. Last verified: 2026-07-24 (live).*
+memories, identically under Claude Code and pi. Last verified: 2026-08-01 (the
+`pi-agent` executor tested live; the rest of the wiring last verified 2026-07-24).*
+
+> **pi is the executor (standing request, 2026-08-01).** Subagentic work is run
+> by pi, from either harness, via `bin/pi-agent`. Claude's own `Agent` tool is
+> reserved for when the user asks for it. The fleet files below remain the single
+> definition of each worker; `pi-agent` is only the dispatcher. Hooks follow the
+> same principle — see [hooks.md](hooks.md) and `bin/pi-nudge`.
 
 ## Goal
 
@@ -47,15 +54,49 @@ the top skills with their `SKILL.md` path and any `memory/*.md` files. `-a` show
 the full menu; `-n N` caps the count. It is the **single source of truth** for
 skill selection — both harnesses use the same logic through it.
 
+## The executor — `pi-agent`
+
+`pi-agent <explorer|implementer|reviewer|orchestrator|path.md> "<task>"` runs the
+fleet body as a headless pi session in the current repo.
+
+| | |
+|---|---|
+| agent resolution | `<repo>/.agents/agents/<name>.md` first, then `~/.agents/agents/<name>.md`; a path or `*.md` argument is used as-is |
+| how the body is applied | `--append-system-prompt <file>` |
+| tools | `explorer`/`reviewer` → `read,bash`; everything else → `read,bash,edit,write`. The read-only pair keeps `bash` because grep, git and `harness-skill-pick` are how they work |
+| context | `--no-context-files`: no AGENTS.md auto-load. The worker reads what its body tells it to, so its context is scoped to the task |
+| skills | discovery left **on** — project and global `SKILL.md`s are available |
+| env | `PI_AGENT_TIMEOUT` (900), `PI_AGENT_MODEL`, `PI_AGENT_THINKING` (medium), `PI_AGENT_EPHEMERAL=1` for `--no-session` |
+| output | worker report on stdout, one dispatch line on stderr; exit status is pi's (124 on timeout, with a note) |
+
+**`-ne` (extensions disabled) is load-bearing, not tidying.** The pi
+permission-system extension prompts before a bash call, and under `-p` there is
+nobody to answer — the worker hangs to its timeout and returns nothing. Verified
+2026-08-01: an identical prompt returns empty with extensions loaded and works
+with `-ne`. The cost is that `pick_skills` (the `pi-harness-delegate` extension)
+is unavailable inside a worker, which is why the fleet bodies invoke
+`harness-skill-pick` over bash instead — same selector, same output.
+
+Smoke test, 2026-08-01: `pi-agent explorer "which file registers the MDX
+components and what is the exact export name?"` answered
+`src/components/mdx.tsx:94`, `mdxComponents`, correctly, in ~20s.
+
 ## Per-harness wiring
 
 **Claude Code** — reads the fleet from `~/.claude/agents` and skills from
-`~/.claude/skills` (committed *relative* symlinks inside the whole-dir-linked
-`~/.claude` → `.../agentic-harness/claude`: `claude/agents → ../agents/agents`,
-`claude/skills → ../agents/skills`). The main loop delegates per the
-`AGENTS.md` "Delegation protocol" section and spawns workers with the `Agent`
-tool; workers call `harness-skill-pick` via Bash and load skills with the Skill
-tool. "Claude extension" = fleet + selector CLI + the self-heal SessionStart hook.
+`~/.claude/skills` (committed *relative* symlinks inside
+`.../agentic-harness/claude`: `claude/agents → ../agents/agents`,
+`claude/skills → ../agents/skills`). The main loop delegates per the `AGENTS.md`
+"Delegation protocol" section, **dispatching workers with `pi-agent` over Bash**
+rather than the `Agent` tool (2026-08-01); each worker then calls
+`harness-skill-pick` itself. "Claude extension" = fleet + selector CLI +
+`pi-agent` + the self-heal SessionStart hook.
+
+Note both `~/.claude` and `~/.claude2` are in use on this machine and share the
+same nix-managed `settings.json` by symlink; one hook registration covers both.
+The 2026-08-01 incident in [hooks.md](hooks.md) is what happens when those inner
+`claude/{agents,skills}` symlinks get deleted — Claude silently loses its fleet
+and skills, which is exactly what `harness-heal` exists to repair.
 
 **pi** — `@tintinweb/pi-subagents` (installed, in `settings.json` packages)
 provides Claude-Code-style subagents. It reads custom agents from

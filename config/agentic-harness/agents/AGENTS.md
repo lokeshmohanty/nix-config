@@ -27,13 +27,18 @@ context is an orchestrator: it scopes the task, delegates, and synthesises.
   pi: the `pick_skills` tool). It lists matching global + project skills and
   their `memory/` files. Load those `SKILL.md`s and read the memories — never
   re-derive what a skill/memory already records.
-- **Delegate to the fleet** (`~/.agents/agents/`, read by both Claude Code and
-  pi via `@tintinweb/pi-subagents`): `orchestrator` (decompose + route a
-  multi-step task), `explorer` (read-only investigation), `implementer` (make
-  the change), `reviewer` (adversarially verify before trusting). Run
+- **Delegate to the fleet** (`~/.agents/agents/`): `orchestrator` (decompose +
+  route a multi-step task), `explorer` (read-only investigation), `implementer`
+  (make the change), `reviewer` (adversarially verify before trusting). Run
   independent units in parallel; pass each worker the skills/memories you found.
+- **pi executes the workers** (standing request, 2026-08-01). Dispatch with
+  `pi-agent <agent> "<task>"` — a headless pi session running that fleet body,
+  scoped to the task, in the current repo. This is the default for both
+  harnesses; Claude's own `Agent` tool is for when the user asks for it.
 - **Trivial turns stay inline.** A one-line answer or a mechanical edit does not
   need a subagent. Delegation is the default for real work, not a tax on chat.
+- Hooks and nudges are also pi's job — they screen deterministically, then hand
+  the judgement to `pi-nudge` with only that hook's context.
 - Full rationale and per-harness wiring: `~/.agents/docs/delegation.md`.
 
 ## Global skills (invoke on demand)

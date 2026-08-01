@@ -5,8 +5,31 @@
 ## Rules
 
 1. **<1s on the no-op path.** Hooks fire constantly; anything slow taxes every session.
-2. **Nix-manage hook scripts** in `~/.nix/config/agentic-harness/bin/` — never loose scripts in `~/.local/bin` for harness hooks.
+2. **Nix-manage hook scripts** in `~/.nix/config/agentic-harness/bin/` — never loose scripts in `~/.local/bin` for harness hooks. (`home/activations.nix` symlinks all of `bin/*` into `~/.local/bin`, so a new script is on PATH after the next `home-manager switch`; hooks call it by absolute path regardless.)
 3. **Document every new hook on this page** (what, event, harness, script path).
+4. **The screen is deterministic; the judgement goes to pi.** Standing request,
+   2026-08-01: a hook decides *whether* to fire in bash/python — cwd, git state,
+   markers, one-per-session guards — and then hands the actual wording to a pi
+   subagent through `bin/pi-nudge`, with only that hook's context. Rule 1 is
+   unaffected because pi is never reached on the no-op path. Every nudge keeps a
+   static fallback that is printed verbatim if pi is missing, errors, or times
+   out, and `pi-nudge` treats a reply of `SILENT` as "screen fired, nothing worth
+   saying" so the hook goes quiet instead of nagging.
+
+### `pi-nudge` — the shared wrapper
+
+`pi-nudge <name> <fallback-file|-> [context-file...]`, task prompt in
+`PI_NUDGE_TASK`. Runs `pi -p -nc -ns -nt --no-session --thinking off`: no
+AGENTS.md, no skills, no tools, no session, nothing but the prompt and the
+context files the hook chose to pass. Env knobs: `PI_NUDGE_TIMEOUT` (default 60),
+`PI_NUDGE_MODEL`.
+
+**Budget the timeouts as a chain.** Measured 2026-08-01 against the ziq GLM-5.2
+router: 10–20s typical for a nudge-sized prompt, but variable enough that 45s
+produced a spurious fallback on an identical shape. Hence `pi-nudge` at 60s, and
+the registered hook `timeout` at **90s** — the registered timeout must exceed
+pi's, or Claude kills the hook before the fallback can print. `UserPromptSubmit`
+hooks block the turn from starting, so they run on a tighter budget (25s).
 
 ## Current inventory (post 2026-07-18 restructure)
 
@@ -14,15 +37,25 @@
 
 | Event | Hook | What it does |
 |---|---|---|
-| Stop | `skill-memory-nudge` | Once per session, when a skill was used but no memory was written, tells the model to capture the session's corrections into the owning skill's `memory/`. Script: `~/.nix/config/agentic-harness/bin/skill-memory-nudge` |
+| SessionStart | `harness-session-start` | Auto-scaffolds `AGENTS.md`/`STATUS.md`/`docs/`/`.agents` in unharnessed git repos. Script: `.../bin/harness-session-start`. Timeout 10s. Deterministic — no pi handoff (see below). |
+| Stop | `docs-nudge` | Screens for "tracked source changed, `docs/` didn't", then asks pi which page is now stale, given the diff and the docs ToC. Script: `.../bin/docs-nudge`. Timeout 90s. |
+| Stop | `skill-memory-nudge` | Screens for "a skill was used, no memory was written", then asks pi what this session's user messages actually contained that must be captured, and where. Script: `.../bin/skill-memory-nudge`. Timeout 90s. |
 
-**Correction (2026-08-01, read against the live file):** the previous revision of
-this page claimed `harness-session-start` (SessionStart) and `docs-nudge` (Stop)
-were registered here as of 2026-07-18. They are **not** — `claude/settings.json`
-carried no `hooks` block at all until `skill-memory-nudge` was added. Both
-scripts still exist in `agentic-harness/bin/` and still work; they are simply
-unregistered. Re-register them deliberately if they are wanted, rather than
-trusting this table's history.
+**Incident, 2026-08-01 — read this before trusting a live settings file.** While
+adding `skill-memory-nudge`, the live `claude/settings.json` was found trimmed to
+`model`/`theme`/`enabledPlugins`: no `hooks` block, no `permissions`, no
+`attribution`, `model` downgraded from `opus[1m]` to `opus`, and 5 of 6
+`enabledPlugins` gone. That was taken at face value and this page was "corrected"
+to say the hooks had never been registered. **Both were wrong.** The committed
+file did have `harness-session-start` and `docs-nudge` registered exactly as the
+2026-07-18 entry claimed; the *live* file had been rewritten by the app (a
+re-login is the likely trigger), and writing to it persisted the loss into the
+nix repo, where an auto-commit (`26f381d`) captured it along with the deletion of
+`claude/{.gitignore,CLAUDE.md,agents,skills,rules/context7.md}` — including the
+committed relative symlinks that give Claude its skills and fleet. Restored from
+`26f381d^` the same day. Lessons: **diff a live harness file against `git show
+HEAD:<path>` before writing to it**, and treat an unexpectedly minimal config as
+evidence of a clobber rather than as ground truth.
 
 `skill-memory-nudge` (added 2026-08-01, standing request): the harness's skills
 are supposed to learn from each use, and a session that takes feedback without
@@ -34,10 +67,25 @@ the global tree (`~/.agents/skills/*/memory`), the current repo's project skills
 (`~/.claude*/projects/<slug>/memory`, where the slug is the repo path with both
 `/` and `.` flattened to `-`). Guarded by `stop_hook_active` and a per-session
 marker in `$TMPDIR`, so it nudges at most once, and it exits before any
-filesystem walk when no skill was used. Measured ~265 ms per invocation, python
-startup dominating. Registered in the nix-managed `claude/settings.json`, which
-**both** `~/.claude` and `~/.claude2` symlink to — one registration covers both
-config dirs.
+filesystem walk when no skill was used. Measured ~265 ms on the no-op path,
+python startup dominating; ~13s when it fires and pi answers. Registered in the
+nix-managed `claude/settings.json`, which **both** `~/.claude` and `~/.claude2`
+symlink to — one registration covers both config dirs.
+
+What it hands pi is deliberately narrow: **only Lokesh's own messages** from the
+transcript (assistant prose, tool results and file contents are dropped — they
+are what makes a transcript expensive and they are not evidence of what he
+asked for), plus the list of memory roots. pi then names the specific
+corrections and which skill's `memory/` should hold each. Verified 2026-08-01
+against a synthetic transcript: it picked out a durable convention, ignored
+`"continue"`, and answered `SILENT` for a session containing only mechanical
+instructions.
+
+`harness-session-start` is the **one hook that stays fully deterministic**. It
+scaffolds missing files and heals symlinks; there is no judgement in it, it runs
+on *every* session start, and an LLM in that path would add latency and
+nondeterminism to a `mkdir`. If it ever needs to decide something, that decision
+is what should go to `pi-nudge` — not the scaffolding.
 
 ### AXI SessionStart hooks — REMOVED 2026-07-27
 
@@ -54,7 +102,7 @@ The three AXI announcement hooks (`gh-axi`, `chrome-devtools-axi`, `lavish-axi`)
 
 | Event | Hook | What it does |
 |---|---|---|
-| UserPromptSubmit | `research-critic-nudge` | Added 2026-07-22. Keeps the adversarial ICLR-spotlight reviewer in play without the user asking: on prompts that look like a *research decision* (keyword screen over the prompt), injects the research-gate chain: `research-theorist` (theory grounding / novel falsifiable hypothesis, novelty-checked against litgraph) then `research-critic` (adversarial ICLR-spotlight review; a HARD GATE for experiment plans). Silent for non-thesis cwd and for mechanical prompts. Script: `~/.nix/config/agentic-harness/bin/research-critic-nudge` (no-op path ~8 ms). |
+| UserPromptSubmit | `research-critic-nudge` | Added 2026-07-22. Keeps the adversarial ICLR-spotlight reviewer in play without the user asking: on prompts that look like a *research decision* (keyword screen over the prompt), injects the research-gate chain — theorist (theory grounding / novel falsifiable hypothesis, novelty-checked against litgraph) then critic (adversarial ICLR-spotlight review; a HARD GATE for experiment plans). Silent for non-thesis cwd and for mechanical prompts. Script: `~/.nix/config/agentic-harness/bin/research-critic-nudge` (no-op path ~23 ms). **Since 2026-08-01** the reminder is written by pi (`pi-nudge`, 25s budget) from the prompt alone, so it names the actual decision being made; the keyword `case` statement still does the screening, and the old static text is the fallback. Verified: a baseline/ablation prompt produced a decision-specific gate, a "fix the typo in the results section" prompt produced `SILENT`, and a non-thesis cwd still exits in ~23 ms. |
 
 ### Gortex hooks — REMOVED globally 2026-07-18, now per-repo only
 

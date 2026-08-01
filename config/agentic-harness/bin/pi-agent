@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+# Run a fleet subagent as a headless pi session.
+#
+# Standing request (2026-08-01): subagentic work is executed by pi, not by
+# Claude's own Agent tool. The fleet under agents/agents/ stays the single
+# definition of each worker's behaviour; this script is what makes Claude able to
+# dispatch to it.
+#
+# Usage:
+#   pi-agent <explorer|implementer|reviewer|orchestrator|path.md> "<task>"
+#   pi-agent explorer "where does the MDX pipeline register components?"
+#
+# Env:
+#   PI_AGENT_TIMEOUT   seconds before the worker is killed (default 900)
+#   PI_AGENT_MODEL     override the model (default: pi's configured default)
+#   PI_AGENT_THINKING  off|minimal|low|medium|high|xhigh|max (default medium)
+#   PI_AGENT_EPHEMERAL 1 to leave no session file behind
+#
+# Exit status is pi's. The worker's report goes to stdout; dispatch diagnostics
+# go to stderr so a caller can keep them apart.
+set -uo pipefail
+
+die() { printf 'pi-agent: %s\n' "$*" >&2; exit 2; }
+
+[ "$#" -ge 2 ] || die 'usage: pi-agent <agent> "<task>"'
+agent="$1"; shift
+task="$*"
+
+command -v pi >/dev/null 2>&1 || die 'pi is not on PATH'
+
+# Resolve the agent definition: project fleet wins over the global one, matching
+# the precedence documented in agents/docs/delegation.md.
+resolve_agent() {
+  local name="$1" root
+  case "$name" in
+    */*|*.md)
+      [ -r "$name" ] && { printf '%s' "$name"; return 0; }
+      ;;
+  esac
+  root="$(git rev-parse --show-toplevel 2>/dev/null)"
+  for candidate in \
+    ${root:+"$root/.agents/agents/$name.md"} \
+    "$HOME/.agents/agents/$name.md"
+  do
+    [ -r "$candidate" ] && { printf '%s' "$candidate"; return 0; }
+  done
+  return 1
+}
+
+def="$(resolve_agent "$agent")" || die "no such fleet agent: $agent (looked in <repo>/.agents/agents and ~/.agents/agents)"
+
+# Read-only roles get no edit/write tool at all; the rest get the full set.
+# `bash` is required even for the read-only pair — grep, git and
+# harness-skill-pick are how they work.
+case "$(basename "$def" .md)" in
+  explorer|reviewer) tools="read,bash" ;;
+  *)                 tools="read,bash,edit,write" ;;
+esac
+
+# Extensions are disabled deliberately. The pi permission-system extension
+# prompts before a bash call, and in `-p` (non-interactive) mode there is nobody
+# to answer: the worker hangs until its timeout with no output. Verified
+# 2026-08-01 — identical prompt returns nothing with extensions loaded and works
+# with `-ne`. The cost is that `pick_skills` (the pi-harness-delegate extension)
+# is unavailable, which is why the fleet bodies call `harness-skill-pick` over
+# bash instead; that CLI is on PATH and is the same selector.
+set -- -p -ne --no-context-files \
+  --append-system-prompt "$def" \
+  --tools "$tools" \
+  --thinking "${PI_AGENT_THINKING:-medium}"
+
+[ -n "${PI_AGENT_MODEL:-}" ] && set -- "$@" --model "$PI_AGENT_MODEL"
+if [ "${PI_AGENT_EPHEMERAL:-0}" = "1" ]; then
+  set -- "$@" --no-session
+else
+  set -- "$@" --name "$(basename "$def" .md): $(printf '%.60s' "$task")"
+fi
+
+# AGENTS.md is not auto-loaded (--no-context-files): a worker gets the fleet body
+# plus what it decides to read, so its context is scoped to the task instead of
+# carrying every project index. The body tells it to read AGENTS.md/STATUS.md
+# when it needs them.
+printf 'pi-agent: %s (%s) in %s\n' "$(basename "$def" .md)" "$tools" "$(pwd)" >&2
+
+timeout "${PI_AGENT_TIMEOUT:-900}" pi "$@" "$task"
+status=$?
+[ "$status" -eq 124 ] && printf 'pi-agent: worker timed out after %ss\n' "${PI_AGENT_TIMEOUT:-900}" >&2
+exit "$status"

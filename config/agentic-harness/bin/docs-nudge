@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 # Claude Code Stop hook: once per session, remind the agent when tracked source
 # changed but docs/ did not. Exit 2 + stderr feeds the reminder back to the model.
+#
+# 2026-08-01: the *judgement* — whether this diff actually warrants a docs
+# update, and which page — is made by a pi subagent via `pi-nudge`, given only
+# the changed-file list and the docs/ table of contents. The screen below stays
+# deterministic and cheap, so the no-op path never involves a model.
 set -uo pipefail
+
+BIN="$(cd "$(dirname "$0")" && pwd)"
 
 command -v python3 >/dev/null 2>&1 || exit 0
 input="$(cat 2>/dev/null || true)"
@@ -25,8 +32,48 @@ src="$(printf '%s\n' "$changed" | grep -vE '^(docs/|STATUS\.md|AGENTS\.md|TODO\.
 printf '%s\n' "$changed" | grep -qE '^docs/' && exit 0
 
 touch "$marker"
+
+fallback="docs-nudge: tracked files are modified ($(printf '%s ' $src)) but docs/ was not updated.
+If this session made significant changes, update docs/ (docs-sync skill); otherwise state briefly why no docs update is needed and finish."
+
+# Only the context this judgement needs: which files changed, how much, and what
+# pages exist to update. Not the diff bodies, not the session.
+ctx="$(mktemp "${TMPDIR:-/tmp}/docs-nudge-ctx.XXXXXX")"
+trap 'rm -f "$ctx"' EXIT
 {
-  echo "docs-nudge: tracked files are modified ($(printf '%s ' $src)) but docs/ was not updated."
-  echo "If this session made significant changes, update docs/ (docs-sync skill); otherwise state briefly why no docs update is needed and finish."
-} >&2
+  echo "repo: $ROOT"
+  echo
+  echo "--- changed tracked files (with line counts) ---"
+  git -C "$ROOT" diff --stat HEAD -- $(printf '%s ' $changed) 2>/dev/null | tail -40
+  echo
+  # The diff body, capped. Without it the judgement is guesswork — asked for a
+  # verdict from --stat alone, pi correctly answers "show me the diff".
+  echo "--- diff (truncated) ---"
+  git -C "$ROOT" diff -U2 HEAD -- $(printf '%s ' $changed) 2>/dev/null | head -c 12000
+  echo
+  echo "--- docs/ pages available to update ---"
+  ls -1 "$ROOT/docs" 2>/dev/null | head -30
+  echo
+  echo "--- docs/index.md ---"
+  head -c 3000 "$ROOT/docs/index.md" 2>/dev/null
+} >"$ctx"
+
+out="$(
+  PI_NUDGE_TASK='You are the docs-drift hook for Lokesh'"'"'s agent harness. A coding session
+changed tracked source files in a repo whose docs/ folder was not touched.
+
+From the context below, judge whether this change actually warrants a docs
+update, and if so, name the specific page and the specific thing that is now
+stale or missing. Reply with at most 4 lines addressed to the agent finishing
+the session. Be concrete about the page and the section.
+
+If the changed files are cosmetic, generated, or plainly do not affect anything
+documented (formatting, lockfiles, assets, a typo), reply with exactly: SILENT' \
+    "$BIN/pi-nudge" docs-nudge - "$ctx" <<<"$fallback"
+)"
+
+# pi-nudge prints nothing when it judges the drift immaterial — then the session
+# stops cleanly instead of being interrupted by a nudge nobody needed.
+[ -n "$out" ] || exit 0
+printf '%s\n' "$out" >&2
 exit 2

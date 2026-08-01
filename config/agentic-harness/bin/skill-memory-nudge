@@ -34,8 +34,94 @@ MAX_SCAN_BYTES = 32 * 1024 * 1024
 SKILL_MARKERS = (b'"name":"Skill"', b'"name": "Skill"', b"SKILL.md")
 
 
+PI_NUDGE = pathlib.Path(__file__).resolve().parent / "pi-nudge"
+
+TASK = """You are the skill-memory hook for Lokesh's agent harness. A coding \
+session just ended. It used a skill but wrote nothing into any skill's memory/ \
+directory, which means anything it was told is about to be lost.
+
+Below are the things Lokesh actually said during that session, in order, and \
+the list of memory roots in scope. Decide what — if anything — must be written \
+down before the session ends.
+
+Reply with at most 6 lines, addressed to the agent that is finishing the \
+session. Name the specific corrections, preferences or traps you can see in his \
+messages, and for each one say which skill's memory/ should hold it. Quote his \
+phrasing where it matters. Do not invent items that are not in the messages, \
+and do not restate generic advice about writing memories.
+
+If his messages contain nothing durable — only mechanical instructions like \
+"continue", "run the tests", "fix the typo" — reply with exactly: SILENT"""
+
+
 def bail():
     sys.exit(0)
+
+
+def user_turns(tpath, limit=40):
+    """The user's own messages, which is the only context this hook's judgement
+    needs. Tool output, assistant prose and file contents are deliberately left
+    out — they are what makes a transcript expensive and they are not evidence
+    of what Lokesh asked for."""
+    turns = []
+    try:
+        with tpath.open("r", errors="replace") as fh:
+            for line in fh:
+                if '"user"' not in line:
+                    continue
+                try:
+                    rec = json.loads(line)
+                except Exception:
+                    continue
+                if rec.get("type") != "user":
+                    continue
+                content = (rec.get("message") or {}).get("content")
+                if isinstance(content, str):
+                    text = content
+                elif isinstance(content, list):
+                    text = "\n".join(
+                        p.get("text", "")
+                        for p in content
+                        if isinstance(p, dict) and p.get("type") == "text"
+                    )
+                else:
+                    continue
+                text = text.strip()
+                # Skip hook output, reminders and tool-result envelopes fed back
+                # as user turns; they are not Lokesh talking.
+                if not text or text.startswith(("<system-reminder", "<local-command")):
+                    continue
+                turns.append(text[:1500])
+    except OSError:
+        return []
+    return turns[-limit:]
+
+
+def nudge_via_pi(payload, tpath, where, fallback):
+    """Hand the judgement to a pi subagent, with only this hook's context."""
+    turns = user_turns(tpath)
+    if not turns or not PI_NUDGE.is_file():
+        return fallback
+
+    context = "\n\n".join(f"[{i}] {t}" for i, t in enumerate(turns, 1))
+    context += f"\n\n--- memory roots in scope ---\n{where}"
+
+    try:
+        proc = subprocess.run(
+            [str(PI_NUDGE), "skill-memory-nudge", "-"],
+            input=fallback,
+            capture_output=True,
+            text=True,
+            timeout=int(os.environ.get("SKILL_MEMORY_NUDGE_TIMEOUT", "75")),
+            env={**os.environ, "PI_NUDGE_TASK": TASK + "\n\n--- his messages ---\n" + context},
+        )
+    except Exception:
+        return fallback
+    out = proc.stdout.strip()
+    if not out:
+        # pi answered SILENT: the screen fired but nothing is worth saying.
+        sys.exit(0)
+    return out + "\n"
 
 
 def main():
@@ -144,7 +230,7 @@ def main():
 
     marker.touch()
     where = "; ".join(str(r) for r in roots if r.is_dir())
-    sys.stderr.write(
+    fallback = (
         "skill-memory-nudge: this session used a skill but wrote no skill memory.\n"
         "Skills are supposed to learn from each use. Before you finish:\n"
         "  1. Re-read what Lokesh said this session — corrections, preferences, "
@@ -157,6 +243,7 @@ def main():
         f"Memory roots in scope: {where}\n"
         "If nothing durable came up this session, say so in one line and finish.\n"
     )
+    sys.stderr.write(nudge_via_pi(payload, tpath, where, fallback))
     sys.exit(2)
 
 
