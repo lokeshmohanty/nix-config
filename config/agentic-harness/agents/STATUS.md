@@ -2,7 +2,23 @@
 
 *Update in place; keep short. History lives in `~/.nix` git log.*
 
-## Current (2026-07-24)
+## Current (2026-08-01)
+
+- **pi is the executor (2026-08-01):** subagents dispatch via `bin/pi-agent`,
+  hook judgements via `bin/pi-nudge`. `docs-nudge`, `skill-memory-nudge` (new)
+  and `research-critic-nudge` now screen in bash/python and let pi write the
+  actual nudge. Full: `docs/delegation.md`, `docs/hooks.md`.
+  - **TODO:** `home-manager switch` to put `pi-agent`/`pi-nudge` on PATH —
+    symlinked by hand into `~/.local/bin` for now.
+  - **Open question:** nudge latency is 10–20s (ziq GLM-5.2 router), occasionally
+    over 45s. `PI_NUDGE_MODEL` exists to point nudges at something faster if the
+    end-of-turn wait becomes annoying.
+- **Config clobber, 2026-08-01 (resolved):** the app rewrote the live
+  `claude/settings.json` down to model/theme/plugins; it was written back and
+  committed before anyone noticed, losing the registered hooks, `permissions`,
+  `attribution`, `opus[1m]`, 5 plugins and the `claude/{agents,skills}` symlinks.
+  Restored from `26f381d^` in `2d03e61`. **Diff a live harness file against
+  `git show HEAD:<path>` before writing to it.** Write-up in `docs/hooks.md`.
 
 - **Delegation layer (2026-07-24):** tasks now route to a shared skill-aware
   subagent fleet (`~/.agents/agents/{orchestrator,explorer,implementer,reviewer}.md`),
