@@ -7,35 +7,43 @@
   ...
 }:
 (import ../../home/email/accounts.nix {
-  inherit config lib mkCalendar mkContact mkEmail;
-}) {
-  main = {
-    address = "lokesh1197@gmail.com";
-    flavor = "gmail";
-    signature = ''
-      Lokesh Mohanty
-    '';
-    primary = true;
-  };
+  inherit
+    config
+    lib
+    mkCalendar
+    mkContact
+    mkEmail
+    ;
+})
+  {
+    main = {
+      address = "lokesh1197@gmail.com";
+      flavor = "gmail";
+      signature = ''
+        Lokesh Mohanty
+      '';
+      primary = true;
+    };
 
-  personal = {
-    address = "me.lokeshmohanty@gmail.com";
-    flavor = "gmail";
-    signature = "Lokesh Mohanty";
-  };
+    personal = {
+      address = "me.lokeshmohanty@gmail.com";
+      flavor = "gmail";
+      signature = "Lokesh Mohanty";
+    };
 
-  zenteiq = {
-    address = "lokeshmohanty@zenteiq.com";
-    flavor = "gmail";
-    signature = "Lokesh Mohanty";
-  };
+    zenteiq = {
+      address = "lokeshmohanty@zenteiq.com";
+      flavor = "gmail";
+      signature = "Lokesh Mohanty";
+      folders.trash = "[Gmail]/Bin";
+    };
 
-  iisc = {
-    address = "lokeshm@iisc.ac.in";
-    flavor = "outlook";
-    signature = ''
-      Lokesh Mohanty
-      Indian Institute of Science
-    '';
-  };
-}
+    iisc = {
+      address = "lokeshm@iisc.ac.in";
+      flavor = "outlook";
+      signature = ''
+        Lokesh Mohanty
+        Indian Institute of Science
+      '';
+    };
+  }

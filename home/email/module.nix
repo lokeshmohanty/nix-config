@@ -20,6 +20,7 @@ let
     userName = account.userName or account.address;
     flavor = account.mail.flavor;
     passwordCommand = account.passwordCommand;
+    folders = account.folders or { };
 
     imap.authentication = if account.mail.oauth or false then "xoauth2" else "app";
     smtp.authentication = if account.mail.oauth or false then "xoauth2" else "app";
@@ -40,18 +41,36 @@ let
     };
 
     msmtp.enable = true;
-    msmtp.extraConfig = { auth = "xoauth2"; };
+    msmtp.extraConfig = {
+      auth = "xoauth2";
+    };
 
     imapnotify = {
       enable = true;
       boxes = [ "INBOX" ];
       onNotify = "mbsync ${name}";
       onNotifyPost = ''
+        # `notmuch new` runs the postNew hook, which strips the `new` tag before
+        # it returns, so `tag:new` is always empty here. Diff this account's
+        # inbox message IDs before vs. after indexing to find genuinely new mail.
+        before_file=$(${pkgs.coreutils}/bin/mktemp)
+        ${pkgs.notmuch}/bin/notmuch search --output=messages "tag:inbox and tag:${name}" > "$before_file"
         ${pkgs.notmuch}/bin/notmuch new
-        msg=$(${pkgs.notmuch}/bin/notmuch search --limit=1 --sort=newest-first --format=json tag:inbox and tag:${name} | ${pkgs.jq}/bin/jq '.[0]["authors"], .[0]["subject"]' | ${pkgs.coreutils}/bin/paste -d': ' - -)
-        if [ -n "$msg" ]; then ${pkgs.libnotify}/bin/notify-send "(${name}) $msg"; fi
+        newids=$(${pkgs.notmuch}/bin/notmuch search --sort=newest-first --output=messages "tag:inbox and tag:${name}" | ${pkgs.gawk}/bin/awk 'NR==FNR{seen[$0]=1; next} !($0 in seen)' "$before_file" -)
+        ${pkgs.coreutils}/bin/rm -f "$before_file"
+        count=$(printf '%s\n' "$newids" | ${pkgs.gawk}/bin/awk 'NF{c++} END{print c+0}')
+        if [ "$count" -gt 0 ]; then
+          details=$(printf '%s\n' "$newids" | ${pkgs.coreutils}/bin/head -n 3 | while IFS= read -r mid; do
+            # Escape & and < for the notification daemon's StyledText/Pango markup so
+            # raw ampersands/angle-brackets in sender/subject don't hide the body.
+            [ -n "$mid" ] && ${pkgs.notmuch}/bin/notmuch search --format=json "$mid" | ${pkgs.jq}/bin/jq -r '.[0] | ( ((.authors // "Unknown") | split("|")[0] | gsub("^\\s+|\\s+$";"")) + ": " + (.subject // "(no subject)") ) | gsub("&";"&amp;") | gsub("<";"&lt;")'
+          done)
+          ${pkgs.libnotify}/bin/notify-send "(${name}) $count new" "$(printf '%s\n' "$details")"
+        fi
       '';
-      extraConfig = { xoAuth2 = true; };
+      extraConfig = {
+        xoAuth2 = true;
+      };
     }
     // (account.mail.imapnotify or { });
 
@@ -115,24 +134,35 @@ in
     }
 
     (lib.mkIf cfg.enable {
-      home.packages = with pkgs; [
-        aspell
-        oauth2ms
-        w3m-full
-      ] ++ [
-        self.packages.${pkgs.stdenv.hostPlatform.system}.oauthman
-      ];
+      home.packages =
+        with pkgs;
+        [
+          aspell
+          oauth2ms
+          w3m-full
+        ]
+        ++ [
+          self.packages.${pkgs.stdenv.hostPlatform.system}.oauthman
+        ];
 
       programs.khard = {
         enable = true;
         settings = {
           general = {
             default_action = "list";
-            editor = [ "nvim" "-i" "NONE" ];
+            editor = [
+              "nvim"
+              "-i"
+              "NONE"
+            ];
           };
           "contact table" = {
             display = "formatted_name";
-            preferred_email_address_type = [ "pref" "work" "home" ];
+            preferred_email_address_type = [
+              "pref"
+              "work"
+              "home"
+            ];
           };
         };
       };
@@ -165,16 +195,29 @@ in
             map (account: "+${account.name} -- tag:new and (${accountTagQuery account})") emailAccounts
           )}
           ${lib.concatStringsSep "\n" (
-            map (account: "+inbox -- tag:new and path:${account.name}/${account.folders.inbox}/cur") emailAccounts
+            map (
+              account: "+inbox -- tag:new and path:\"${account.name}/${account.folders.inbox}/cur\""
+            ) emailAccounts
           )}
           ${lib.concatStringsSep "\n" (
-            map (account: "+sent -inbox -unread -- tag:new and path:${account.name}/${account.folders.sent}/cur") emailAccounts
+            map (
+              account: "+sent -inbox -unread -- tag:new and path:\"${account.name}/${account.folders.sent}/cur\""
+            ) emailAccounts
           )}
           ${lib.concatStringsSep "\n" (
-            map (account: "+draft -inbox -unread -- tag:new and path:${account.name}/${account.folders.drafts}/cur") emailAccounts
+            map (account: "+sent -inbox -unread -- tag:new and from:${account.address}") emailAccounts
           )}
           ${lib.concatStringsSep "\n" (
-            map (account: "+trash +deleted -inbox -unread -- tag:new and path:${account.name}/${account.folders.trash}/cur") emailAccounts
+            map (
+              account:
+              "+draft -inbox -unread -- tag:new and path:\"${account.name}/${account.folders.drafts}/cur\""
+            ) emailAccounts
+          )}
+          ${lib.concatStringsSep "\n" (
+            map (
+              account:
+              "+trash +deleted -inbox -unread -- tag:new and path:\"${account.name}/${account.folders.trash}/cur\""
+            ) emailAccounts
           )}
           -new -- tag:new
           EOM
