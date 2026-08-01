@@ -1,6 +1,6 @@
 # Hooks — inventory + how to add one
 
-*Purpose: the current hook inventory across all harnesses and the registration recipe per harness. Every new hook must be recorded here. Last verified: 2026-07-18 (live system; restructure of the same date partially applied — pending items flagged).*
+*Purpose: the current hook inventory across all harnesses and the registration recipe per harness. Every new hook must be recorded here. Last verified: 2026-08-01 (Claude global section read against the live `claude/settings.json`; other sections still carry their 2026-07-18 verification).*
 
 ## Rules
 
@@ -14,10 +14,30 @@
 
 | Event | Hook | What it does |
 |---|---|---|
-| SessionStart | `harness-session-start` | Auto-scaffolds `AGENTS.md`/`STATUS.md`/`docs/`/`.agents` in unharnessed git repos. Script: `~/.nix/config/agentic-harness/bin/harness-session-start` |
-| Stop | `docs-nudge` | Reminds when tracked source changed but `docs/` didn't. Script: `~/.nix/config/agentic-harness/bin/docs-nudge` |
+| Stop | `skill-memory-nudge` | Once per session, when a skill was used but no memory was written, tells the model to capture the session's corrections into the owning skill's `memory/`. Script: `~/.nix/config/agentic-harness/bin/skill-memory-nudge` |
 
-Applied 2026-07-18: `harness-session-start` (SessionStart) and `docs-nudge` (Stop) are registered in the nix-managed settings.json; scripts live in `agentic-harness/bin/` (tested: scaffold, idempotency, one-nudge-per-session).
+**Correction (2026-08-01, read against the live file):** the previous revision of
+this page claimed `harness-session-start` (SessionStart) and `docs-nudge` (Stop)
+were registered here as of 2026-07-18. They are **not** — `claude/settings.json`
+carried no `hooks` block at all until `skill-memory-nudge` was added. Both
+scripts still exist in `agentic-harness/bin/` and still work; they are simply
+unregistered. Re-register them deliberately if they are wanted, rather than
+trusting this table's history.
+
+`skill-memory-nudge` (added 2026-08-01, standing request): the harness's skills
+are supposed to learn from each use, and a session that takes feedback without
+writing it down throws it away. Fires only when both conditions hold — the
+transcript shows a skill was loaded or invoked, *and* no `.md` under any memory
+root has an mtime later than the session's first transcript record. Roots are
+the global tree (`~/.agents/skills/*/memory`), the current repo's project skills
+(`<root>/.agents/skills/*/memory`), and Claude's per-project auto-memory store
+(`~/.claude*/projects/<slug>/memory`, where the slug is the repo path with both
+`/` and `.` flattened to `-`). Guarded by `stop_hook_active` and a per-session
+marker in `$TMPDIR`, so it nudges at most once, and it exits before any
+filesystem walk when no skill was used. Measured ~265 ms per invocation, python
+startup dominating. Registered in the nix-managed `claude/settings.json`, which
+**both** `~/.claude` and `~/.claude2` symlink to — one registration covers both
+config dirs.
 
 ### AXI SessionStart hooks — REMOVED 2026-07-27
 

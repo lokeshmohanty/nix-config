@@ -1,0 +1,164 @@
+#!/usr/bin/env python3
+"""Claude Code Stop hook: keep skill memories current automatically.
+
+Standing request (2026-08-01): whenever a session actually uses a skill, any
+correction or preference Lokesh gave during it must land in that skill's
+`memory/` before the session ends. Skills whose memory never grows go stale,
+and the next session re-derives what it was already told.
+
+This hook fires at most once per session, and only when BOTH hold:
+
+  * a skill was loaded or invoked during the session, and
+  * no memory file anywhere in scope was written since the session started.
+
+Scope is every skill's `memory/` — the global tree (~/.agents/skills), the
+current repo's project skills (<root>/.agents/skills), and Claude's own
+per-project auto-memory store. Applies to all skills and all memories, not to
+any particular one.
+
+Contract: stdin = JSON event payload; exit 2 + stderr feeds the text back to
+the model. Must stay fast on the no-op path (it exits before any filesystem
+walk when no skill was used).
+"""
+
+import json
+import os
+import pathlib
+import subprocess
+import sys
+import tempfile
+from datetime import datetime, timezone
+
+# Bound the transcript scan so a very long session cannot stall the hook.
+MAX_SCAN_BYTES = 32 * 1024 * 1024
+SKILL_MARKERS = (b'"name":"Skill"', b'"name": "Skill"', b"SKILL.md")
+
+
+def bail():
+    sys.exit(0)
+
+
+def main():
+    try:
+        payload = json.load(sys.stdin)
+    except Exception:
+        bail()
+
+    # Do not re-fire on the continuation the previous nudge caused.
+    if payload.get("stop_hook_active"):
+        bail()
+
+    session_id = payload.get("session_id") or "nosession"
+    marker = pathlib.Path(tempfile.gettempdir()) / f"skill-memory-nudge-{session_id}"
+    if marker.exists():
+        bail()
+
+    transcript = payload.get("transcript_path")
+    if not transcript:
+        bail()
+    tpath = pathlib.Path(transcript)
+    if not tpath.is_file():
+        bail()
+
+    # 1. Was a skill used at all? Cheapest discriminator, so it runs first.
+    used_skills = False
+    try:
+        with tpath.open("rb") as fh:
+            scanned = 0
+            tail = b""
+            while scanned < MAX_SCAN_BYTES:
+                chunk = fh.read(1 << 20)
+                if not chunk:
+                    break
+                scanned += len(chunk)
+                window = tail + chunk
+                if any(m in window for m in SKILL_MARKERS):
+                    used_skills = True
+                    break
+                tail = window[-32:]
+    except OSError:
+        bail()
+    if not used_skills:
+        bail()
+
+    # 2. When did the session start? First transcript record; fall back to the
+    #    file's own mtime if it carries no usable timestamp.
+    started = None
+    try:
+        with tpath.open("r", errors="replace") as fh:
+            first = fh.readline()
+        ts = json.loads(first).get("timestamp")
+        if ts:
+            started = datetime.fromisoformat(ts.replace("Z", "+00:00")).timestamp()
+    except Exception:
+        started = None
+    if started is None:
+        try:
+            started = tpath.stat().st_mtime
+        except OSError:
+            bail()
+
+    # 3. Collect every memory root in scope.
+    roots = []
+    home = pathlib.Path.home()
+    roots.append(home / ".agents" / "skills")
+
+    cwd = payload.get("cwd") or os.getcwd()
+    try:
+        top = subprocess.run(
+            ["git", "-C", cwd, "rev-parse", "--show-toplevel"],
+            capture_output=True, text=True, timeout=3,
+        )
+        repo = top.stdout.strip() if top.returncode == 0 else ""
+    except Exception:
+        repo = ""
+    if repo:
+        roots.append(pathlib.Path(repo) / ".agents" / "skills")
+        # Claude's per-project auto-memory store, under whichever config dir is
+        # live. The slug flattens both separators: "/home/a/x.github.io" becomes
+        # "-home-a-x-github-io".
+        slug = repo.replace("/", "-").replace(".", "-")
+        for cfg in sorted(home.glob(".claude*")):
+            auto = cfg / "projects" / slug / "memory"
+            if auto.is_dir():
+                roots.append(auto)
+
+    # 4. Was any memory file written since the session began?
+    touched = False
+    for root in roots:
+        if not root.is_dir():
+            continue
+        for path in root.rglob("*.md"):
+            if root.name != "memory" and "memory" not in path.parts:
+                continue
+            try:
+                if path.stat().st_mtime > started:
+                    touched = True
+                    break
+            except OSError:
+                continue
+        if touched:
+            break
+    if touched:
+        bail()
+
+    marker.touch()
+    where = "; ".join(str(r) for r in roots if r.is_dir())
+    sys.stderr.write(
+        "skill-memory-nudge: this session used a skill but wrote no skill memory.\n"
+        "Skills are supposed to learn from each use. Before you finish:\n"
+        "  1. Re-read what Lokesh said this session — corrections, preferences, "
+        "rejected approaches, traps you hit.\n"
+        "  2. Anything durable goes into the owning skill's memory/ now, in his "
+        "words, with an absolute date and a **Why:** line. Edit the line it "
+        "contradicts rather than adding a second version.\n"
+        "  3. Update the skill's SKILL.md memory table if you added a file, and "
+        "cross-reference with [[name]] (verify: harness-memory-links --check).\n"
+        f"Memory roots in scope: {where}\n"
+        "If nothing durable came up this session, say so in one line and finish.\n"
+    )
+    sys.exit(2)
+
+
+if __name__ == "__main__":
+    main()

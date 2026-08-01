@@ -18,7 +18,8 @@ them rather than re-deriving a type scale or picking a "nice" font per project.
    in `memory/typography.md`. A fourth face needs a reason.
 2. **Name tokens after the role, not the classification.** `--font-display`,
    `--font-body`, `--font-mono` — never `--font-serif` holding a sans, which is
-   how a stack drifts out of sync with its names.
+   how a stack drifts out of sync with its names. The same holds for colour:
+   `--ink-2`, never `--grey-600`. See `memory/palette.md`.
 3. **Self-host webfonts.** Fontsource variable packages, imported in CSS, so the
    build hashes and fingerprints them. No CDN link tags: they add a third-party
    request per visitor and break offline dev.
@@ -30,3 +31,5 @@ them rather than re-deriving a type scale or picking a "nice" font per project.
 
 - `memory/typography.md` — the three type roles, the exact stacks, and the
   Tailwind v4 traps that silently drop a face.
+- `memory/palette.md` — the colour tokens, what the three accents *mean*, the
+  surface stack, and the margin-tape signature element.
