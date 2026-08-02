@@ -1,7 +1,15 @@
 # Palette — the instrument reading
 
 Decided 2026-07-28 alongside [[typography]], first built in
-`~/Documents/Research/Thesis/thesis-ui/src/app.css`. Reused verbatim by `ecr`.
+`~/Documents/Research/Thesis/thesis-ui/src/app.css`. Dark palette shared
+verbatim by `ecr` and `reticle` (Zola theme). Light palettes have diverged:
+
+- **thesis-ui / reticle** — blueprint-cool paper (`#e7ecef`), the canonical
+  light palette.
+- **ecr** — near-white paper (`#fbfcfd`), warmer ink (`#12222a`), and slightly
+  shifted accents (proved `#0f766e`, obligation `#5b46b8`, blocking `#b4382a`).
+  Evolved independently for a mail client that is looked at all day.
+
 
 The direction is *an instrument reading of a document*: a cool blueprint-paper
 ground, petrol ink, and three semantic accents that carry meaning rather than

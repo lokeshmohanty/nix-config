@@ -63,4 +63,5 @@
   programs.virt-manager.enable = true;
 
   networking.hostName = "bhaskara";
+  searxng.enable = true; # local DuckDuckGo backend for pi web_search
 }

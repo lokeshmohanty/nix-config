@@ -25,6 +25,7 @@
     ./programs.nix
     ./fonts.nix
     ./ssh.nix
+    ./searxng.nix
     ./virtualisation.nix
   ];
 

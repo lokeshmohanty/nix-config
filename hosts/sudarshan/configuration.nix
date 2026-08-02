@@ -18,6 +18,7 @@
 
   networking.hostName = "sudarshan";
   gaming.enable = true;
+  searxng.enable = true; # local DuckDuckGo backend for pi web_search
   desktop.niri.enable = true;
   desktop.hyprland.enable = true;
 

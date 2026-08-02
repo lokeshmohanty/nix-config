@@ -7,7 +7,7 @@
     "@earendil-works/pi-tui": "^0.82.1",
     "@gotgenes/pi-permission-system": "^24.0.0",
     "@juicesharp/rpiv-advisor": "^2.3.1",
-    "@narumitw/pi-plan-mode": "^0.41.0",
+    "@narumitw/pi-plan-mode": "^0.44.0",
     "@narumitw/pi-retry": "^0.31.0",
     "@tintinweb/pi-subagents": "^0.14.2",
     "pi-agent-browser-native": "^0.2.71",

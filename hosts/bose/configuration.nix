@@ -26,4 +26,5 @@
   programs.virt-manager.enable = true;
 
   networking.hostName = "bose";
+  searxng.enable = true; # local DuckDuckGo backend for pi web_search
 }

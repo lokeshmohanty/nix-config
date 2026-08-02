@@ -54,6 +54,16 @@
           ln -sfn ${config.vars.nixDir}/config/agentic-harness/pi ${config.home.homeDirectory}/.pi
         ''
       );
+      # pi-web-access reads web-search.json from $XDG_CONFIG_HOME/pi (set by
+      # home-manager xdg.configHome), NOT from ~/.pi. Without this link the
+      # repo-tracked file above is shadowed by an unmanaged ~/.config/pi file.
+      # Symlink it so the repo file is the single source of truth.
+      pi-web-search = lib.mkIf config.modules.ai.enable (
+        lib.mkAfter ''
+          mkdir -p ${config.xdg.configHome}/pi
+          ln -sfn ${config.vars.nixDir}/config/agentic-harness/pi/web-search.json ${config.xdg.configHome}/pi/web-search.json
+        ''
+      );
       codex = lib.mkIf config.modules.ai.enable (
         lib.mkAfter ''
           ln -sfn ${config.vars.nixDir}/config/agentic-harness/codex ${config.home.homeDirectory}/.codex

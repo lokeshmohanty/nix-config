@@ -1,5 +1,73 @@
 # Decisions
 
+## 2026-08-02 — Patch noctalia-shell toast line cap; translucent notifications
+
+Mail notifications from `home/email/module.nix` `onNotifyPost` were elided:
+noctalia-shell (the quickshell-based notification daemon) hardcodes the toast
+body to `maximumLineCount: 5` in `Modules/Notification/Notification.qml`, and
+the multi-message body (one `author: subject` line per new mail, separated by
+`<br/>-----------<br/>`) exceeded five lines so the tail was cut with
+`Text.ElideRight`. The cap is not exposed in noctalia's settings UI, so it is
+patched in-tree rather than configured at runtime.
+
+`system/desktop-environment/noctalia.nix` now builds
+`inputs.noctalia.packages.<system>.default` through `overrideAttrs` with a
+`postFixup` `sed` that rewrites the body element's `maximumLineCount: 5` to
+`20` (anchored to the leading-space + `5$` so it hits only line 689, not the
+summary/compact caps of 3/1/2). Verified by realising the derivation: the
+built `Notification.qml` differs from the upstream output on exactly that one
+line. Translucency needed no patch — `notifications.backgroundOpacity` is a
+runtime setting read by the card's `Qt.alpha(Color.mSurface, ...)`, so
+`config/noctalia/settings.json` sets it to `0.7` (70%); the symlinked
+`~/.config/noctalia` dir makes that live without a rebuild.
+
+The `overrideAttrs` adds a derivation to the system closure (120 derivations
+in a `dry-build`), so the line-cap change takes effect only after
+`nixos-rebuild switch`; the opacity change is immediate on quickshell restart.
+
+## 2026-07-31 — SearXNG backs pi `web_search` (self-hosted, no API keys)
+
+pi's web search comes from the `pi-web-access` package, not pi core. It has
+no native DuckDuckGo provider (v0.17.0 supports openai, brave, parallel,
+tinyfish, search1api, searchinfinity, querit, tavily, serpdive, anysearch,
+searxng, exa, perplexity, gemini). The previous default was AnySearch, a
+shared third-party API that was slow and rate-limited. SearXNG is a
+self-hostable meta-engine, so we run a localhost-only instance and point
+pi-web-access at it — no API keys, no shared rate limits.
+
+`system/searxng.nix` runs a localhost-only SearXNG instance
+(`services.searx`, built-in HTTP server, no uwsgi/nginx/redis) bound to
+`127.0.0.1:8888`. SearXNG's loader requires `use_default_settings.engines`
+to be a dict of `keep_only`/`remove`, not a boolean (a bool crashes
+`update_settings` with `'bool' object has no attribute 'get'`); engine names
+are lowercase and the `engines` override merges into the kept default by
+name. The engine set is **Bing only**: measured 2026-08-02 on sudarshan,
+this host's IP is reputation-flagged by the other no-API-key engines —
+DuckDuckGo's html/lite endpoints return a CAPTCHA
+(`SearxEngineCaptchaException`), Brave returns HTTP 429, Mojeek and Qwant
+return HTTP 403/access-denied — while Bing (`www.bing.com/search`) returns
+7-10 clean results per query reliably. SearXNG ships bing disabled by
+default, so it is enabled explicitly. `config/agentic-harness/pi/web-search.json`
+sets `provider: "searxng"` + `searxngBaseUrl: "http://127.0.0.1:8888"`.
+Enabled on all three NixOS hosts (`searxng.enable`) since all run pi; the
+server home profile does not import `system/`.
+
+Two correctness details: (1) pi-web-access's SSRF guard always blocks the
+literal hostname `localhost` but allows `127.0.0.1` when `127.0.0.0/8` is in
+`ssrf.allowRanges`, so the URL uses the IP, not the name. (2) pi-web-access reads
+`web-search.json` from `$XDG_CONFIG_HOME/pi` (set to `~/.config` by home-manager),
+NOT from `~/.pi`, so the repo-tracked file was shadowed by an unmanaged
+`~/.config/pi/web-search.json` written by the curator UI. `home/activations.nix`
+now symlinks `~/.config/pi/web-search.json` to the repo file so the repo is the
+single source of truth. `allowBrowserCookies`/`chromeProfile` are kept (they
+govern Gemini Web, a separate capability) and `searchRouting` with anysearch is
+dropped. `web-search.json` also sets `workflow: "none"`: pi-web-access's
+default workflow is `summary-review`, which auto-opens an interactive browser
+curator and blocks at a `waiting-for-approval` phase — `none` makes
+`web_search` a plain tool that returns results directly (the agent then
+summarizes/acts), matching headless `pi -p` (which already defaults to `none`
+because `!hasUI`).
+
 ## 2026-07-29 — kitty replaces foot as the default terminal
 
 The niri session spawns a hidden kitty server at startup

@@ -1,10 +1,12 @@
 {
+  "provider": "searxng",
+  "searxngBaseUrl": "http://127.0.0.1:8888",
+  "workflow": "none",
+  "ssrf": {
+    "allowRanges": ["127.0.0.0/8"]
+  },
   "allowBrowserCookies": true,
   "chromeProfile": "Default",
-  "searchRouting": {
-    "providers": ["anysearch", "gemini"],
-    "fallbackOn": ["transient", "quota", "network"]
-  },
   "webSearch": {
     "enabled": true
   }
