@@ -4,5 +4,6 @@ agent/trust.json
 agent/models-store.json
 agent/ayu/
 agent/extensions/pi-permission-system/logs/
+agent/mcp-cache.json
 cache/
 

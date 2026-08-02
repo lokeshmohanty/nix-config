@@ -3,6 +3,9 @@
   "defaultProvider": "router-glm5.2",
   "defaultModel": "GLM-5.2",
   "defaultThinkingLevel": "medium",
+  "retry": {
+    "enabled": true
+  },
   "packages": [
     "npm:@tintinweb/pi-subagents",
     "npm:pi-web-access",
@@ -15,7 +18,11 @@
     "npm:@narumitw/pi-plan-mode",
     "npm:pi-lens",
     "npm:pi-patty-bg-tasks",
-    "npm:pi-loop-police"
+    "npm:pi-loop-police",
+    "npm:pi-mcp-adapter",
+    "npm:@narumitw/pi-retry",
+    "npm:@juicesharp/rpiv-advisor",
+    "npm:pi-simplify"
   ],
   "richRenderer": {
     "imageScale": 1,
