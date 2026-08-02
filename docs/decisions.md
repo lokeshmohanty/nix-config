@@ -1,5 +1,39 @@
 # Decisions
 
+## 2026-08-02 — No `printf` format verbs in imapnotify hooks (goimapnotify Sprintf)
+
+Mail notifications showed a count but an empty body, and the count was always
+wrong. Root cause is upstream of both notmuch and the notification daemon:
+**goimapnotify passes the hook command through `fmt.Sprintf` with the mailbox
+name as the argument** before handing it to bash. In `home/email/module.nix`
+`onNotifyPost` this meant the *first* `%s` in the script — the one in
+`printf '%s\n' "$newids"` that fed the `count` pipeline — was replaced by the
+literal `INBOX`, so the count was computed from `printf 'INBOX\n'` and was
+always `1`. Every later verb became `%!s(MISSING)`, so the body `printf`
+aborted with ``printf: `!': invalid format character`` and emitted nothing.
+Confirmed by running `fmt.Sprintf(hook, "INBOX")` over the deployed
+`~/.config/imapnotify/imapnotify-main-config.json`.
+
+**Rule: hook bodies use `echo`, never `printf` with format verbs.** One
+deliberate `%s` is kept in the opening log line so it absorbs Sprintf's
+argument; without a verb, Go appends `%!(EXTRA string=INBOX)` as a bogus
+trailing line.
+
+Two further defects fixed in the same hook: message IDs from
+`notmuch search --output=messages` are now re-quoted as `id:"…"` — IDs
+containing query-syntax characters (e.g. `…{17cd4d3f-…}@intensemail.no-ip.org`)
+were parsed as query operators and silently matched the *wrong* message rather
+than erroring, so no guard could catch it; and the before/after dedup `awk`
+switched from `NR==FNR` to `FILENAME==ARGV[1]`, which otherwise drops the first
+new message whenever the "before" snapshot is empty.
+
+goimapnotify forwards only the hook's **stdout** to the journal, which is why
+all of this failed invisibly. Hooks now append stderr to a bounded (2000-line)
+per-account log at `~/.local/state/imapnotify/<account>.log`.
+
+This supersedes the diagnosis in the entry below: the toast line cap was a real
+and separate constraint, but the empty bodies were this Sprintf bug.
+
 ## 2026-08-02 — Patch noctalia-shell toast line cap; translucent notifications
 
 Mail notifications from `home/email/module.nix` `onNotifyPost` were elided:
