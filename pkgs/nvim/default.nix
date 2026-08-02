@@ -12,12 +12,6 @@ let
       version = "source";
       src = inputs.plugins-everforest;
     };
-    notmuch-nvim = pkgs.vimUtils.buildVimPlugin {
-      pname = "notmuch-nvim";
-      version = "source";
-      src = ./lua/notmuch.nvim;
-      doCheck = false;
-    };
     bruno = pkgs.vimUtils.buildVimPlugin {
       pname = "bruno";
       version = "source";
@@ -65,8 +59,6 @@ inputs.nix-wrapper-modules.wrappers.neovim.wrap [
         mermaid-cli
         imagemagick
         ghostscript
-        w3m-full # required for notmuch
-        notmuch # required for notmuch
         bruno-cli # required for bruno
         texlab # LaTeX
         resvg # svg rendering for lean-nvim
@@ -120,7 +112,6 @@ inputs.nix-wrapper-modules.wrappers.neovim.wrap [
           gx-nvim
           flash-nvim
           undotree
-          # customPlugins.notmuch-nvim
           customPlugins.bruno
         ];
       };

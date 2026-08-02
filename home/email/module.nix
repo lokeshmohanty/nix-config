@@ -79,6 +79,10 @@ let
         new_file=$(${pkgs.coreutils}/bin/mktemp)
         ${pkgs.notmuch}/bin/notmuch search --output=messages "tag:inbox and tag:${name}" > "$before_file"
         ${pkgs.notmuch}/bin/notmuch new
+        # preNew may have moved deleted messages into Trash; push those moves
+        # (and pull anything new) to the server. Run in the background so it
+        # does not block the new-mail notification below.
+        ${pkgs.isync}/bin/mbsync -a &
         ${pkgs.notmuch}/bin/notmuch search --sort=newest-first --output=messages "tag:inbox and tag:${name}" > "$after_file"
         # FILENAME==ARGV[1] rather than NR==FNR: when "before" is empty (first run,
         # or a failed search) NR==FNR would silently swallow the first "after" line.
@@ -248,6 +252,35 @@ in
           "spam"
           "trash"
         ];
+        hooks.preNew = ''
+          # Move every message tagged `deleted` into its account's Trash folder
+          # so mbsync propagates the deletion to the server. notmuch's
+          # synchronize_flags maps only D/F/P/R/S (not `deleted`/`trash`), so a
+          # notmuch tag alone never becomes an IMAP \Deleted — the only reliable
+          # way to delete via IMAP (Gmail/Outlook use folder-based trash) is to
+          # physically move the file into the Trash maildir. Running this in
+          # preNew means `notmuch new` indexes the files at their new path and
+          # the postNew trash-folder rule re-tags them in the same cycle.
+          mail_root="${config.xdg.dataHome}/Mail"
+          moved=0
+          ${lib.concatStringsSep "\n" (
+            map (account: ''
+              trash_dir="$mail_root/${account.name}/${account.folders.trash}/cur"
+              ${pkgs.coreutils}/bin/mkdir -p "$trash_dir"
+              while IFS= read -r file; do
+                [ -z "$file" ] && continue
+                case "$file" in
+                  *"${account.name}/${account.folders.trash}/"*) continue ;;
+                esac
+                ${pkgs.coreutils}/bin/mv -n "$file" "$trash_dir/" && moved=$((moved + 1))
+              done < <(${pkgs.notmuch}/bin/notmuch search --output=files \
+                "tag:deleted and path:${account.name}/** and not path:\"${account.name}/${account.folders.trash}/cur\"")
+            '') emailAccounts
+          )}
+          if [ "$moved" -gt 0 ]; then
+            echo "preNew: moved $moved deleted message(s) to Trash" >&2
+          fi
+        '';
         hooks.postNew = ''
           notmuch tag --batch <<EOM
           ${lib.concatStringsSep "\n" (

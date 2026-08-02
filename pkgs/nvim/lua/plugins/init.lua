@@ -14,7 +14,6 @@ require("plugins.snacks")
 require("lze").load(require("plugins.optional"))
 require("lze").load({
   { import = "plugins.zk" },
-  { import = "plugins.notmuch" },
   -- {
   --   "vim-table-mode",
   --   ft = "markdown",
