@@ -43,6 +43,14 @@
 
     llm-agents.url = "github:numtide/llm-agents.nix";
 
+    # Tracks `main`. `github:lokeshmohanty/ecr/release` is the other channel and
+    # follows the newest tag; `nix flake update ecr` moves whichever is pinned
+    # here, and `ecr --version` reports the revision so the two never blur.
+    ecr = {
+      url = "github:lokeshmohanty/ecr";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nix-alien.url = "github:thiagokokada/nix-alien";
     nix-wrapper-modules.url = "github:BirdeeHub/nix-wrapper-modules";
     nix-wrapper-modules.inputs.nixpkgs.follows = "nixpkgs";

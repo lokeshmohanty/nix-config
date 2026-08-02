@@ -1,4 +1,7 @@
 { ... }:
 {
-  imports = [ ./module.nix ];
+  imports = [
+    ./module.nix
+    ./ecr.nix
+  ];
 }

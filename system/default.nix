@@ -72,8 +72,17 @@
         "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
         "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       ];
-      extra-substituters = [ "https://yazi.cachix.org" ];
-      extra-trusted-public-keys = [ "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k=" ];
+      extra-substituters = [
+        "https://yazi.cachix.org"
+        # ecr is consumed straight from git on the `main` channel, so without
+        # this every `nix flake update` rebuilds the server and the web client
+        # from source. CI pushes here on every push to main.
+        "https://lokeshmohanty.cachix.org"
+      ];
+      extra-trusted-public-keys = [
+        "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
+        "lokeshmohanty.cachix.org-1:XkCPbX2XsKzlr0P/MecvqruyTeOA8SzJzwMcCOfuLuI="
+      ];
     };
     # Garbage collection is being handled by "nix-helper (nh)"
     # gc = {
