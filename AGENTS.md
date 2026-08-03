@@ -22,7 +22,7 @@ via `nixos-rebuild` / `home-manager switch` (see `docs/index.md` for commands).
 | `system/` | NixOS modules (DE, fonts, services, security, virtualisation, …) |
 | `home/` | home-manager modules (`ai.nix` = agent tools, `activations.nix` = symlinks, editor/shell/gui, …) |
 | `config/` | raw app configs symlinked by activations (hypr, niri, waybar, **agentic-harness**, …) |
-| `pkgs/` | custom packages (nvim, ghost-*, oauthman) |
+| `pkgs/` | custom packages (nvim, ghost-*, axi-tools) |
 | `scripts/` | user scripts, linked into `~/.local/bin` |
 | `Justfile` | non-nix setup recipes (fish plugins, wallpapers, prompt) |
 | `STATUS.md` | volatile: current focus, pending config chores |

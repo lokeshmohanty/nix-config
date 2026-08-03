@@ -24,7 +24,7 @@ questions about this repo from this folder plus the linked pages.*
 | Update inputs | `nix flake update` (in `~/.nix`) |
 | Syntax-check a module | `nix-instantiate --parse <file.nix>` |
 | Format | `nix fmt` (formatter: nixfmt) |
-| Build a custom package | `nix build ~/.nix#<name>` / run: `nix run ~/.nix#<name>` (pkgs/: nvim, ghost-*, oauthman) |
+| Build a custom package | `nix build ~/.nix#<name>` / run: `nix run ~/.nix#<name>` (pkgs/: nvim, ghost-*, axi-tools) |
 | Non-nix setup (fish plugins, wallpapers) | `just <recipe>` — see `Justfile` |
 | Scaffold agent harness in a repo | `harness-init [dir]` (from `config/agentic-harness/bin/`) |
 

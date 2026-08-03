@@ -1,7 +1,7 @@
 {
   config,
+  inputs,
   pkgs,
-  self,
   lib,
   ...
 }:
@@ -187,6 +187,10 @@ let
   };
 in
 {
+  # Unconditional: importing the flake's module only declares `programs.ecr`;
+  # nothing is installed until it is enabled under `modules.email.enable` below.
+  imports = [ inputs.ecr.homeManagerModules.default ];
+
   options.modules.email.enable = lib.mkEnableOption "email tooling and shared account helpers";
 
   config = lib.mkMerge [
@@ -197,16 +201,20 @@ in
     }
 
     (lib.mkIf cfg.enable {
-      home.packages =
-        with pkgs;
-        [
-          aspell
-          oauth2ms
-          w3m-full
-        ]
-        ++ [
-          self.packages.${pkgs.stdenv.hostPlatform.system}.oauthman
-        ];
+      home.packages = with pkgs; [
+        aspell
+        oauth2ms
+        w3m-full
+      ];
+
+      # ecr is a UI over the notmuch maildir this module builds — mbsync fetches
+      # into it, msmtp sends from it, notmuch indexes it — so it rides along
+      # wherever email is enabled. The server stays opt-in per host (only
+      # sudarshan runs it); see hosts/sudarshan/default.nix.
+      programs.ecr = {
+        enable = true;
+        desktop = true;
+      };
 
       programs.khard = {
         enable = true;
@@ -316,9 +324,12 @@ in
         '';
       };
 
+      # imapnotify runs each account's passwordCommand itself, and that is now
+      # `ecr oauth token <name>`, so ecr has to be on this unit's PATH — a user
+      # unit inherits nothing from the login shell.
       services.imapnotify.enable = true;
       services.imapnotify.path = [
-        self.packages.${pkgs.stdenv.hostPlatform.system}.oauthman
+        config.programs.ecr.package
         pkgs.libnotify
       ];
 

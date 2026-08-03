@@ -7,7 +7,8 @@
 }:
 let
   googleClientIdCommand = [
-    "oauthman"
+    "ecr"
+    "oauth"
     "client-id"
     "--provider"
     "gmail"
@@ -16,7 +17,8 @@ let
   ];
 
   googleClientSecretCommand = [
-    "oauthman"
+    "ecr"
+    "oauth"
     "client-secret"
     "--provider"
     "gmail"
@@ -28,7 +30,7 @@ let
 
   flavorDefaults = {
     gmail = name: {
-      passwordCommand = "oauthman token ${name}";
+      passwordCommand = "ecr oauth token ${name}";
       mail = {
         flavor = "gmail.com";
         oauth = true;
@@ -62,7 +64,7 @@ let
     };
 
     outlook = name: {
-      passwordCommand = "oauthman token ${name}";
+      passwordCommand = "ecr oauth token ${name}";
       mail = {
         flavor = "outlook.office365.com";
         oauth = true;

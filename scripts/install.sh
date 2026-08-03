@@ -774,7 +774,6 @@ setup_config_files() {
     "${REPO_DIR}/scripts/email-md.sh|${TARGET_HOME}/.local/bin/email-md.sh"
     "${REPO_DIR}/scripts/fixes|${TARGET_HOME}/.local/bin/fixes"
     "${REPO_DIR}/scripts/install.sh|${TARGET_HOME}/.local/bin/install.sh"
-    "${REPO_DIR}/scripts/oauthman|${TARGET_HOME}/.local/bin/oauthman"
     "${REPO_DIR}/scripts/setup-email.sh|${TARGET_HOME}/.local/bin/setup-email.sh"
     "${REPO_DIR}/config/agentic-harness/bin/docs-nudge|${TARGET_HOME}/.local/bin/docs-nudge"
     "${REPO_DIR}/config/agentic-harness/bin/harness-init|${TARGET_HOME}/.local/bin/harness-init"

@@ -12,9 +12,10 @@ maybe_discover() {
 
 echo "== OAuth setup =="
 
-for acc in main iisc zenteiq personal; do
-  echo "run oauthman setup $acc --email <address> before syncing"
+for acc in main zenteiq personal; do
+  echo "run ecr oauth setup $acc --provider gmail --email <address> before syncing"
 done
+echo "run ecr oauth setup iisc --provider microsoft --email <address> before syncing"
 
 echo "== Maildir scaffold =="
 for acc in main zenteiq personal iisc; do

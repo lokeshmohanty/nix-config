@@ -59,7 +59,7 @@ self-documenting subtree. Do not modify it from this page's context; read
 ## Custom packages (`pkgs/`)
 
 `pkgs/default.nix` maps each subdir (nvim, ghost-build/-charity/-wrapper,
-oauthman) into flake packages and apps (`nix run ~/.nix#<name>`).
+axi-tools) into flake packages and apps (`nix run ~/.nix#<name>`).
 
 ## Ubuntu bootstrap flow
 
