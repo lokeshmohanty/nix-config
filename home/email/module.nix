@@ -251,6 +251,11 @@ in
 
       programs.notmuch = {
         enable = true;
+        # ecr's mailing-list sidebar searches `List:<value>`, which needs
+        # `List-Id` indexed. notmuch only applies `index.header` to mail
+        # indexed after the setting is added, so a database that already has
+        # mail needs `notmuch reindex '*'` once for it to take effect.
+        extraConfig.index."header.List" = "List-Id";
         new.tags = [
           "new"
           "unread"
