@@ -82,7 +82,7 @@ let
         # preNew may have moved deleted messages into Trash; push those moves
         # (and pull anything new) to the server. Run in the background so it
         # does not block the new-mail notification below.
-        ${pkgs.isync}/bin/mbsync -a &
+        ${config.programs.mbsync.package}/bin/mbsync -a &
         ${pkgs.notmuch}/bin/notmuch search --sort=newest-first --output=messages "tag:inbox and tag:${name}" > "$after_file"
         # FILENAME==ARGV[1] rather than NR==FNR: when "before" is empty (first run,
         # or a failed search) NR==FNR would silently swallow the first "after" line.
@@ -285,7 +285,17 @@ in
                 case "$file" in
                   *"${account.name}/${account.folders.trash}/"*) continue ;;
                 esac
-                ${pkgs.coreutils}/bin/mv -n "$file" "$trash_dir/" && moved=$((moved + 1))
+                # Strip the mbsync UID (`,U=<uid>`) from the filename so mbsync
+                # assigns a fresh, non-colliding UID in the Trash folder. Moving a
+                # file with its original (higher, possibly duplicate) UID makes
+                # mbsync abort with "UID N is beyond highest assigned UID M"
+                # / "duplicate UID N".
+                base=$(basename "$file")
+                case "$base" in
+                  *,U=*) dest="$trash_dir/$${base%%,U=*}:$${base#*,U=*}" ;;
+                  *) dest="$trash_dir/$${base}" ;;
+                esac
+                ${pkgs.coreutils}/bin/mv -n "$file" "$dest" && moved=$((moved + 1))
               done < <(${pkgs.notmuch}/bin/notmuch search --output=files \
                 "tag:deleted and path:${account.name}/** and not path:\"${account.name}/${account.folders.trash}/cur\"")
             '') emailAccounts
