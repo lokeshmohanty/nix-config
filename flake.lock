@@ -200,11 +200,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785823739,
-        "narHash": "sha256-maWiS8V/DDsQoxMR+tsXjA/cJHhpMNb3mPuEFlA5fqk=",
+        "lastModified": 1785910731,
+        "narHash": "sha256-g1lLeDYjbYWA2wrzu4/PbExheqCFbYhDhydam/v2Ig4=",
         "owner": "lokeshmohanty",
         "repo": "ecr",
-        "rev": "b3d07940ad4c0ed050aeb00ac72a9c6789d51aba",
+        "rev": "5043a9e8360b9a93a8154095a1f4cebe92a4eac2",
         "type": "github"
       },
       "original": {
