@@ -346,7 +346,6 @@ binds {
     Mod+X repeat=false { close-window; }
     Mod+Shift+X { spawn-sh "niri msg pick-window | rg PID | cut -d':' -f2 | xargs kill"; }
     Mod+Shift+E { quit; }
-    Mod+O { spawn "~/.config/niri/my-commands"; }
     Ctrl+Alt+Delete { spawn-sh "noctalia-shell ipc call sessionMenu toggle"; }
 
     // Powers off the monitors. To turn them back on, do any input like
@@ -359,14 +358,15 @@ binds {
     Mod+Return { spawn "kitty" "--single-instance"; }
     Mod+E { spawn "nautilus"; }
     Mod+B { spawn "firefox"; }
-    Mod+M { spawn-sh "kitty --single-instance vi -c 'Notmuch'"; }
+    Mod+M { spawn-sh "ecr-desktop"; }
     Mod+S { spawn-sh "kitten quick-access-terminal"; }
     Mod+D { spawn-sh "noctalia-shell ipc call launcher toggle"; } // >settings, ...
+    Mod+O { spawn "~/.config/niri/my-commands"; }
     Mod+Q { spawn-sh "noctalia-shell ipc call sessionMenu toggle"; }
     Mod+Shift+S { spawn-sh "noctalia-shell ipc call settings toggle"; } // >settings, ...
     Mod+Shift+W { spawn-sh "noctalia-shell ipc call wallpaper toggle"; }
     Mod+Shift+B { spawn "qutebrowser"; }
-    Mod+I { spawn "~/.config/niri/my-bookmark" "list"; }
+    Mod+I { spawn-sh "kitty --single-instance vi -c 'lua Snacks.scratch()'"; }
     Mod+Shift+I { spawn "~/.config/niri/my-bookmark" "commands"; }
     Mod+Alt+R { spawn "~/.config/niri/my-recorder" "commands"; }
     Mod+Alt+K { spawn "pkill" "-SIGUSR1" "-f" "gpu-screen-recorder"; }
