@@ -22,9 +22,10 @@ and `hostlib.mkHomeHost <module>`. Each host dir (`sudarshan`, `bhaskara`,
 
 - **system**: `configuration.nix` + `hardware-configuration.nix` (+ host extras
   like `syncthing.nix`), hardware profile from nixos-hardware.
-- **home** (`lokesh@<host>`): imports `../../home` (+ host extras like
-  `email.nix`) and flips feature toggles:
-  `modules = { ai.enable; activations.enable; editor.enable; gui.enable; shell.enable; tui.enable; }`.
+- **home** (`lokesh@<host>`): imports `../../home` and flips feature toggles:
+  `modules = { ai.enable; activations.enable; editor.enable; email.enable; gui.enable; shell.enable; tui.enable; }`.
+  Mail accounts are **not** among them — they live in `~/.config/ecr/accounts.toml`,
+  which ecr owns and its client writes; see `docs/decisions.md`.
 - **Ubuntu/server home** (`lokesh@server`): imported from `hosts/server.nix`.
   It enables AI, editor, shell, TUI, and their activations while disabling GUI
   styling. `scripts/install.sh` applies this standalone Home Manager profile.

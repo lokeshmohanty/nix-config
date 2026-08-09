@@ -18,15 +18,13 @@
     "lokesh@sudarshan" = self.hostlib.mkHomeHost (
       { pkgs, ... }:
       {
-        imports = [
-          ../../home
-          ./email.nix
-        ];
+        imports = [ ../../home ];
 
         modules = {
           ai.enable = true;
           activations.enable = true;
           editor.enable = true;
+          email.enable = true;
           gui.enable = true;
           shell.enable = true;
           tui.enable = true;
@@ -35,7 +33,9 @@
         # ecr's server is a systemd *user* service: the maildir, the notmuch
         # database and the token store all live in $HOME, where Xapian has to
         # write. The client itself is installed wherever email is enabled (see
-        # home/email/module.nix); only sudarshan runs the server.
+        # home/email/module.nix); only sudarshan runs the server. The accounts
+        # themselves are not here — they live in ~/.config/ecr/accounts.toml,
+        # which ecr owns and the client writes.
         programs.ecr.server = {
           enable = true;
           # Bound to sudarshan's Tailscale IPv4 (100.64.0.0/10), not loopback

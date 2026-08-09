@@ -1,5 +1,53 @@
 # Decisions
 
+## 2026-08-09 — ecr owns the mail configuration; imapnotify, vdirsyncer, khard and khal are gone
+
+`home/email/` no longer configures anything. It installs three binaries and
+ecr, and that is all. `home/email/accounts.nix` and `hosts/sudarshan/email.nix`
+are deleted; `modules.email.enable` is set in `hosts/sudarshan/default.nix`
+beside the other module switches.
+
+**What replaced what.** ecr's [managed mode](https://www.lokeshmohanty.in/ecr)
+renders the isyncrc, the msmtp config, the notmuch config and its `pre-new` and
+`post-new` hooks from `~/.config/ecr/accounts.toml` into
+`~/.config/ecr/managed/`. `ecr serve` holds an IMAP IDLE connection per account
+itself, which is what imapnotify was for — no fifth process to supervise, and
+no hook script whose failures are invisible (the two decisions below). `ecr
+account sync-dav` fetches CardDAV and CalDAV into a vdir under
+`~/.local/state/ecr`, which is what vdirsyncer was for; khard and khal went with
+it, so this machine has no calendar *browser* any more — ecr renders an
+invitation where the message is and can reply to it, but it does not show a
+month.
+
+**The three binaries stay, and must.** ecr ships no notmuch, mbsync or msmtp and
+refuses to, not even behind ours as a fallback: two copies of isync at the same
+version are not the same binary, and a fallback is one PATH ordering away from
+being a substitution. They are in `home.packages`, which is what puts them on
+the `ecr` user unit's PATH — the user manager carries `~/.nix-profile/bin`.
+`isync` keeps the `withCyrusSaslXoauth2` override; a plain one fails every OAuth
+account with `selected SASL mechanism(s) not available`.
+
+**`accounts.toml` is deliberately not rendered from Nix.** It would be a
+read-only store symlink, and the client's Accounts tab, `ecr account add` and
+`ecr account remove` all write it. So the four accounts left the flake: they now
+live in ecr's own state, migrated once with `ecr account import --write`, which
+carries the existing `Patterns`, `Expunge`, `Remove`, `CertificateFile` and
+primary address across rather than imposing ecr's presets.
+
+**Two things import could not carry, both found by reading the diff.** ecr's
+generated `post-new` tags by the folder a message arrived in and ends with a
+catch-all that puts anything unclaimed in the inbox — which is safe only if
+every folder has a role. zenteiq's trash is `[Gmail]/Bin`, not `[Gmail]/Trash`,
+and `Patterns *` means `[Gmail]/All Mail` is synced on all three Gmail accounts
+even though ecr's model assumes it is not. Unfixed, zenteiq's deletions and
+every server-side-filtered message would have landed back in the inbox. Both are
+`[account.*.folders]` overrides in `accounts.toml`; `folder()` falls back to the
+provider preset per role, so a partial table is enough.
+
+`tls_trust_file` is also dropped — the msmtp renderer never emits it. msmtp
+falls back to the system trust store and validates Gmail and Office 365 fine,
+verified with `msmtp --serverinfo`.
+
 ## 2026-08-02 — No `printf` format verbs in imapnotify hooks (goimapnotify Sprintf)
 
 Mail notifications showed a count but an empty body, and the count was always

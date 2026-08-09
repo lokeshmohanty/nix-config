@@ -19,7 +19,9 @@ STATE_DIR="${XDG_RUNTIME_DIR:-/tmp}/screen-rec"
 STATE="$STATE_DIR/session"
 LAST="$STATE_DIR/last"
 LOG="$STATE_DIR/recorder.log"
-REC_DIR="${SCREEN_REC_DIR:-$HOME/Videos/recordings}"
+# Lokesh's existing recordings folder — capital R. Do not "correct" it to
+# lowercase: that silently creates a second directory beside the real one.
+REC_DIR="${SCREEN_REC_DIR:-$HOME/Videos/Recordings}"
 
 # ------------------------------------------------------------------ output
 
@@ -156,7 +158,7 @@ usage: screen-rec start [flags]
   --quality <q>    medium | high | very_high (default) | ultra
   --codec <c>      h264 (default) | hevc | av1 | vp8 | vp9
   --no-cursor      do not draw the cursor
-  --output <path>  file (default ~/Videos/recordings/rec-<timestamp>.mp4)
+  --output <path>  file (default ~/Videos/Recordings/rec-<timestamp>.mp4)
   --replay <sec>   rolling in-RAM buffer of the last <sec>; save with `screen-rec save`
 examples:
   screen-rec start

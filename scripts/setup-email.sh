@@ -1,51 +1,44 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-maybe_discover() {
-  local pair="$1"
-  local local_path="$2"
-
-  if ! find "$local_path" -mindepth 1 -maxdepth 1 -type d | read -r _; then
-    vdirsyncer discover "$pair"
-  fi
-}
+# Bootstraps mail on a fresh machine. ecr owns the configuration now: it renders
+# the isyncrc, the msmtp config, the notmuch config and its hooks from
+# ~/.config/ecr/accounts.toml. Nothing here writes those files by hand, and
+# `notmuch setup` in particular must not be run — it would write
+# ~/.config/notmuch, which is the config ecr is deliberately not using.
 
 echo "== OAuth setup =="
 
 for acc in main zenteiq personal; do
-  echo "run ecr oauth setup $acc --provider gmail --email <address> before syncing"
+  echo "run: ecr oauth setup $acc --provider gmail --email <address>"
 done
-echo "run ecr oauth setup iisc --provider microsoft --email <address> before syncing"
+echo "run: ecr oauth setup iisc --provider microsoft --email <address>"
 
-echo "== Maildir scaffold =="
-for acc in main zenteiq personal iisc; do
-  for folder in Sent Drafts Trash; do
-    mkdir -p "$HOME/.local/share/Mail/$acc/$folder"
-  done
-done
+echo "== Accounts =="
+
+if [ ! -f "$HOME/.config/ecr/accounts.toml" ]; then
+  echo "no accounts.toml — add each account, then rerun:"
+  echo "  ecr account add main --address <address> --provider gmail"
+  echo "or, if this machine already has a working mbsync/msmtp/notmuch setup:"
+  echo "  ecr account import        # shows what ecr would generate"
+  echo "  ecr account import --write"
+  exit 1
+fi
+
+# Renders the four managed files. Safe to rerun: a file you edited by hand is
+# moved aside rather than overwritten.
+ecr account apply
+
+echo "== Check =="
+ecr doctor
 
 echo "== Initial sync =="
 mbsync -a || true
+ecr notmuch new
 
-echo "== Notmuch setup =="
-
-notmuch setup <<EOF
-$HOME/Mail
-Lokesh Mohanty
-lokesh1197@gmail.com
-EOF
-
-notmuch new
+echo "== Contacts and calendars =="
+# Fetches CardDAV and CalDAV into a vdir under ~/.local/state/ecr. Read-only.
+# The ecr-sync-dav.timer keeps it fresh from here on.
+ecr account sync-dav || true
 
 echo "== Done =="
-
-echo "== DAV bootstrap =="
-maybe_discover contacts_main "$HOME/.local/share/contacts/main"
-maybe_discover contacts_personal "$HOME/.local/share/contacts/personal"
-maybe_discover contacts_zenteiq "$HOME/.local/share/contacts/zenteiq"
-maybe_discover calendar_main "$HOME/.local/share/calendars/main"
-maybe_discover calendar_personal "$HOME/.local/share/calendars/personal"
-maybe_discover calendar_zenteiq "$HOME/.local/share/calendars/zenteiq"
-
-echo "== DAV sync =="
-vdirsyncer sync
