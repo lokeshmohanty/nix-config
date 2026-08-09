@@ -53,9 +53,14 @@ in
     # each generated file is current, stale, edited or missing.
 
     # Contacts and calendars. `ecr account sync-dav` fetches CardDAV and CalDAV
-    # into a vdir under ~/.local/state/ecr, which is what replaced vdirsyncer —
-    # but the server never schedules it, so the timer is still ours to run. It
-    # is read-only: fetching an address book cannot lose anything.
+    # into a vdir under ~/.local/state/ecr; the server never schedules it, so
+    # the timer is ours. It is read-only — fetching an address book cannot lose
+    # anything.
+    #
+    # It is currently a **no-op**: no account sets `[dav]`, because against
+    # Gmail ecr's OAuth token carries no carddav/calendar scope and the preset
+    # URL answers 404. The timer is armed for when that works; see
+    # docs/decisions.md. vdirsyncer's own vdirs are still on disk, untouched.
     systemd.user.services.ecr-sync-dav = {
       Unit = {
         Description = "Fetch contacts and calendars into ecr's vdir";

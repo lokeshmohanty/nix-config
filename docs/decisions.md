@@ -12,12 +12,25 @@ renders the isyncrc, the msmtp config, the notmuch config and its `pre-new` and
 `post-new` hooks from `~/.config/ecr/accounts.toml` into
 `~/.config/ecr/managed/`. `ecr serve` holds an IMAP IDLE connection per account
 itself, which is what imapnotify was for — no fifth process to supervise, and
-no hook script whose failures are invisible (the two decisions below). `ecr
-account sync-dav` fetches CardDAV and CalDAV into a vdir under
-`~/.local/state/ecr`, which is what vdirsyncer was for; khard and khal went with
-it, so this machine has no calendar *browser* any more — ecr renders an
-invitation where the message is and can reply to it, but it does not show a
-month.
+no hook script whose failures are invisible (the two decisions below).
+
+**Contacts and calendars are a regression, deliberately accepted, and this is
+the part to read before wondering where the address book went.** vdirsyncer,
+khard and khal are gone. `ecr account sync-dav` is what was supposed to replace
+them, and against Gmail it does not work yet: ecr's OAuth profile requests only
+`https://mail.google.com/` (`oauth/providers.rs`), with no
+`auth/carddav` or `auth/calendar` scope, and the provider's preset URL
+`https://www.googleapis.com/carddav/v1/principals/` answers **404** because it
+carries no per-user path. Verified by opting one account in and running it. So
+no `[account.*.dav]` table is set, `ecr account sync-dav` reports *no contacts
+or calendars configured* and exits 0, and the `ecr-sync-dav.timer` is a no-op
+kept armed for when ecr's DAV works.
+
+**Nothing was deleted.** The vdirs vdirsyncer built are untouched at
+`~/.local/share/contacts` (7.3M) and `~/.local/share/calendars` (9.6M). Until
+ecr's DAV lands, this machine has no calendar browser and no contact CLI — ecr
+renders an invitation where the message is and can reply to it, and it completes
+addresses from mail you have written, but it does not show a month.
 
 **The three binaries stay, and must.** ecr ships no notmuch, mbsync or msmtp and
 refuses to, not even behind ours as a fallback: two copies of isync at the same

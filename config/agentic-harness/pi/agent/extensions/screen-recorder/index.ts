@@ -22,6 +22,10 @@ import { join } from "node:path";
 
 const HARNESS_BIN = join(homedir(), ".nix", "config", "agentic-harness", "bin");
 
+/** Seconds a worker gets. Recording tasks wait on real time (a 30s capture is
+ *  30s of nothing) on top of a model that needs minutes per step. */
+const WORKER_TIMEOUT_S = 1800;
+
 /** Resolve a harness script: PATH first, then the nix-repo copy. */
 function resolve(name: string): string {
 	const fallback = join(HARNESS_BIN, name);
@@ -50,6 +54,13 @@ function taskFor(request: string): string {
 		"  with no <file> it converts the most recent recording.",
 		"- Anything that needs the user to point at part of the screen (`--region` with no geometry)",
 		"  opens an interactive selector — only use it if the request implies the user is at the screen.",
+		"",
+		"You capture whatever is already on the screen. You cannot play the user's games, drive their",
+		"apps, or put anything on screen yourself. If the request needs particular content shown — a game",
+		"being played, a feature demoed — do NOT record an idle desktop and do NOT keep trying: stop",
+		"immediately and report that the user has to perform it, with the exact commands they should run",
+		"(`screen-rec start --region`, do the thing, `screen-rec stop`, then `screen-rec convert …`).",
+		"Recording per artifact: N separate gifs need N separate start/stop cycles, not one recording.",
 		"",
 		"Report the absolute path of every file you produced, with its size and duration.",
 	].join("\n");
@@ -96,21 +107,49 @@ export default function (pi: ExtensionAPI) {
 			// Detached from this handler: a recording task can run for minutes and
 			// blocking the handler would freeze the TUI. The report is pushed into
 			// the conversation when the worker finishes.
+			// pi-agent runs its own `timeout $PI_AGENT_TIMEOUT`. Keep ours strictly
+			// longer, so its expiry wins and its "worker timed out" message survives;
+			// two equal timeouts race and node's SIGTERM kills the messenger.
 			execFile(
 				resolve("pi-agent"),
 				["implementer", taskFor(request)],
-				{ timeout: 900_000, maxBuffer: 8 * 1024 * 1024, env: { ...process.env, PI_AGENT_THINKING: "low" } },
+				{
+					timeout: (WORKER_TIMEOUT_S + 60) * 1000,
+					maxBuffer: 8 * 1024 * 1024,
+					env: {
+						...process.env,
+						PI_AGENT_THINKING: "low",
+						PI_AGENT_TIMEOUT: String(WORKER_TIMEOUT_S),
+					},
+				},
 				(err: any, stdout, stderr) => {
 					const report = (stdout || "").trim();
 					// err.message would echo the entire task prompt back — report the
 					// exit condition and the tail of pi-agent's diagnostics instead.
 					let failure = "";
 					if (err) {
-						const why = err.killed || err.signal
-							? `was killed (${err.signal ?? "timeout"})`
-							: `exited ${err.code ?? "abnormally"}`;
+						// err.killed means *we* timed it out; a bare signal came from elsewhere.
+						const why = err.killed
+							? `hit the ${Math.round(WORKER_TIMEOUT_S / 60)}min timeout and was killed`
+							: err.signal
+								? `was killed (${err.signal})`
+								: `exited ${err.code ?? "abnormally"}`;
 						const detail = (stderr || "").trim().split("\n").slice(-3).join("\n");
-						failure = `\n\n(worker ${why}${detail ? `:\n${detail}` : ""})`;
+						// A killed worker never gets to run its own cleanup, so a recording
+						// it started is still running. Say so rather than leaving it to rot.
+						let dangling = "";
+						try {
+							const state = execFileSync(resolve("screen-rec"), ["status"], {
+								encoding: "utf-8",
+								timeout: 10_000,
+							}).trim();
+							if (!/^recording: idle/.test(state)) {
+								dangling = `\n\nA recording is STILL RUNNING — stop it with \`screen-rec stop\`:\n${state}`;
+							}
+						} catch {
+							/* status is best-effort */
+						}
+						failure = `\n\n(worker ${why}${detail ? `:\n${detail}` : ""})${dangling}`;
 					}
 					pi.sendMessage(
 						{
