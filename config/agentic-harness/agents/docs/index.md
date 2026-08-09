@@ -11,7 +11,7 @@ config lives in `~/.nix/config/agentic-harness/` and is committed in the `~/.nix
 | [layout.md](layout.md) | You need to know where anything lives (global + per-project), the symlink map, or the .gitignore rules. |
 | [harnesses.md](harnesses.md) | You need to know what a specific harness supports (hooks, skills, extensions, MCP, config paths) before using or extending it. |
 | [hooks.md](hooks.md) | You are adding/changing a hook, or wondering why one fires. Current hook inventory. |
-| [tools.md](tools.md) | You need GitNexus, gortex, context7, or wonder which code-intelligence tool applies. |
+| [tools.md](tools.md) | You need GitNexus, gortex, context7, `screen-rec` (screen recording / gif conversion), or wonder which supporting tool applies. |
 | [project-template.md](project-template.md) | You are scaffolding or auditing a project's harness (what every repo must have). |
 | [delegation.md](delegation.md) | You want tasks handled by skill-aware subagents — the shared fleet, `harness-skill-pick`, and per-harness (Claude/pi) wiring. |
 | [pi-context-budget.md](pi-context-budget.md) | pi sessions start bloated or feel slow. What startup context costs, how to measure it, the `lazy-tools` / `lazy-skills` deferred-loading extensions, and the pi extension-API traps they hit. |

@@ -27,6 +27,7 @@ questions about this repo from this folder plus the linked pages.*
 | Build a custom package | `nix build ~/.nix#<name>` / run: `nix run ~/.nix#<name>` (pkgs/: nvim, ghost-*, axi-tools) |
 | Non-nix setup (fish plugins, wallpapers) | `just <recipe>` — see `Justfile` |
 | Scaffold agent harness in a repo | `harness-init [dir]` (from `config/agentic-harness/bin/`) |
+| Record the screen / turn a clip into a gif | `screen-rec` (from `config/agentic-harness/bin/`; run bare for state + commands). In pi: `/record <what you want>` |
 
 Fresh install: boot NixOS media → `nixos-install --flake .#<hostname>`; details in `README.md`.
 

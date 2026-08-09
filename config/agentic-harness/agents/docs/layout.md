@@ -28,7 +28,7 @@
 │   ├── agent/{settings.json, models.json}
 │   └── web-search.json
 ├── templates/project/       # scaffolding source for harness-init
-├── bin/                     # harness-init, harness-session-start, docs-nudge
+├── bin/                     # harness-init, harness-session-start, docs-nudge, screen-rec
 └── README.md
 ```
 

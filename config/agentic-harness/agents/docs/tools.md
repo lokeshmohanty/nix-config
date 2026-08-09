@@ -1,6 +1,6 @@
 # Supporting tools — code intelligence & docs tooling
 
-*Purpose: which code-intelligence / docs tool applies where, and current install state. Last verified: 2026-07-18 (live system).*
+*Purpose: which code-intelligence / docs / media tool applies where, and current install state. Last verified: 2026-08-09 (screen-rec added; the rest 2026-07-18).*
 
 ## Decision guide
 
@@ -12,6 +12,7 @@
 | Papers / literature | litgraph (own repo, `litgraph-ops` skill) |
 | Everything else | plain `docs/` markdown — the llm-wiki pattern |
 | Resolve or audit `[[links]]` between skill memories | `harness-memory-links` (see `harness-ops`) |
+| Record the screen, or turn a clip into a gif | `screen-rec` (below; pi's `/record` dispatches to it) |
 
 ## GitNexus (`abhigyanpatwari/GitNexus`)
 
@@ -46,6 +47,30 @@
 - Two access paths:
   - **CLI:** `npx ctx7@latest library <name> "<question>"` → pick `/org/project` ID → `npx ctx7@latest docs <id> "<question>"` (no global `ctx7` binary installed; npx-resolved, v0.5.5 verified).
   - **MCP:** `context7` server registered in Claude (`~/.claude.json`), Codex (`[mcp_servers.context7]`), and Gemini (`mcpServers.context7`) — HTTPS endpoint with API key.
+
+## screen-rec (`bin/screen-rec`, ours)
+
+Screen recording + video conversion as an AXI CLI: `gpu-screen-recorder` for capture
+(GPU-encoded, no measurable impact on the recorded session), `ffmpeg` for conversion,
+`gifski` as an optional higher-quality gif encoder. TOON on stdout, progress on stderr,
+exit 0/1/2. Run it with no arguments for live state + the command list; every subcommand
+has `--help`.
+
+- `start` … `stop` (also `pause`, `status`); `start --replay <sec>` keeps a rolling in-RAM
+  buffer that `save` writes out. The recorder is `setsid`-detached and outlives the session
+  that started it — state (pid, target, output) lives in `$XDG_RUNTIME_DIR/screen-rec/`.
+- `convert <file> --format gif|mp4|webm|webp|png` with `--width/--fps/--start/--duration/--speed`.
+  With no `<file>` it converts the most recent recording.
+- Consumers: pi's `/record` command dispatches an `implementer` subagent that drives this CLI
+  ([harnesses.md](harnesses.md)); a human runs the same commands directly. Nothing registers
+  model tools, so none of this costs system-prompt context.
+
+Machine facts verified 2026-08-09 (niri/Wayland, gsr 5.12.5), all encoded in the script:
+monitor capture works by name (`eDP-1`) and via `screen` with no xdg-desktop-portal round trip;
+`-w focused` is X11-only and is rejected with a pointer to `--region` (which uses `slurp`);
+a replay buffer needs an integer kbps `-q` (CBR) **and** an explicit `-c mp4`, because `-o` is a
+directory; animated webp must use `libwebp_anim` (plain `libwebp` came out ~12x larger) and
+ffprobe cannot demux the result, so its dimensions are reported as unknown rather than `0x0`.
 
 ## The llm-wiki pattern (docs/-first philosophy)
 

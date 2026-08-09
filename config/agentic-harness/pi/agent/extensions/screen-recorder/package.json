@@ -1,0 +1,21 @@
+{
+  "name": "pi-screen-recorder",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "index.ts",
+  "description": "/record — plain-language screen recording and gif conversion, dispatched to a fleet subagent that drives the screen-rec CLI (gpu-screen-recorder + ffmpeg). Registers no tools.",
+  "keywords": [
+    "pi-package",
+    "pi",
+    "pi-extension",
+    "screen-recording",
+    "ffmpeg",
+    "gif"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "typebox": "*"
+  }
+}

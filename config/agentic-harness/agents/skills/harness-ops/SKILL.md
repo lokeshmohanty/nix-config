@@ -123,6 +123,11 @@ second source of truth") made mechanical.
 
 ## Memory
 
+- `memory/capability-as-command-not-tool.md` — Lokesh's standing rule (2026-08-09) that
+  a new pi capability is a slash command dispatching a `pi-agent` subagent over an AXI
+  CLI, **not** a registered tool: tool schemas are charged to every session's system
+  prompt, and `lazy-tools` parking is not a substitute. Includes the dispatch pattern
+  (detached, `sendMessage` on completion) and how to test an extension without pi.
 - `memory/pi-rich-renderer-fork.md` — why `pi/agent/extensions/rich-renderer/` is a
   vendored fork of the npm package, the two upstream bugs it fixes (kitty `c`/`r`
   aspect collapse, math matcher deleting prose), how to test it under

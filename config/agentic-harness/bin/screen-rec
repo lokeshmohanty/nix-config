@@ -1,0 +1,583 @@
+#!/usr/bin/env bash
+# screen-rec — record the screen (gpu-screen-recorder) and convert clips (ffmpeg).
+#
+# The single source of truth for "how this machine records and converts video":
+# the pi /record command dispatches a subagent that drives this CLI, and a human
+# can run the same commands by hand. Nothing here registers tools with a model,
+# so it costs no system-prompt context.
+#
+# AXI conventions (agents/skills/axi-standards): TOON on stdout, progress on
+# stderr, exit 0 success/no-op, 1 error, 2 usage.
+#
+# Verified 2026-08-09 on niri/Wayland with gsr 5.12.5: monitor capture works by
+# name (eDP-1) and via `screen`; `focused` is X11-only; a replay buffer needs an
+# integer -q bitrate (CBR) and an explicit -c container.
+set -uo pipefail
+
+SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+STATE_DIR="${XDG_RUNTIME_DIR:-/tmp}/screen-rec"
+STATE="$STATE_DIR/session"
+LAST="$STATE_DIR/last"
+LOG="$STATE_DIR/recorder.log"
+REC_DIR="${SCREEN_REC_DIR:-$HOME/Videos/recordings}"
+
+# ------------------------------------------------------------------ output
+
+err() { printf 'error: %s\n' "$*"; }
+hint() { printf 'help: %s\n' "$*"; }
+usage_err() { err "$1"; shift; [ "$#" -gt 0 ] && hint "$*"; exit 2; }
+tilde() { printf '%s' "${1/#$HOME/\~}"; }
+# TOON quotes values containing a delimiter.
+q() { case "$1" in *,*|*:*|'') printf '"%s"' "$1" ;; *) printf '%s' "$1" ;; esac; }
+
+need() {
+  command -v "$1" >/dev/null 2>&1 && return 0
+  err "$1 is not installed"
+  hint "$2"
+  exit 1
+}
+
+# ------------------------------------------------------------------- state
+
+read_state() {
+  [ -r "$STATE" ] || return 1
+  # shellcheck disable=SC1090
+  . "$STATE"
+  [ -n "${pid:-}" ] || return 1
+}
+
+# Alive AND still gpu-screen-recorder — a bare kill -0 would be fooled by pid reuse.
+alive() {
+  kill -0 "$1" 2>/dev/null || return 1
+  local comm
+  comm="$(cat "/proc/$1/comm" 2>/dev/null)" || return 0
+  [[ "$comm" == gpu-screen* ]]
+}
+
+# Load the live session into $pid/$mode/... or return 1, clearing stale state.
+session() {
+  read_state || return 1
+  if ! alive "$pid"; then rm -f "$STATE"; return 1; fi
+  return 0
+}
+
+elapsed_of() { echo $(( $(date +%s) - started )); }
+
+human_time() {
+  local s=$1
+  if [ "$s" -ge 60 ]; then printf '%dm%02ds' $((s / 60)) $((s % 60)); else printf '%ds' "$s"; fi
+}
+
+human_size() {
+  local b=$1
+  if [ "$b" -lt 1024 ]; then printf '%dB' "$b"
+  elif [ "$b" -lt 1048576 ]; then awk -v b="$b" 'BEGIN{printf "%.1fKB", b/1024}'
+  else awk -v b="$b" 'BEGIN{printf "%.1fMB", b/1048576}'; fi
+}
+
+# "1920x1080 6s 410.8KB" for a media file; fields are blank when unknowable
+# (ffprobe cannot demux animated webp, and stills have no duration).
+probe() {
+  local f="$1" dims="" dur="" size=""
+  [ -f "$f" ] || { printf '  dims: -\n  duration: -\n  size: -\n'; return; }
+  size="$(human_size "$(stat -c %s "$f")")"
+  local out w h d
+  out="$(ffprobe -v error -show_entries stream=width,height -show_entries format=duration \
+        -of default=nw=1:nk=1 "$f" 2>/dev/null)"
+  w="$(sed -n 1p <<<"$out")"; h="$(sed -n 2p <<<"$out")"; d="$(sed -n 3p <<<"$out")"
+  [ -n "$w" ] && [ "$w" != "0" ] && [ "$w" != "N/A" ] && dims="${w}x${h}"
+  case "$d" in ''|N/A) ;; *) dur="$(human_time "${d%.*}")" ;; esac
+  printf '  dims: %s\n  duration: %s\n  size: %s\n' "${dims:--}" "${dur:--}" "$size"
+}
+
+# --------------------------------------------------------------- home view
+
+recent_list() {
+  local files=() f
+  [ -d "$REC_DIR" ] || return 0
+  while IFS= read -r f; do files+=("$f"); done < <(ls -1t "$REC_DIR" 2>/dev/null | head -5)
+  local total
+  total="$(ls -1 "$REC_DIR" 2>/dev/null | wc -l)"
+  if [ "${#files[@]}" -eq 0 ]; then
+    printf 'recent: 0 recordings in %s\n' "$(tilde "$REC_DIR")"
+    return 0
+  fi
+  printf 'recent[%d]{file,size}:\n' "${#files[@]}"
+  for f in "${files[@]}"; do
+    printf '  %s,%s\n' "$(q "$f")" "$(human_size "$(stat -c %s "$REC_DIR/$f")")"
+  done
+  [ "$total" -gt "${#files[@]}" ] && printf 'help: %d recordings total in %s\n' "$total" "$(tilde "$REC_DIR")"
+  return 0
+}
+
+home() {
+  printf 'bin: %s\n' "$(tilde "$SELF")"
+  printf 'description: Record the screen with gpu-screen-recorder and convert clips to gif/mp4/webm with ffmpeg\n'
+  cmd_status
+  recent_list
+  printf 'help[4]:\n'
+  printf '  Run `screen-rec start` to record the whole screen, then `screen-rec stop` to save it\n'
+  printf '  Run `screen-rec start --region WxH+X+Y` for part of the screen (omit the value to drag it)\n'
+  printf '  Run `screen-rec convert <file> --format gif --width 800 --fps 15` to make a shareable gif\n'
+  printf '  Run `screen-rec targets` to list monitors and audio devices, `screen-rec <cmd> --help` for flags\n'
+}
+
+# ----------------------------------------------------------------- targets
+
+cmd_targets() {
+  need gpu-screen-recorder "enable programs.gpu-screen-recorder in the nix config"
+  local mons auds n
+  mons="$(gpu-screen-recorder --list-monitors 2>/dev/null)"
+  n="$(grep -c . <<<"$mons")"
+  printf 'monitors[%d]{name,resolution}:\n' "$n"
+  while IFS='|' read -r name res; do
+    [ -n "$name" ] && printf '  %s,%s\n' "$(q "$name")" "$(q "$res")"
+  done <<<"$mons"
+  auds="$(gpu-screen-recorder --list-audio-devices 2>/dev/null)"
+  n="$(grep -c . <<<"$auds")"
+  printf 'audio[%d]{id,label}:\n' "$n"
+  while IFS='|' read -r id label; do
+    [ -n "$id" ] && printf '  %s,%s\n' "$(q "$id")" "$(q "$label")"
+  done <<<"$auds"
+  printf 'help[2]:\n'
+  printf '  Run `screen-rec start --target <name>` to record one monitor\n'
+  printf '  Run `screen-rec start --audio output|input|both` to capture sound\n'
+}
+
+# ------------------------------------------------------------------- start
+
+start_help() {
+  cat <<'EOF'
+usage: screen-rec start [flags]
+  --target <t>     screen (default) | monitor name | region | portal | /dev/videoN
+  --region <geom>  WxH+X+Y; with no value, drag a rectangle (slurp)
+  --fps <n>        frame rate (default 30)
+  --audio <a>      none (default) | output | input | both
+  --quality <q>    medium | high | very_high (default) | ultra
+  --codec <c>      h264 (default) | hevc | av1 | vp8 | vp9
+  --no-cursor      do not draw the cursor
+  --output <path>  file (default ~/Videos/recordings/rec-<timestamp>.mp4)
+  --replay <sec>   rolling in-RAM buffer of the last <sec>; save with `screen-rec save`
+examples:
+  screen-rec start
+  screen-rec start --region --fps 24
+  screen-rec start --target eDP-1 --audio output --quality ultra
+  screen-rec start --replay 60
+EOF
+}
+
+cmd_start() {
+  local target=screen region="" want_region=0 fps=30 audio=none quality=very_high
+  local codec="" cursor=yes output="" replay=""
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --help|-h) start_help; exit 0 ;;
+      --target) target="${2:-}"; shift 2 ;;
+      --region)
+        want_region=1; target=region
+        # --region may carry a geometry or stand alone (then we drag one).
+        case "${2:-}" in ''|--*) shift ;; *) region="$2"; shift 2 ;; esac ;;
+      --fps) fps="${2:-}"; shift 2 ;;
+      --audio) audio="${2:-}"; shift 2 ;;
+      --quality) quality="${2:-}"; shift 2 ;;
+      --codec) codec="${2:-}"; shift 2 ;;
+      --no-cursor) cursor=no; shift ;;
+      --output) output="${2:-}"; shift 2 ;;
+      --replay) replay="${2:-}"; shift 2 ;;
+      *) usage_err "unknown flag $1 for \`start\`" \
+           "valid flags: --target --region --fps --audio --quality --codec --no-cursor --output --replay" ;;
+    esac
+  done
+
+  need gpu-screen-recorder "enable programs.gpu-screen-recorder in the nix config"
+
+  if session; then
+    err "already recording (pid $pid) -> $output_path"
+    hint "Run \`screen-rec stop\` to finish it first, or \`screen-rec status\` to see it"
+    exit 1
+  fi
+
+  case "$audio" in
+    none) audio_arg="" ;;
+    output) audio_arg="default_output" ;;
+    input) audio_arg="default_input" ;;
+    both) audio_arg="default_output|default_input" ;;
+    *) audio_arg="$audio" ;;
+  esac
+
+  case "$quality" in
+    medium|high|very_high|ultra) ;;
+    *) usage_err "unknown --quality $quality" "valid: medium, high, very_high, ultra" ;;
+  esac
+
+  if [ "$target" = focused ]; then
+    err "--target focused is X11-only and this is a Wayland session"
+    hint "Run \`screen-rec start --region\` to drag a rectangle, or --target screen"
+    exit 1
+  fi
+
+  if [ "$want_region" = 1 ] && [ -z "$region" ]; then
+    need slurp "add slurp to the system packages"
+    printf 'select a region…\n' >&2
+    region="$(slurp -f '%wx%h+%x+%y' 2>/dev/null)" || {
+      err "region selection cancelled"
+      hint "Run \`screen-rec start --region WxH+X+Y\` to pass the geometry instead"
+      exit 1
+    }
+  fi
+
+  mkdir -p "$STATE_DIR"
+  local mode=record
+  [ -n "$replay" ] && mode=replay
+
+  if [ "$mode" = replay ]; then
+    output="${output:-$REC_DIR}"
+    mkdir -p "$output"
+  elif [ -n "$output" ]; then
+    mkdir -p "$(dirname "$output")"
+  else
+    mkdir -p "$REC_DIR"
+    output="$REC_DIR/rec-$(date +%Y-%m-%d_%H-%M-%S).mp4"
+  fi
+
+  local args=(-w "$target" -f "$fps" -v no)
+  if [ "$mode" = replay ]; then
+    # CBR keeps the RAM footprint predictable, and CBR takes -q as integer kbps,
+    # not a preset name. -o is a directory here, so -c must be explicit.
+    local kbps
+    case "$quality" in medium) kbps=5000 ;; high) kbps=10000 ;; very_high) kbps=15000 ;; ultra) kbps=25000 ;; esac
+    args+=(-q "$kbps" -r "$replay" -replay-storage ram -bm cbr -c mp4)
+  else
+    args+=(-q "$quality")
+  fi
+  [ -n "$region" ] && args+=(-region "$region")
+  [ -n "$audio_arg" ] && args+=(-a "$audio_arg")
+  [ -n "$codec" ] && args+=(-k "$codec")
+  [ "$cursor" = no ] && args+=(-cursor no)
+  args+=(-o "$output")
+
+  # setsid: the recording must outlive this script (and the agent session that
+  # ran it). In a non-interactive shell the job is not a process-group leader,
+  # so setsid execs in place and $! is the real pid — verified below anyway.
+  setsid gpu-screen-recorder "${args[@]}" >"$LOG" 2>&1 &
+  local newpid=$!
+  sleep 1.2
+  if ! alive "$newpid"; then
+    newpid="$(pgrep -n -f 'gpu-screen-recorder -w' 2>/dev/null)" || newpid=""
+  fi
+  if [ -z "$newpid" ] || ! alive "$newpid"; then
+    err "recorder exited immediately"
+    printf 'detail: %s\n' "$(q "$(grep -m1 -i 'gsr error\|error' "$LOG" 2>/dev/null || tail -1 "$LOG" 2>/dev/null)")"
+    hint "Run \`screen-rec targets\` to see valid --target values"
+    exit 1
+  fi
+
+  cat >"$STATE" <<EOF
+pid=$newpid
+mode=$mode
+target=$(printf '%q' "${region:-$target}")
+output_path=$(printf '%q' "$output")
+fps=$fps
+audio=$audio
+replay=${replay:-0}
+started=$(date +%s)
+paused=0
+EOF
+
+  if [ "$mode" = replay ]; then
+    printf 'recording:\n  state: buffering\n  buffer: %ss\n  target: %s\n  fps: %s\n  pid: %s\n  directory: %s\n' \
+      "$replay" "$(q "${region:-$target}")" "$fps" "$newpid" "$(q "$output")"
+    printf 'help[2]:\n'
+    printf '  Run `screen-rec save` to write the last %ss to disk\n' "$replay"
+    printf '  Run `screen-rec stop` to end buffering (this discards the buffer)\n'
+  else
+    printf 'recording:\n  state: active\n  target: %s\n  fps: %s\n  audio: %s\n  pid: %s\n  output: %s\n' \
+      "$(q "${region:-$target}")" "$fps" "$audio" "$newpid" "$(q "$output")"
+    printf 'help[2]:\n'
+    printf '  Run `screen-rec stop` to finish and save\n'
+    printf '  Run `screen-rec pause` to pause or resume\n'
+  fi
+}
+
+# -------------------------------------------------------------------- stop
+
+cmd_stop() {
+  [ "$#" -eq 0 ] || { [ "$1" = --help ] && { echo "usage: screen-rec stop"; exit 0; }; \
+    usage_err "unknown flag $1 for \`stop\`" "valid flags: (none)"; }
+
+  if ! session; then
+    printf 'recording: not running (no-op)\n'
+    hint "Run \`screen-rec start\` to begin recording"
+    exit 0
+  fi
+
+  local secs; secs=$(elapsed_of)
+  kill -INT "$pid" 2>/dev/null || true
+  local i=0
+  while alive "$pid" && [ "$i" -lt 60 ]; do sleep 0.25; i=$((i + 1)); done
+  local stuck=0; alive "$pid" && stuck=1
+  rm -f "$STATE"
+
+  if [ "$mode" = replay ]; then
+    printf 'recording:\n  state: stopped\n  elapsed: %s\n  saved: no\n' "$(human_time "$secs")"
+    hint "A replay buffer is only written by \`screen-rec save\`; SIGINT discards it"
+    exit 0
+  fi
+  if [ "$stuck" = 1 ]; then
+    err "sent SIGINT but pid $pid is still alive"
+    hint "Check $(tilde "$output_path") and \`kill -INT $pid\` again"
+    exit 1
+  fi
+  if [ ! -f "$output_path" ]; then
+    err "recorder stopped but $output_path was never written"
+    printf 'detail: %s\n' "$(q "$(tail -1 "$LOG" 2>/dev/null)")"
+    exit 1
+  fi
+  printf '%s\n' "$output_path" >"$LAST"
+  printf 'recording:\n  state: saved\n  elapsed: %s\n  output: %s\n' "$(human_time "$secs")" "$(q "$output_path")"
+  probe "$output_path"
+  hint "Run \`screen-rec convert $(printf '%q' "$output_path") --format gif --width 800 --fps 15\` to make a gif"
+}
+
+# ------------------------------------------------------------ pause / save
+
+cmd_pause() {
+  if ! session; then
+    printf 'recording: not running (no-op)\n'
+    exit 0
+  fi
+  if [ "$mode" = replay ]; then
+    err "pause does not apply to a replay buffer"
+    hint "Run \`screen-rec save\` to write the buffer, or \`screen-rec stop\` to end it"
+    exit 1
+  fi
+  kill -USR2 "$pid" 2>/dev/null || { err "could not signal pid $pid"; exit 1; }
+  local now=$((1 - paused))
+  sed -i "s/^paused=.*/paused=$now/" "$STATE"
+  if [ "$now" = 1 ]; then
+    printf 'recording:\n  state: paused\n  pid: %s\n' "$pid"
+    hint "Run \`screen-rec pause\` again to resume"
+  else
+    printf 'recording:\n  state: active\n  pid: %s\n' "$pid"
+  fi
+}
+
+cmd_save() {
+  if ! session; then
+    err "no replay buffer is running"
+    hint "Run \`screen-rec start --replay 60\` to start one"
+    exit 1
+  fi
+  if [ "$mode" != replay ]; then
+    err "this is a normal recording, not a replay buffer"
+    hint "Run \`screen-rec stop\` to finish and save it"
+    exit 1
+  fi
+  local before after new i=0
+  before="$(ls -1 "$output_path" 2>/dev/null)"
+  kill -USR1 "$pid" 2>/dev/null || { err "could not signal pid $pid"; exit 1; }
+  while [ "$i" -lt 40 ]; do
+    sleep 0.25; i=$((i + 1))
+    after="$(ls -1 "$output_path" 2>/dev/null)"
+    new="$(comm -13 <(sort <<<"$before") <(sort <<<"$after") | head -1)"
+    [ -n "$new" ] && break
+  done
+  if [ -z "$new" ]; then
+    err "sent the save signal but no new file appeared in $output_path"
+    printf 'detail: %s\n' "$(q "$(tail -1 "$LOG" 2>/dev/null)")"
+    exit 1
+  fi
+  sleep 0.5   # let the muxer finish before probing
+  printf '%s\n' "$output_path/$new" >"$LAST"
+  printf 'replay:\n  state: saved\n  output: %s\n' "$(q "$output_path/$new")"
+  probe "$output_path/$new"
+  hint "The buffer keeps running — run \`screen-rec stop\` when you are done"
+}
+
+cmd_status() {
+  if ! session; then
+    printf 'recording: idle (nothing is being recorded)\n'
+    return 0
+  fi
+  local secs; secs=$(elapsed_of)
+  local state=active
+  [ "$mode" = replay ] && state=buffering
+  [ "${paused:-0}" = 1 ] && state=paused
+  printf 'recording:\n  state: %s\n  target: %s\n  fps: %s\n  elapsed: %s\n  pid: %s\n  output: %s\n' \
+    "$state" "$(q "$target")" "$fps" "$(human_time "$secs")" "$pid" "$(q "$output_path")"
+  [ "$mode" = replay ] && printf '  buffer: %ss\n' "$replay"
+  [ "$mode" = record ] && [ -f "$output_path" ] && printf '  written: %s\n' "$(human_size "$(stat -c %s "$output_path")")"
+  return 0
+}
+
+# ----------------------------------------------------------------- convert
+
+convert_help() {
+  cat <<'EOF'
+usage: screen-rec convert <input> [flags]
+  --format <f>      gif (default) | mp4 | webm | webp | png
+  --output <path>   default: input path with the new extension
+  --width <px>      scale to this width, height follows the aspect ratio
+  --fps <n>         output frame rate (gif defaults to 15)
+  --start <t>       trim start, seconds or HH:MM:SS
+  --duration <t>    trim length, seconds or HH:MM:SS
+  --speed <x>       playback multiplier (2 = twice as fast)
+  --quality <q>     low | medium (default) | high
+  --no-audio        drop the audio track
+  --gif-encoder <e> ffmpeg (default, fast) | gifski (slower, better)
+examples:
+  screen-rec convert rec.mp4 --format gif --width 800 --fps 15
+  screen-rec convert rec.mp4 --format gif --start 0:03 --duration 8 --gif-encoder gifski
+  screen-rec convert rec.mp4 --format mp4 --speed 2 --quality low
+notes:
+  gifs shrink dramatically with --width 800 and --fps 10-15
+EOF
+}
+
+cmd_convert() {
+  local input="" format=gif output="" width="" fps="" start="" duration=""
+  local speed=1 quality=medium keep_audio=1 gifenc=ffmpeg
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --help|-h) convert_help; exit 0 ;;
+      --format) format="${2:-}"; shift 2 ;;
+      --output) output="${2:-}"; shift 2 ;;
+      --width) width="${2:-}"; shift 2 ;;
+      --fps) fps="${2:-}"; shift 2 ;;
+      --start) start="${2:-}"; shift 2 ;;
+      --duration) duration="${2:-}"; shift 2 ;;
+      --speed) speed="${2:-}"; shift 2 ;;
+      --quality) quality="${2:-}"; shift 2 ;;
+      --no-audio) keep_audio=0; shift ;;
+      --gif-encoder) gifenc="${2:-}"; shift 2 ;;
+      -*) usage_err "unknown flag $1 for \`convert\`" \
+            "valid flags: --format --output --width --fps --start --duration --speed --quality --no-audio --gif-encoder" ;;
+      *) [ -z "$input" ] && input="$1" || usage_err "unexpected argument $1" "usage: screen-rec convert <input> [flags]"; shift ;;
+    esac
+  done
+
+  # No input: fall back to the last thing recorded, which is the common case.
+  if [ -z "$input" ] && [ -r "$LAST" ]; then input="$(cat "$LAST")"; fi
+  [ -n "$input" ] || usage_err "an input file is required" "usage: screen-rec convert <input> --format gif --width 800"
+  [ -f "$input" ] || { err "input not found: $input"; hint "Run \`screen-rec\` to list recent recordings"; exit 1; }
+  need ffmpeg "add ffmpeg to the home packages"
+
+  case "$format" in gif|mp4|webm|webp|png) ;; *) usage_err "unknown --format $format" "valid: gif, mp4, webm, webp, png" ;; esac
+  case "$quality" in low) qi=0 ;; medium) qi=1 ;; high) qi=2 ;; *) usage_err "unknown --quality $quality" "valid: low, medium, high" ;; esac
+
+  if [ -z "$output" ]; then output="${input%.*}.$format"; fi
+  # Never clobber: pick base-1.ext, base-2.ext, …
+  if [ -e "$output" ]; then
+    local stem="${output%.*}" ext="${output##*.}" n=1
+    while [ -e "$stem-$n.$ext" ]; do n=$((n + 1)); done
+    output="$stem-$n.$ext"
+  fi
+  mkdir -p "$(dirname "$output")"
+
+  local trim=()
+  [ -n "$start" ] && trim+=(-ss "$start")
+  [ -n "$duration" ] && trim+=(-t "$duration")
+
+  # Filter chain shared by every format: retime, resample, then scale.
+  local vf=()
+  [ "$speed" != 1 ] && vf+=("setpts=PTS/$speed")
+  [ -n "$fps" ] && vf+=("fps=$fps")
+  [ -n "$width" ] && vf+=("scale=$width:-2:flags=lanczos")
+  local chain; chain="$(IFS=,; echo "${vf[*]}")"
+
+  local t0; t0=$(date +%s)
+  local note="" rc=0 out=""
+  local FF=(ffmpeg -nostdin -v error -y)
+
+  if [ "$format" = gif ] && [ "$gifenc" = gifski ]; then
+    need gifski "add gifski to the system packages"
+    local src="$input" tmp=""
+    if [ "${#trim[@]}" -gt 0 ] || [ "$speed" != 1 ]; then
+      # gifski cannot trim or retime, so pre-cut into a temp file first.
+      tmp="$STATE_DIR/gifski-src-$$.mp4"; mkdir -p "$STATE_DIR"
+      local pre=("${FF[@]}" "${trim[@]}" -i "$input" -an)
+      [ "$speed" != 1 ] && pre+=(-vf "setpts=PTS/$speed")
+      pre+=(-c:v libx264 -crf 16 -preset veryfast "$tmp")
+      out="$("${pre[@]}" 2>&1)" || rc=1
+      src="$tmp"
+    fi
+    if [ "$rc" = 0 ]; then
+      local gq; case "$qi" in 0) gq=60 ;; 1) gq=90 ;; 2) gq=100 ;; esac
+      local g=(gifski -o "$output" --fps "${fps:-15}" -Q "$gq")
+      [ -n "$width" ] && g+=(--width "$width")
+      g+=("$src")
+      out="$("${g[@]}" 2>&1)" || rc=1
+    fi
+    [ -n "$tmp" ] && rm -f "$tmp"
+    note=gifski
+  elif [ "$format" = gif ]; then
+    # Two-pass palette in one graph — vastly better than ffmpeg's default dither.
+    local colors; case "$qi" in 0) colors=64 ;; 1) colors=128 ;; 2) colors=256 ;; esac
+    [ -z "$chain" ] && chain="fps=15"
+    local filter="$chain,split[a][b];[a]palettegen=max_colors=$colors:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle"
+    out="$("${FF[@]}" "${trim[@]}" -i "$input" -vf "$filter" -loop 0 "$output" 2>&1)" || rc=1
+  elif [ "$format" = png ]; then
+    local a=("${FF[@]}" "${trim[@]}" -i "$input")
+    [ -n "$chain" ] && a+=(-vf "$chain")
+    a+=(-frames:v 1 "$output")
+    out="$("${a[@]}" 2>&1)" || rc=1
+  else
+    local a=("${FF[@]}" "${trim[@]}" -i "$input")
+    [ -n "$chain" ] && a+=(-vf "$chain")
+    case "$format" in
+      mp4) local crf preset
+        case "$qi" in 0) crf=30; preset=veryfast ;; 1) crf=23; preset=medium ;; 2) crf=18; preset=slow ;; esac
+        a+=(-c:v libx264 -crf "$crf" -preset "$preset" -pix_fmt yuv420p -movflags +faststart) ;;
+      webm) local crf cpu
+        case "$qi" in 0) crf=40; cpu=5 ;; 1) crf=32; cpu=3 ;; 2) crf=24; cpu=1 ;; esac
+        a+=(-c:v libvpx-vp9 -crf "$crf" -b:v 0 -row-mt 1 -deadline good -cpu-used "$cpu") ;;
+      webp) local wq
+        case "$qi" in 0) wq=50 ;; 1) wq=75 ;; 2) wq=90 ;; esac
+        # libwebp_anim diffs between frames; plain libwebp stored every frame
+        # whole and came out ~12x larger on the same clip.
+        a+=(-c:v libwebp_anim -loop 0 -q:v "$wq"); keep_audio=0 ;;
+    esac
+    if [ "$keep_audio" = 0 ]; then
+      a+=(-an)
+    elif [ "$speed" != 1 ]; then
+      # atempo only accepts 0.5-2.0x; outside that the audio has to go.
+      if awk -v s="$speed" 'BEGIN{exit !(s>=0.5 && s<=2)}'; then
+        a+=(-filter:a "atempo=$speed")
+      else
+        a+=(-an); note="audio dropped: --speed $speed is outside atempo's 0.5-2x range"
+      fi
+    fi
+    a+=("$output")
+    out="$("${a[@]}" 2>&1)" || rc=1
+  fi
+
+  if [ "$rc" != 0 ]; then
+    err "conversion failed"
+    printf 'detail: %s\n' "$(q "$(tail -3 <<<"$out" | tr '\n' ' ')")"
+    hint "Run \`screen-rec convert --help\` for the supported flags"
+    exit 1
+  fi
+
+  printf 'converted:\n  input: %s\n  output: %s\n' "$(q "$input")" "$(q "$output")"
+  probe "$output"
+  printf '  took: %s\n' "$(human_time $(( $(date +%s) - t0 )))"
+  [ -n "$note" ] && printf '  note: %s\n' "$(q "$note")"
+  return 0
+}
+
+# ------------------------------------------------------------------ dispatch
+
+case "${1:-}" in
+  ''|home) home ;;
+  start) shift; cmd_start "$@" ;;
+  stop) shift; cmd_stop "$@" ;;
+  pause) shift; cmd_pause "$@" ;;
+  save) shift; cmd_save "$@" ;;
+  status) shift; cmd_status ;;
+  targets) shift; cmd_targets ;;
+  convert) shift; cmd_convert "$@" ;;
+  --help|-h|help)
+    home ;;
+  *)
+    usage_err "unknown command ${1}" "valid commands: start, stop, pause, save, status, targets, convert (run \`screen-rec\` for live state)" ;;
+esac
