@@ -21,6 +21,13 @@
         confirm_os_window_close = "2";
         shell = "fish";
       };
+      # Foot emits CSI 13;2u (CSI-u) for Shift+Enter by default; kitty's
+      # legacy mode sends a plain CR, so tmux (extended-keys-format csi-u)
+      # can't tell it apart from Enter. Emit the same sequence foot did so
+      # tmux/inner apps see a distinct Shift+Enter again.
+      keybindings = {
+        "shift+enter" = "send_text all \\x1b[13;2u";
+      };
       shellIntegration.enableFishIntegration = true;
     };
   };
