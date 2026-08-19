@@ -16,7 +16,7 @@
   };
   flake.homeConfigurations = {
     "lokesh@sudarshan" = self.hostlib.mkHomeHost (
-      { pkgs, ... }:
+      { self, pkgs, ... }:
       {
         imports = [ ../../home ];
 
@@ -54,6 +54,7 @@
         home.packages = with pkgs; [
           slack
           tigervnc
+          self.packages.${pkgs.stdenv.hostPlatform.system}.ab-download-manager
         ];
       }
     );
