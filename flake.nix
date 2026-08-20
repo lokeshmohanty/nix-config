@@ -15,26 +15,8 @@
 
     hyprland.url = "github:hyprwm/Hyprland";
 
-    niri.url = "github:sodiboo/niri-flake";
-    niri.inputs.nixpkgs.follows = "nixpkgs";
-
-    nirinit = {
-      url = "github:amaanq/nirinit";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     sysc-greet = {
       url = "github:Nomadcxx/sysc-greet";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    noctalia = {
-      url = "github:noctalia-dev/noctalia-shell";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.noctalia-qs.follows = "noctalia-qs";
-    };
-    noctalia-qs = {
-      url = "github:noctalia-dev/noctalia-qs";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -64,10 +46,6 @@
     };
     "plugins-everforest" = {
       url = "github:neanias/everforest-nvim";
-      flake = false;
-    };
-    "plugins-bruno" = {
-      url = "github:romek-codes/bruno.nvim";
       flake = false;
     };
   };

@@ -14,10 +14,11 @@
   services.power-profiles-daemon.enable = true;
   services.upower.enable = true;
 
+  services.gnome.sushi.enable = true; # nautilus file previewer
+
   programs.gpu-screen-recorder.enable = true;
   programs.nautilus-open-any-terminal.enable = true;
   programs.nautilus-open-any-terminal.terminal = "${pkgs.kitty}/bin/kitty --single-instance";
-  services.gnome.sushi.enable = true; # nautilus file previewer
   xdg.portal = {
     enable = true;
     xdgOpenUsePortal = true;
@@ -28,8 +29,6 @@
 
     brightnessctl
     pinentry-qt
-    jmtpfs
-    dunst
     libnotify
     wl-clipboard
     wtype

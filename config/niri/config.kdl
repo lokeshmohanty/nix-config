@@ -88,7 +88,7 @@ output "DP-1" {
     scale 1
     // normal, 90, 180, 270, flipped, flipped-90, flipped-180 and flipped-270.
     // transform "90"
-    position x=1920 y=0
+    position x=-1920 y=0
     // layout {
     //     default-column-width { proportion 1.0; }
     // }
@@ -257,7 +257,7 @@ layout {
 // Add lines like this to spawn processes at startup.
 // Note that running niri as a session supports xdg-desktop-autostart,
 // which may be more convenient to use.
-spawn-at-startup "noctalia-shell"
+spawn-at-startup "noctalia"
 spawn-at-startup "kitty" "--single-instance" "--start-as=hidden"
 hotkey-overlay { skip-at-startup; }
 prefer-no-csd // omit client-side decorations
@@ -317,60 +317,106 @@ window-rule {
 }
 
 window-rule {
-    geometry-corner-radius 5
+    geometry-corner-radius 10
     clip-to-geometry true
     draw-border-with-background false
-    opacity 0.9
+    opacity 0.85
 }
 
 window-rule {
     match is-focused=true
-    opacity 0.98
+    opacity 0.95
 }
 
+/* Apps: blur them all without xray so it looks more realistic. */
+window-rule {
+  background-effect {
+    blur true
+    xray false
+  }
+}
+/*
+  Noctalia
+  Disable xray on all our surfaces so it looks more realistic.
+  Noctalia publishes blur regions automatically when ext-background-effects is available.
+*/
+layer-rule {
+  match namespace="^noctalia-(bar-[^\"]+|notification|dock|panel|attached-panel|osd)$"
+  background-effect {
+    xray false
+    // blur false
+  }
+}
+
+/* Enable blur on noctalia's window switcher and disable xray. */
+layer-rule {
+    match namespace="noctalia-window-switcher"
+    background-effect {
+        blur true
+        xray false
+    }
+}
+
+/* You can also fine-tune the blur effect globally. */
+blur {
+  passes 1        // more passes = stronger blur (default: 3)
+  offset 3.0      // sample distance per pass (default: 3.0)
+  noise 0.03      // grain overlay (default: 0.02)
+  saturation 1.0  // color saturation boost (default: 1.5)
+}
+
+
+// Noctalia
+// ===================================
+window-rule {
+  match app-id="dev.noctalia.Noctalia"
+  open-floating true
+  default-column-width { fixed 1080; }
+  default-window-height { fixed 920; }
+}
+
+// debug {
+//   // Allows notification actions and window activation from Noctalia.
+//   honor-xdg-activation-with-invalid-serial
+// }
+// ===================================
+
+// Keybindings
+// ===================================
 binds {
-    // "Mod" is a special modifier equal to Super when running on a TTY, and to Alt
-    // when running as a winit window.
-    //
-    // Most actions that you can bind here can also be invoked programmatically with
     // `niri msg action do-something`.
-
-    // Mod-Shift-/, which is usually the same as Mod-?,
-    // shows a list of important hotkeys.
     Mod+Shift+Slash { show-hotkey-overlay; }
-
-    // Open/close the Overview: a zoomed-out view of workspaces and windows.
-    // You can also move the mouse into the top-left hot corner,
-    // or do a four-finger swipe up on a touchpad.
     Mod+Space repeat=false { toggle-overview; }
     Mod+X repeat=false { close-window; }
     Mod+Shift+X { spawn-sh "niri msg pick-window | rg PID | cut -d':' -f2 | xargs kill"; }
     Mod+Shift+E { quit; }
-    Ctrl+Alt+Delete { spawn-sh "noctalia-shell ipc call sessionMenu toggle"; }
 
     // Powers off the monitors. To turn them back on, do any input like
     // moving the mouse or pressing any other key.
     Mod+ALT+P { power-off-monitors; }
 
-    // ============
     // Applications
     // ============
     Mod+Return { spawn "kitty" "--single-instance"; }
-    Mod+E { spawn "nautilus"; }
     Mod+B { spawn "firefox"; }
-    Mod+M { spawn-sh "ecr-desktop"; }
-    Mod+S { spawn-sh "kitten quick-access-terminal"; }
-    Mod+D { spawn-sh "noctalia-shell ipc call launcher toggle"; } // >settings, ...
+    Mod+E { spawn "nautilus"; }
+    Mod+I { spawn "~/.config/niri/my-bookmark" "list"; }
+    Mod+M { spawn-sh "ecr"; }
     Mod+O { spawn "~/.config/niri/my-commands"; }
-    Mod+Q { spawn-sh "noctalia-shell ipc call sessionMenu toggle"; }
-    Mod+Shift+S { spawn-sh "noctalia-shell ipc call settings toggle"; } // >settings, ...
-    Mod+Shift+W { spawn-sh "noctalia-shell ipc call wallpaper toggle"; }
+    Mod+S { spawn-sh "kitten quick-access-terminal"; }
     Mod+Shift+B { spawn "qutebrowser"; }
-    Mod+I { spawn-sh "kitty --single-instance vi -c 'lua Snacks.scratch()'"; }
     Mod+Shift+I { spawn "~/.config/niri/my-bookmark" "commands"; }
-    Mod+Alt+R { spawn "~/.config/niri/my-recorder" "commands"; }
     Mod+Alt+K { spawn "pkill" "-SIGUSR1" "-f" "gpu-screen-recorder"; }
+    Mod+Alt+R { spawn "~/.config/niri/my-recorder" "commands"; }
 
+    // Noctalia
+    // ============
+    Mod+D { spawn-sh "noctalia msg panel-toggle launcher"; } // >settings
+    Mod+Q { spawn-sh "noctalia msg panel-toggle session"; }
+    Mod+Comma { spawn-sh "noctalia msg panel-toggle control-center"; }
+    Mod+Shift+S { spawn-sh "noctalia msg settings-toggle"; }
+    Mod+Shift+W { spawn-sh "noctalia msg panel-toggle wallpaper"; }
+    Ctrl+Alt+Delete { spawn-sh "noctalia msg panel-toggle session"; }
 
     Print { spawn-sh "grim -g \"$(slurp)\" - | satty -f -"; }
     Ctrl+Print { screenshot-screen; }
@@ -380,13 +426,14 @@ binds {
     }
 
     // Special Keys
-    XF86AudioRaiseVolume { spawn-sh "noctalia-shell ipc call volume increase"; }
-    XF86AudioLowerVolume { spawn-sh "noctalia-shell ipc call volume decrease"; }
-    XF86AudioMute { spawn-sh "noctalia-shell ipc call volume muteOutput"; }
-    XF86AudioMicMute { spawn-sh "noctalia-shell ipc call volume muteInput"; }
-    XF86MonBrightnessUp { spawn-sh "noctalia-shell ipc call brightness increase"; }
-    XF86MonBrightnessDown { spawn-sh "noctalia-shell ipc call brightness decrease"; }
+    XF86AudioRaiseVolume { spawn-sh "noctalia msg volume-up"; }
+    XF86AudioLowerVolume { spawn-sh "noctalia msg volume-down"; }
+    XF86AudioMute { spawn-sh "noctalia msg volume-mute"; }
+    XF86AudioMicMute { spawn-sh "noctalia msg mic-mute"; }
+    XF86MonBrightnessUp { spawn-sh "noctalia msg brightness-up"; }
+    XF86MonBrightnessDown { spawn-sh "noctalia msg brightness-down"; }
     XF86Display { spawn "nwg-displays"; }
+
     XF86Calculator { spawn "qalculate-gtk"; }
     Mod+F6 { spawn "brightnessctl" "-d" "tpacpi::kbd_backlight" "set" "+1"; }
     Mod+F5 { spawn "brightnessctl" "-d" "tpacpi::kbd_backlight" "set" "1-"; }
@@ -503,9 +550,9 @@ binds {
     Mod+BracketRight { consume-or-expel-window-right; }
 
     // Consume one window from the right to the bottom of the focused column.
-    Mod+Comma  { consume-window-into-column; }
+    // Mod+Comma  { consume-window-into-column; }
     // Expel the bottom window from the focused column to the right.
-    Mod+Period { expel-window-from-column; }
+    // Mod+Period { expel-window-from-column; }
 
     Mod+R { switch-preset-column-width; }
     // Cycling through the presets in reverse order is also possible.
@@ -598,6 +645,7 @@ binds {
     // which ensures niri always processes them, even when an inhibitor is active.
     Mod+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
 }
+// ===================================
 
 // In future version
 // /* Apps: blur them all without xray for a better look */

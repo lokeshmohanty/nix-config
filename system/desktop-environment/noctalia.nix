@@ -1,7 +1,6 @@
 # https://docs.noctalia.dev/getting-started/nixos/
 {
   pkgs,
-  inputs,
   ...
 }:
 {
@@ -23,7 +22,6 @@
     ffmpeg
     gifski
 
-    inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
+    noctalia
   ];
-  services.gnome.evolution-data-server.enable = true; # calendar events
 }

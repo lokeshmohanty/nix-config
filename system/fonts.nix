@@ -6,8 +6,8 @@
 
     packages = with pkgs; [
       cascadia-code
+      nunito
       iosevka-comfy.comfy-duo
-      nerd-fonts.inconsolata-go
       nerd-fonts.fira-code
       victor-mono
       google-fonts

@@ -1,7 +1,7 @@
 { ... }:
 {
   services.syncthing = {
-    enable = true;
+    enable = false;
     user = "lokesh";
     openDefaultPorts = true;
     overrideDevices = true;

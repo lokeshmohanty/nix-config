@@ -79,14 +79,14 @@ home-manager switch --flake .#lokesh@sudarshan
 ```
 
 - Update flake
+
 ```sh
 nix flake update
 ```
 
-
 ## Nix
 
-- Install `nix` 
+- Install `nix`
   - [DeterminateSystems](https://github.com/DeterminateSystems/nix-installer)
   - [Official](https://nixos.org/download.html)
   - [Nix Portable (no root)](https://github.com/DavHau/nix-portable)
@@ -135,7 +135,7 @@ git ls-files -v . | grep ^S
 - **Examples** : [misterio77](https://github.com/misterio77/nix-config)
 - **Blogs**    : [flakes: tweag](https://www.tweag.io/blog/2020-05-25-flakes/), [flakes: Li Yang](https://tech.aufomm.com/my-nixos-journey-flakes/), [nix: Li Yang](https://tech.aufomm.com/my-nix-journey-use-nix-with-ubuntu/)
 
-# TODO 
+# TODO
 
 - Using [secrets](https://lgug2z.com/articles/handling-secrets-in-nixos-an-overview/#sops-nix)
 - Modularize (<https://www.youtube.com/watch?v=-TRbzkw6Hjs>)

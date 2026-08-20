@@ -17,7 +17,7 @@
     }
     (lib.mkIf config.modules.gui.enable {
       qt.enable = true;
-      qt.platformTheme.name = "gtk"; # gtk3
+      qt.platformTheme.name = "gtk3";
     })
   ];
 }

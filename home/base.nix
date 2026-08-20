@@ -36,6 +36,7 @@
     };
     packages = with pkgs; [
       self.packages.${pkgs.stdenv.hostPlatform.system}.ghost-build
+      self.packages.${pkgs.stdenv.hostPlatform.system}.ab-download-manager
       postgresql
 
       # Misc

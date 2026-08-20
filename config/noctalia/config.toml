@@ -1,0 +1,210 @@
+config_version = 12
+
+[bar]
+order = [ "Top" ]
+
+    [bar.Top]
+    background_opacity = 0.59999998658895493
+    capsule = true
+    capsule_opacity = 0.67999998480081558
+    capsule_padding = 5.0
+    capsule_thickness = 0.79999998584389687
+    color = "secondary"
+    font_family = "Cascadia Code"
+    font_weight = 600
+    icon_color = "primary"
+    margin_edge = 5
+    margin_ends = 10
+    padding = 10
+    radius = 15
+    thickness = 30
+    widget_spacing = 10
+    start = [ "control-center", "workspaces", "active_window" ]
+    end = [
+        "media",
+        "tray",
+        "notifications",
+        "clipboard",
+        "network",
+        "bluetooth",
+        "volume",
+        "brightness",
+        "battery",
+        "session"
+    ]
+
+[battery]
+warning_threshold = 20
+
+    [battery.device."/org/freedesktop/UPower/devices/mouse_dev_C4_AA_BF_B3_5D_2C"]
+    warning_threshold = 20
+
+[control_center]
+sidebar = "full"
+
+[dock]
+active_monitor_only = true
+auto_hide = true
+background_opacity = 0.56999998725950718
+enabled = true
+launcher_icon = "grain"
+launcher_position = "start"
+layer = "overlay"
+pinned = [ "firefox" ]
+reserve_space = false
+
+[lockscreen_widgets]
+enabled = false
+schema_version = 2
+widget_order = [ "lockscreen-login-box@DP-2", "lockscreen-login-box@eDP-1" ]
+
+    [lockscreen_widgets.grid]
+    cell_size = 16
+    major_interval = 4
+    visible = true
+
+    [lockscreen_widgets.widget."lockscreen-login-box@DP-2"]
+    box_height = 196.0
+    box_width = 810.0
+    cx = 960.0
+    cy = 898.0
+    output = "DP-2"
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@DP-2".settings]
+        background_color = "surface_variant"
+        background_opacity = 0.88
+        background_radius = 12.0
+        center_password_text = false
+        input_opacity = 1.0
+        input_radius = 6.0
+        layout = "regular"
+        show_caps_lock = true
+        show_keyboard_layout = true
+        show_login_button = true
+        show_media = true
+        show_session_buttons = true
+        show_unlock_hint = true
+        show_weather = true
+
+    [lockscreen_widgets.widget."lockscreen-login-box@eDP-1"]
+    box_height = 196.0
+    box_width = 810.0
+    cx = 960.0
+    cy = 898.0
+    output = "eDP-1"
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@eDP-1".settings]
+        background_color = "surface_variant"
+        background_opacity = 0.88
+        background_radius = 12.0
+        center_password_text = false
+        input_opacity = 1.0
+        input_radius = 6.0
+        layout = "regular"
+        show_caps_lock = true
+        show_keyboard_layout = true
+        show_login_button = true
+        show_media = true
+        show_session_buttons = true
+        show_unlock_hint = true
+        show_weather = true
+
+[notification]
+background_opacity = 0.79999998211860657
+border = false
+history_retention_hours = 18
+
+[plugins]
+enabled = []
+
+[shell]
+font_family = "Nunito Sans"
+telemetry_enabled = true
+
+    [shell.panel]
+    borders = false
+    control_center_position = "center"
+    open_near_click_control_center = true
+    session_placement = "floating"
+    session_position = "center"
+    wallpaper_placement = "floating"
+    wallpaper_position = "center"
+
+    [[shell.session.actions]]
+    action = "lock"
+    countdown_seconds = 0.0
+    enabled = true
+    shortcut = "l"
+    variant = "default"
+
+    [[shell.session.actions]]
+    action = "logout"
+    countdown_seconds = 0.0
+    enabled = true
+    shortcut = "e"
+    variant = "default"
+
+    [[shell.session.actions]]
+    action = "lock_and_suspend"
+    countdown_seconds = 0.0
+    enabled = true
+    shortcut = "q"
+    variant = "default"
+
+    [[shell.session.actions]]
+    action = "reboot"
+    countdown_seconds = 0.0
+    enabled = true
+    shortcut = "r"
+    variant = "default"
+
+    [[shell.session.actions]]
+    action = "shutdown"
+    countdown_seconds = 0.0
+    enabled = true
+    shortcut = "s"
+    variant = "destructive"
+
+[theme]
+builtin = "Kanagawa"
+mode = "dark"
+wallpaper_scheme = "m3-rainbow"
+
+[wallpaper]
+directory = "/home/lokesh/Pictures/Wallpapers"
+
+    [wallpaper.default]
+    path = "/home/lokesh/Pictures/Wallpapers/0016.jpg"
+
+    [wallpaper.last]
+    path = "/home/lokesh/Pictures/Wallpapers/0016.jpg"
+
+    [wallpaper.monitors.eDP-1]
+    path = "/home/lokesh/Pictures/Wallpapers/0016.jpg"
+
+    [[wallpaper.favorite]]
+    path = "/home/lokesh/Pictures/Wallpapers/0008.jpg"
+    theme_mode = "auto"
+
+    [[wallpaper.favorite]]
+    builtin_palette = "Kanagawa"
+    palette_source = "builtin"
+    path = "/home/lokesh/Pictures/Wallpapers/0016.jpg"
+    theme_mode = "dark"
+
+[widget.clock]
+format = "{:%H:%M | %a, %d %b, %Y}"
+
+[widget.control-center]
+glyph = "user-filled"
+
+[widget.media]
+enabled = false
+
+[widget.workspaces]
+font_weight = 1000
+labels_only_when_occupied = true

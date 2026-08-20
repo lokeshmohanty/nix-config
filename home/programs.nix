@@ -12,9 +12,9 @@
     extensions = [ pkgs.gh-dash ];
   };
   programs.nix-index.enable = true;
-  programs.go = {
-    enable = true;
-  };
+  programs.go.enable = true;
+
+  services.mako.enable = true;
 
   # Enable home-manager and git
   programs.home-manager.enable = true;

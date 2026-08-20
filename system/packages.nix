@@ -7,7 +7,6 @@
     # gui applications
     google-chrome
     onlyoffice-desktopeditors
-    motrix
     zotero
     (inkscape-with-extensions.override { inkscapeExtensions = [ inkscape-extensions.textext ]; })
     # krita
@@ -68,7 +67,7 @@
     # quarto
 
     ## latex
-    texlive.combined.scheme-full
+    texliveFull
     texlab
     typst
 

@@ -12,12 +12,6 @@ let
       version = "source";
       src = inputs.plugins-everforest;
     };
-    bruno = pkgs.vimUtils.buildVimPlugin {
-      pname = "bruno";
-      version = "source";
-      src = inputs.plugins-bruno;
-      doCheck = false;
-    };
   };
 in
 inputs.nix-wrapper-modules.wrappers.neovim.wrap [
@@ -35,7 +29,7 @@ inputs.nix-wrapper-modules.wrappers.neovim.wrap [
       hosts.ruby.nvim-host.enable = false;
       hosts.perl.nvim-host.enable = false;
 
-      extraPackages = with pkgs; [
+      runtimePkgs = with pkgs; [
         lua-language-server
         stylua
         nixd
@@ -59,7 +53,6 @@ inputs.nix-wrapper-modules.wrappers.neovim.wrap [
         mermaid-cli
         imagemagick
         ghostscript
-        bruno-cli # required for bruno
         texlab # LaTeX
         resvg # svg rendering for lean-nvim
       ];
@@ -69,6 +62,7 @@ inputs.nix-wrapper-modules.wrappers.neovim.wrap [
           lze
           vim-sleuth
           vim-slime
+          vim-nix
           Recover-vim
           plenary-nvim
           snacks-nvim
@@ -84,7 +78,7 @@ inputs.nix-wrapper-modules.wrappers.neovim.wrap [
           render-markdown-nvim
           markdown-preview-nvim
           img-clip-nvim
-          copilot-lua
+          # copilot-lua
           codecompanion-nvim
           claudecode-nvim
           vimtex
@@ -112,7 +106,6 @@ inputs.nix-wrapper-modules.wrappers.neovim.wrap [
           gx-nvim
           flash-nvim
           undotree
-          customPlugins.bruno
         ];
       };
     }

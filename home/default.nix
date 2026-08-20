@@ -12,7 +12,6 @@
     ./browser
     ./pdf.nix
     ./editor.nix
-    ./email
     ./rofi.nix
     ./tofi.nix
     ./satty.nix

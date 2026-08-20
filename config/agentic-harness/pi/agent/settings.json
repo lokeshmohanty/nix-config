@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.82.0",
+  "lastChangelogVersion": "0.84.2",
   "defaultProvider": "gw-glm-5.2",
   "defaultModel": "zai-org/GLM-5.2",
   "defaultThinkingLevel": "medium",
@@ -13,7 +13,6 @@
     "npm:pi-observational-memory",
     "npm:pi-agent-browser-native",
     "npm:pi-image-tools",
-    "npm:@ayulab/pi-rewind",
     "npm:@gotgenes/pi-permission-system",
     "npm:@narumitw/pi-plan-mode",
     "npm:pi-lens",
