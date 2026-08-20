@@ -27,3 +27,4 @@
 - Library/framework questions: context7 (`ctx7` CLI or MCP) before web search.
 - Code-structure questions in the big zenteiq repos: gortex (tracked there only). Elsewhere: read `docs/` or run GitNexus on demand (`npx gitnexus@latest analyze`).
 - Browser automation: playwright plugin / chrome-devtools-axi.
+- **Console output stays visible.** A long-running command shows progress on the terminal by default, and capturing output to a log means `tee`, never a redirect that swallows it — a silent process is indistinguishable from a hung one. (2026-08-18: a 1M-step training run printed nothing for hours.)

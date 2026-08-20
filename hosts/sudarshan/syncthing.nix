@@ -9,16 +9,15 @@
     dataDir = "/home/lokesh/.local/syncthing";
     settings = {
       devices.lab.id = "HQ6HDW5-X6C3VWS-CYRV44J-CCYOENZ-BVYZLYN-VSCFQFU-MYXBB56-AC36ZAG";
-      devices.office = {
-        id = "ABQJ7BS-BFMPBTG-ONT7GN5-UICS4SX-4F4AFI5-EMVSSNJ-6LA42IQ-SWZCAAJ";
-        addresses = [ "tcp://100.122.114.27:22000" ];
-      };
+      # devices.office = {
+      #   id = "ABQJ7BS-BFMPBTG-ONT7GN5-UICS4SX-4F4AFI5-EMVSSNJ-6LA42IQ-SWZCAAJ";
+      #   addresses = [ "tcp://100.122.114.27:22000" ];
+      # };
       folders = {
         "Projects" = {
           path = "/home/lokesh/Projects";
           devices = [
             "lab"
-            "office"
           ];
           ignorePatterns = [
             ".venv/*"
@@ -29,7 +28,6 @@
           path = "/home/lokesh/Documents/Research";
           devices = [
             "lab"
-            "office"
           ];
           ignorePatterns = [
             ".venv/*"
@@ -40,7 +38,6 @@
           path = "/home/lokesh/Documents/Presentations";
           devices = [
             "lab"
-            "office"
           ];
           ignorePatterns = [
             ".venv/*"
@@ -51,7 +48,6 @@
           path = "/home/lokesh/Documents/Books";
           devices = [
             "lab"
-            "office"
           ];
           ignorePatterns = [
             ".venv/*"
@@ -62,7 +58,6 @@
           path = "/home/lokesh/Desktop/Practice";
           devices = [
             "lab"
-            "office"
           ];
           ignorePatterns = [
             ".venv/*"
@@ -73,7 +68,6 @@
           path = "/home/lokesh/Documents/Notebook";
           devices = [
             "lab"
-            "office"
           ];
           ignorePatterns = [
             ".venv/*"
