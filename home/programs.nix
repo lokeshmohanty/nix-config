@@ -14,7 +14,12 @@
   programs.nix-index.enable = true;
   programs.go.enable = true;
 
-  services.mako.enable = true;
+  # services.mako = {
+  #   enable = true;
+  #   settings = {
+  #     default-timeout = 5000; # in milliseconds
+  #   };
+  # };
 
   # Enable home-manager and git
   programs.home-manager.enable = true;

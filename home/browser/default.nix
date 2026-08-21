@@ -1,10 +1,10 @@
-{ lib, config, ... }:
+{ pkgs, lib, config, ... }:
 {
   options.modules.gui.browser.enable = lib.mkEnableOption "browser programs";
 
   config = lib.mkIf config.modules.gui.browser.enable {
     home.sessionVariables.BROWSER = "firefox";
-    programs.firefox.enable = true;
+    home.packages = [ pkgs.firefox-beta ];
     programs.qutebrowser = {
       enable = true;
       loadAutoconfig = true;
